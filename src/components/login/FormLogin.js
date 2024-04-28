@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import logo from "../../imgs/logoFG.png";
-const FormLogin = () => {
+const FormLogin = ({ setIsLoggedIn }) => {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
@@ -12,6 +12,7 @@ const FormLogin = () => {
       return;
     }
     setError(false);
+    setIsLoggedIn([user]);
   };
 
   return (
