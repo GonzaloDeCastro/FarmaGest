@@ -3,11 +3,9 @@ import Hamburger from "hamburger-react";
 import logo from "../imgs/logoNav.png";
 import Section from "./Section";
 import { Link } from "react-router-dom";
-import { FaBoxArchive } from "react-icons/fa6";
+import { FaBoxArchive, FaGear } from "react-icons/fa6";
 import { HiUsers } from "react-icons/hi";
-import { FaGear } from "react-icons/fa6";
-import { FaBell, FaHome } from "react-icons/fa";
-import { FaUserCircle } from "react-icons/fa";
+import { FaBell, FaHome, FaUserCircle, FaShoppingCart } from "react-icons/fa";
 
 const Layout = ({ children, title }) => {
   const [isOpen, setOpen] = useState(false);
@@ -63,6 +61,9 @@ const Layout = ({ children, title }) => {
           </Link>
 
           <Link to="/sales">
+            <FaShoppingCart className="iconMenu" />
+          </Link>
+          <Link to="/products">
             <FaBoxArchive className="iconMenu" />
           </Link>
           <Link to="/users">
@@ -80,8 +81,12 @@ const Layout = ({ children, title }) => {
             <span>Home</span>
           </Link>
           <Link className="itemMenu" to="/sales">
-            <FaBoxArchive className="iconMenu" />
+            <FaShoppingCart className="iconMenu" />
             <span>Sales</span>
+          </Link>
+          <Link className="itemMenu" to="/products">
+            <FaBoxArchive className="iconMenu" />
+            <span>Products</span>
           </Link>
           <Link className="itemMenu" to="/users">
             <HiUsers className="iconMenu" />

@@ -90,7 +90,7 @@ section {
   text-align: center;
   width: 100%;
   height: 100%;
-  background-color: #60635f;
+  background-color: #c1c1c1;
 }
 header {
   display: flex;
@@ -198,4 +198,86 @@ nav.bigActive span {
 
 .itemMenu:hover * {
   color: #abd34e;
+}
+
+.headerSelected {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+
+.inputSearch {
+  height: 55px;
+  border-radius: 10px;
+  border-color: #ccc;
+  font-family: Arial, FontAwesome;
+  padding-left: 10px;
+}
+.containerSelected {
+  padding: 20px 40px 0px 40px;
+  color: #0f1014;
+}
+
+.containerTableAndPagesSelected {
+  display: flex;
+  min-height: 412px;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.headerTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.headerTable th,
+.headerTable td {
+  border: 1px solid #dddddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.headerTable th {
+  background-color: #f2f2f2;
+}
+
+.headerTable th:last-child,
+.headerTable td:last-child {
+  width: 70px;
+  white-space: nowrap; /* Evitar que el contenido se ajuste automáticamente */
+}
+
+.headerTable .spinner-border {
+  margin-top: 10%;
+  width: 100px;
+  height: 100px;
+}
+
+.NoData {
+  text-align: center;
+  padding: 16px;
+  color: #555;
+}
+
+/* Estilos para filas impares */
+.headerTable tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+.headerTable tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+  color: #333;
+}
+.NoData {
+  margin-top: 20px;
+  font-size: 20px;
+  font-weight: bold;
+}
+.iconABM {
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  margin-left: 4px;
+}
+.iconABM:hover {
+  color: #1353c9;
 }
