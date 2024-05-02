@@ -82,20 +82,20 @@ const Layout = ({ children, title }) => {
           </Link>
           <Link className="itemMenu" to="/sales">
             <FaShoppingCart className="iconMenu" />
-            <span>Sales</span>
+            <span>Ventas</span>
           </Link>
           <Link className="itemMenu" to="/products">
             <FaBoxArchive className="iconMenu" />
-            <span>Products</span>
+            <span>Productos</span>
           </Link>
           <Link className="itemMenu" to="/users">
             <HiUsers className="iconMenu" />
-            <span>Users/Roles</span>
+            <span>Usuarios</span>
           </Link>
 
           <Link className="itemMenu" to="/settings">
             <FaGear className="iconMenu" />
-            <span>Settings</span>
+            <span>Configuración</span>
           </Link>
         </nav>
 

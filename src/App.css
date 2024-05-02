@@ -7,7 +7,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: #0f1014;
-  color: white;
+  color: #0f1014;
 }
 
 .login {
@@ -214,6 +214,7 @@ nav.bigActive span {
   font-family: Arial, FontAwesome;
   padding-left: 10px;
 }
+
 .containerSelected {
   padding: 20px 40px 0px 40px;
   color: #0f1014;
@@ -280,4 +281,37 @@ nav.bigActive span {
 }
 .iconABM:hover {
   color: #1353c9;
+}
+.buttonNewProduct {
+  display: flex;
+  align-items: center;
+  background-color: #abd34e;
+  padding: 13px 10px 13px 10px;
+  color: #000;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.5);
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+.buttonNewProduct:hover {
+  background-color: #d5ff71;
+}
+.iconConfirm {
+  width: 25px;
+  height: 25px;
+  margin-right: 5px;
+}
+
+.buttonConfirm {
+  background-color: #abd34e;
+  color: #000;
+  font-weight: bold;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.5);
+  border: none;
+}
+.buttonConfirm:hover {
+  background-color: #d5ff71;
+  color: #000;
 }

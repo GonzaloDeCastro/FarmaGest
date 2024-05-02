@@ -24,7 +24,7 @@ const productDataSlice = createSlice({
       return {
         ...state,
         initialState: state?.initialState?.filter(
-          (productData) => productData?.id != action?.payload
+          (productData) => productData?.id !== action?.payload
         ),
       };
     },
@@ -32,9 +32,7 @@ const productDataSlice = createSlice({
       return {
         ...state,
         initialState: state.initialState.map((productData) =>
-          productData?.product_id == action?.payload?.product_id
-            ? action.payload
-            : productData
+          productData?.id === action?.payload?.id ? action.payload : productData
         ),
       };
     },
@@ -49,35 +47,22 @@ export const {
 } = productDataSlice.actions;
 
 export const addProductDataAPI = (productData) => async (dispatch) => {
-  console.log("productData ", productData);
+  const { nombre_producto, precio, cantidad } = productData;
   try {
-    const response = await axios.post(`${API}products/`, productData);
+    const response = await axios.post(`${API}productos/`, productData);
     if (response.status === 200) {
-      if (productData.attributes !== undefined) {
-        productData.attributes = JSON.parse(productData.attributes);
-      }
-
-      const newProductId = response.data.newProductId;
-      const isManual = response.data.isManual;
-      let productDataWithId = {
-        ...Object.keys(productData).reduce((acc, key, index) => {
-          if (index === 1) {
-            acc["is_manual"] = isManual;
-          }
-          acc[key] = productData[key];
-          return acc;
-        }, {}),
-      };
-      productDataWithId = {
-        ...productDataWithId,
-        product_id: newProductId,
+      const newProduct = {
+        id: response.data.insertId,
+        Producto: nombre_producto,
+        Precio: precio,
+        Cantidad: cantidad,
       };
 
-      const action = addProductData(productDataWithId);
+      const action = addProductData(newProduct);
       dispatch(action);
       Swal.fire({
         title: "Success!",
-        text: `${productData.product_desc} has been added!`,
+        text: `${productData.nombre_producto} has been added!`,
         icon: "success",
       });
     }
@@ -93,7 +78,7 @@ export const deleteProductDataAPI = (productData) => {
       );
 
       if (response.status === 200) {
-        const action = deleteProductData(parseInt(productData.id));
+        const action = deleteProductData(productData.id);
         dispatch(action);
 
         Swal.fire({
@@ -107,34 +92,25 @@ export const deleteProductDataAPI = (productData) => {
 };
 
 export const editarProductDataAPI = (productData) => {
+  const { nombre_producto, precio, cantidad, id } = productData;
   return async (dispatch) => {
     try {
       const response = await axios.put(
-        `${API}products/${parseInt(productData.product_id)}`,
+        `${API}productos/${parseInt(productData.id)}`,
         productData
       );
       if (response.status === 200) {
-        if (productData.attributes !== undefined) {
-          productData.attributes = JSON.parse(productData.attributes);
-        }
-        const isManual = response.data.isManual;
-
-        const productDataKeys = Object.keys(productData);
-
-        let productDataWithIsManual = {};
-
-        productDataKeys.forEach((key, index) => {
-          productDataWithIsManual[key] = productData[key];
-          if (index === 1) {
-            productDataWithIsManual["is_manual"] = isManual;
-          }
-        });
-
-        const action = editProductData(productDataWithIsManual);
+        const editProduct = {
+          id: id,
+          Producto: nombre_producto,
+          Precio: precio,
+          Cantidad: cantidad,
+        };
+        const action = editProductData(editProduct);
         dispatch(action);
         Swal.fire({
           title: "Success!",
-          text: `Product ${productData.Producto} has been updated!`,
+          text: `Producto ${productData.nombre_producto} ha sido actualizado!`,
           icon: "success",
         });
       }

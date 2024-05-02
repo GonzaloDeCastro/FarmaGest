@@ -5,9 +5,10 @@ import {
   deleteProductDataAPI,
 } from "../../redux/productsSlice";
 import { FaRegTrashCan } from "react-icons/fa6";
-import { MdEdit } from "react-icons/md";
-import { AiFillPlusCircle } from "react-icons/ai";
+
 import Swal from "sweetalert2";
+import ProductForm from "./ProductForm";
+import EditProductFormModal from "./EditProductForm";
 
 const Products = () => {
   const dispatch = useDispatch();
@@ -55,11 +56,11 @@ const Products = () => {
             type="text"
             onChange={handleSearch}
             value={searchText}
-            placeholder=" &#xF002; Search..."
+            placeholder=" &#xF002; Buscar..."
           />
         </div>
         <div style={{ display: "flex" }}>
-          <AiFillPlusCircle style={{ width: "50px", height: "50px" }} />
+          <ProductForm />
         </div>
       </div>
       <div className="containerTableAndPagesSelected">
@@ -76,7 +77,7 @@ const Products = () => {
             </tr>
           </thead>
           <tbody>
-            {Object && Object?.keys(Products)?.length == 0 ? (
+            {Object?.keys(Products)?.length === 0 ? (
               <div
                 className="spinner-border"
                 style={{ marginTop: "10%", width: "100px", height: "100px" }}
@@ -96,7 +97,7 @@ const Products = () => {
                       flexWrap: "nowrap",
                     }}
                   >
-                    <MdEdit className="iconABM" product={dato} />
+                    <EditProductFormModal productSelected={dato} />
                     <FaRegTrashCan
                       className="iconABM"
                       onClick={() => handleDelete(dato)}

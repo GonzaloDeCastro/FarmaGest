@@ -7,7 +7,7 @@ const Home = () => {
       <div>
         <IoMdConstruct className="iconBuild" />
       </div>
-      Page Home in construction
+      Página Home en construcción
     </div>
   );
 };

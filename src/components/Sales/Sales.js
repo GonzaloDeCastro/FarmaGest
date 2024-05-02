@@ -7,7 +7,7 @@ const Sales = () => {
       <div>
         <IoMdConstruct className="iconBuild" />
       </div>
-      Page Sales in construction
+      Página Ventas en construcción
     </div>
   );
 };

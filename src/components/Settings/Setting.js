@@ -7,7 +7,7 @@ const Settings = () => {
       <div>
         <IoMdConstruct className="iconBuild" />
       </div>
-      Page Settings in construction
+      Página Configuración en construcción
     </div>
   );
 };
