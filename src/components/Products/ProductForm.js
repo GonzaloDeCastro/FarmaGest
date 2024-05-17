@@ -2,16 +2,18 @@ import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { FaPlusCircle, FaSave } from "react-icons/fa";
 import { addProductDataAPI } from "../../redux/productsSlice";
+
 import { useDispatch } from "react-redux";
 
-const ProductFormModal = () => {
+const ProductFormModal = ({ Users }) => {
   const dispatch = useDispatch();
+
   const [show, setShow] = useState(false);
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState(0);
   const [quantity, setQuantity] = useState("");
   const [compania, setCompania] = useState(0);
-
+  console.log("Users ", Users);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
@@ -22,6 +24,7 @@ const ProductFormModal = () => {
           nombre_producto: productName,
           precio: price,
           cantidad: quantity,
+          proveedor_id: compania === 0 ? null : compania,
         })
       );
       handleClose();
@@ -30,6 +33,10 @@ const ProductFormModal = () => {
       setPrice(0);
       setQuantity(0);
     } catch {}
+  };
+
+  const handleChange = (e) => {
+    setCompania(e.target.value);
   };
 
   return (
@@ -82,14 +89,21 @@ const ProductFormModal = () => {
               />
             </div>
             <div className="form-group col-md-6">
-              <label htmlFor="quantity">Compania:</label>
-              <input
-                type="number"
-                producto_id="quantity"
-                className="form-control"
+              <label htmlFor="compania">Compania:</label>
+              <select
                 value={compania}
-                onChange={(e) => setCompania(e.target.value)}
-              />
+                className="form-select"
+                onChange={handleChange}
+              >
+                <option value="" className="default-option">
+                  Seleccion proveedor
+                </option>
+                {Users?.map((user) => (
+                  <option key={user.usuario_id} value={user.usuario_id}>
+                    {user.Compania}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </Modal.Body>

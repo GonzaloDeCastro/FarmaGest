@@ -4,12 +4,14 @@ import { FaSave } from "react-icons/fa";
 import { editarProductDataAPI } from "../../redux/productsSlice";
 import { useDispatch } from "react-redux";
 import { MdEdit } from "react-icons/md";
-const EditProductFormModal = ({ productSelected }) => {
+const EditProductFormModal = ({ productSelected, Users }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
   const [productName, setProductName] = useState(productSelected?.Producto);
   const [price, setPrice] = useState(productSelected?.Precio);
   const [quantity, setQuantity] = useState(productSelected?.Cantidad);
+  const [compania, setCompania] = useState(productSelected?.UsuarioID);
+  console.log("productSelected", productSelected);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -21,12 +23,15 @@ const EditProductFormModal = ({ productSelected }) => {
           nombre_producto: productName,
           precio: price,
           cantidad: quantity,
+          proveedor_id: compania,
         })
       );
       handleClose();
     } catch {}
   };
-
+  const handleChange = (e) => {
+    setCompania(e.target.value);
+  };
   return (
     <>
       <MdEdit className="iconABM" onClick={handleShow} />
@@ -71,6 +76,23 @@ const EditProductFormModal = ({ productSelected }) => {
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
               />
+            </div>
+            <div className="form-group col-md-6">
+              <label htmlFor="compania">Compania:</label>
+              <select
+                value={compania}
+                className="form-select"
+                onChange={handleChange}
+              >
+                <option value="" className="default-option">
+                  Section area
+                </option>
+                {Users?.map((user) => (
+                  <option key={user.usuario_id} value={user.usuario_id}>
+                    {user.Compania}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </Modal.Body>

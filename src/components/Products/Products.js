@@ -5,6 +5,7 @@ import {
   deleteProductDataAPI,
 } from "../../redux/productsSlice";
 import { FaRegTrashCan } from "react-icons/fa6";
+import { getUsuarioDataAPI } from "../../redux/usuariosSlice";
 
 import Swal from "sweetalert2";
 import ProductForm from "./ProductForm";
@@ -15,9 +16,11 @@ const Products = () => {
 
   useEffect(() => {
     dispatch(getProductDataAPI());
+    dispatch(getUsuarioDataAPI());
   }, [dispatch]);
 
   const Products = useSelector((state) => state?.product);
+  const Users = useSelector((state) => state.user.initialState);
 
   const [searchText, setSearchText] = useState("");
   const handleSearch = (event) => {
@@ -61,7 +64,7 @@ const Products = () => {
           />
         </div>
         <div style={{ display: "flex" }}>
-          <ProductForm />
+          <ProductForm Users={Users} />
         </div>
       </div>
       <div className="containerTableAndPagesSelected">
@@ -100,7 +103,10 @@ const Products = () => {
                       flexWrap: "nowrap",
                     }}
                   >
-                    <EditProductFormModal productSelected={dato} />
+                    <EditProductFormModal
+                      productSelected={dato}
+                      Users={Users}
+                    />
                     <FaRegTrashCan
                       className="iconABM"
                       onClick={() => handleDelete(dato)}
