@@ -17,7 +17,7 @@ const EditProductFormModal = ({ productSelected }) => {
     try {
       dispatch(
         editarProductDataAPI({
-          id: productSelected?.id,
+          producto_id: productSelected?.producto_id,
           nombre_producto: productName,
           precio: price,
           cantidad: quantity,
@@ -46,7 +46,7 @@ const EditProductFormModal = ({ productSelected }) => {
               <label htmlFor="productName">Product Name:</label>
               <input
                 type="text"
-                id="productName"
+                producto_id="productName"
                 className="form-control"
                 value={productName}
                 onChange={(e) => setProductName(e.target.value)}
@@ -56,7 +56,7 @@ const EditProductFormModal = ({ productSelected }) => {
               <label htmlFor="price">Price:</label>
               <input
                 type="number"
-                id="price"
+                producto_id="price"
                 className="form-control"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
@@ -66,7 +66,7 @@ const EditProductFormModal = ({ productSelected }) => {
               <label htmlFor="quantity">Quantity:</label>
               <input
                 type="number"
-                id="quantity"
+                producto_id="quantity"
                 className="form-control"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}

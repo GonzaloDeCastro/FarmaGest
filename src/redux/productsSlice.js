@@ -24,7 +24,7 @@ const productDataSlice = createSlice({
       return {
         ...state,
         initialState: state?.initialState?.filter(
-          (productData) => productData?.id !== action?.payload
+          (productData) => productData?.producto_id !== action?.payload
         ),
       };
     },
@@ -32,7 +32,9 @@ const productDataSlice = createSlice({
       return {
         ...state,
         initialState: state.initialState.map((productData) =>
-          productData?.id === action?.payload?.id ? action.payload : productData
+          productData?.producto_id === action?.payload?.producto_id
+            ? action.payload
+            : productData
         ),
       };
     },
@@ -52,7 +54,7 @@ export const addProductDataAPI = (productData) => async (dispatch) => {
     const response = await axios.post(`${API}productos/`, productData);
     if (response.status === 200) {
       const newProduct = {
-        id: response.data.insertId,
+        producto_id: response.data.insertId,
         Producto: nombre_producto,
         Precio: precio,
         Cantidad: cantidad,
@@ -74,11 +76,11 @@ export const deleteProductDataAPI = (productData) => {
   return async (dispatch) => {
     try {
       const response = await axios.delete(
-        `${API}productos/${parseInt(productData.id)}`
+        `${API}productos/${parseInt(productData.producto_id)}`
       );
 
       if (response.status === 200) {
-        const action = deleteProductData(productData.id);
+        const action = deleteProductData(productData.producto_id);
         dispatch(action);
 
         Swal.fire({
@@ -92,16 +94,16 @@ export const deleteProductDataAPI = (productData) => {
 };
 
 export const editarProductDataAPI = (productData) => {
-  const { nombre_producto, precio, cantidad, id } = productData;
+  const { nombre_producto, precio, cantidad, producto_id } = productData;
   return async (dispatch) => {
     try {
       const response = await axios.put(
-        `${API}productos/${parseInt(productData.id)}`,
+        `${API}productos/${parseInt(productData.producto_id)}`,
         productData
       );
       if (response.status === 200) {
         const editProduct = {
-          id: id,
+          producto_id: producto_id,
           Producto: nombre_producto,
           Precio: precio,
           Cantidad: cantidad,

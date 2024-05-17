@@ -8,8 +8,9 @@ const ProductFormModal = () => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
   const [productName, setProductName] = useState("");
-  const [price, setPrice] = useState("");
+  const [price, setPrice] = useState(0);
   const [quantity, setQuantity] = useState("");
+  const [compania, setCompania] = useState(0);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -24,6 +25,10 @@ const ProductFormModal = () => {
         })
       );
       handleClose();
+      setCompania(0);
+      setProductName("");
+      setPrice(0);
+      setQuantity(0);
     } catch {}
   };
 
@@ -33,7 +38,7 @@ const ProductFormModal = () => {
         <FaPlusCircle
           style={{ width: "30px", height: "30px", marginRight: "5px" }}
         />
-        <div>New Product</div>
+        <div>Nuevo Producto</div>
       </div>
       <Modal
         show={show}
@@ -42,38 +47,48 @@ const ProductFormModal = () => {
         dialogClassName="custom-modal"
       >
         <Modal.Header closeButton>
-          <Modal.Title>New Product</Modal.Title>
+          <Modal.Title>Nuevo Producto</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="form-row">
             <div className="form-group col-md-6">
-              <label htmlFor="productName">Product Name:</label>
+              <label htmlFor="productName">Nombre del producto:</label>
               <input
                 type="text"
-                id="productName"
+                producto_id="productName"
                 className="form-control"
                 value={productName}
                 onChange={(e) => setProductName(e.target.value)}
               />
             </div>
             <div className="form-group col-md-6">
-              <label htmlFor="price">Price:</label>
+              <label htmlFor="price">Precio:</label>
               <input
                 type="number"
-                id="price"
+                producto_id="price"
                 className="form-control"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
               />
             </div>
             <div className="form-group col-md-6">
-              <label htmlFor="quantity">Quantity:</label>
+              <label htmlFor="quantity">Cantidad:</label>
               <input
                 type="number"
-                id="quantity"
+                producto_id="quantity"
                 className="form-control"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
+              />
+            </div>
+            <div className="form-group col-md-6">
+              <label htmlFor="quantity">Compania:</label>
+              <input
+                type="number"
+                producto_id="quantity"
+                className="form-control"
+                value={compania}
+                onChange={(e) => setCompania(e.target.value)}
               />
             </div>
           </div>

@@ -25,10 +25,11 @@ const Products = () => {
   };
 
   const filteredProducts = Products?.initialState?.filter((product) => {
-    const Products =
-      `${product.nombre_producto} ${product.precio}`.toLowerCase();
+    const Products = `${product.Producto} ${product.Precio}`.toLowerCase();
     return Products.includes(searchText.toLowerCase());
   });
+
+  console.log("filteredProducts ", filteredProducts);
   const keys = Object?.keys(
     (Products && Products.initialState && Products.initialState[0]) || {}
   );
@@ -69,11 +70,11 @@ const Products = () => {
             <tr>
               {keys.map(
                 (column) =>
-                  //quito columna id
-                  column !== "id" && <th key={column}>{column}</th>
+                  //quito columna producto_id
+                  column !== "producto_id" && <th key={column}>{column}</th>
               )}
 
-              <th style={{ width: "70px" }}>Options</th>
+              <th style={{ width: "70px" }}>Opciones</th>
             </tr>
           </thead>
           <tbody>
@@ -85,11 +86,13 @@ const Products = () => {
               />
             ) : filteredProducts?.length > 0 ? (
               filteredProducts?.map((dato) => (
-                <tr key={dato.id}>
+                <tr key={dato.producto_id}>
                   {keys
-                    ?.filter((column) => column !== "id") //filtro para que no aparezca la columna id
+                    ?.filter((column) => column !== "producto_id") //filtro para que no aparezca la columna producto_id
                     .map((column) => (
-                      <td key={`${dato.id}-${column}`}>{dato[column]}</td>
+                      <td key={`${dato.producto_id}-${column}`}>
+                        {dato[column]}
+                      </td>
                     ))}
 
                   <td
@@ -106,7 +109,7 @@ const Products = () => {
                 </tr>
               ))
             ) : (
-              <div className="NoData">no data </div>
+              <div className="NoData">sin datos </div>
             )}
           </tbody>
         </table>
