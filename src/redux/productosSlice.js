@@ -49,7 +49,7 @@ export const {
 } = productDataSlice.actions;
 
 export const addProductDataAPI = (productData) => async (dispatch) => {
-  const { nombre_producto, precio, cantidad, compania } = productData;
+  const { nombre_producto, precio, cantidad, Compania } = productData;
   try {
     const response = await axios.post(`${API}productos/`, productData);
     if (response.status === 200) {
@@ -58,7 +58,7 @@ export const addProductDataAPI = (productData) => async (dispatch) => {
         Producto: nombre_producto,
         Precio: precio,
         Cantidad: cantidad,
-        Compania: compania,
+        Compania: Compania,
       };
 
       const action = addProductData(newProduct);
@@ -95,9 +95,9 @@ export const deleteProductDataAPI = (productData) => {
 };
 
 export const editarProductDataAPI = (productData) => {
-  const { nombre_producto, precio, cantidad, compania, producto_id } =
+  const { nombre_producto, precio, cantidad, Compania, producto_id } =
     productData;
-  console.log("slice ", productData);
+
   return async (dispatch) => {
     try {
       const response = await axios.put(
@@ -110,7 +110,7 @@ export const editarProductDataAPI = (productData) => {
           Producto: nombre_producto,
           Precio: precio,
           Cantidad: cantidad,
-          Compania: compania,
+          Compania: Compania,
         };
         const action = editProductData(editProduct);
         dispatch(action);

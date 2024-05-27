@@ -1,14 +1,14 @@
 import React from "react";
 import { IoMdConstruct } from "react-icons/io";
 
-const Users = () => {
+const Ventas = () => {
   return (
     <div className="buildPage">
       <div>
         <IoMdConstruct className="iconBuild" />
       </div>
-      Page Users in construction
+      Página Ventas en construcción
     </div>
   );
 };
-export default Users;
+export default Ventas;

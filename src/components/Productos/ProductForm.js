@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { FaPlusCircle, FaSave } from "react-icons/fa";
-import { addProductDataAPI } from "../../redux/productsSlice";
+import { addProductDataAPI } from "../../redux/productosSlice";
 
 import { useDispatch } from "react-redux";
 
@@ -12,8 +12,9 @@ const ProductFormModal = ({ Users }) => {
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState(0);
   const [quantity, setQuantity] = useState("");
-  const [compania, setCompania] = useState(0);
-  console.log("Users ", Users);
+  const [companiaID, setCompaniaID] = useState(0);
+  const [companiaDesc, setCompaniaDesc] = useState("");
+
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
@@ -24,11 +25,12 @@ const ProductFormModal = ({ Users }) => {
           nombre_producto: productName,
           precio: price,
           cantidad: quantity,
-          proveedor_id: compania === 0 ? null : compania,
+          proveedor_id: companiaID === 0 ? null : companiaID,
+          Compania: companiaDesc,
         })
       );
       handleClose();
-      setCompania(0);
+      setCompaniaID(0);
       setProductName("");
       setPrice(0);
       setQuantity(0);
@@ -36,12 +38,15 @@ const ProductFormModal = ({ Users }) => {
   };
 
   const handleChange = (e) => {
-    setCompania(e.target.value);
+    setCompaniaID(e.target.value);
+    const selectedCompaniaDesc =
+      e.target.selectedOptions[0].getAttribute("data-user-compania");
+    setCompaniaDesc(selectedCompaniaDesc);
   };
 
   return (
     <>
-      <div className="buttonNewProduct" onClick={handleShow}>
+      <div className="buttonNewItem" onClick={handleShow}>
         <FaPlusCircle
           style={{ width: "30px", height: "30px", marginRight: "5px" }}
         />
@@ -89,9 +94,9 @@ const ProductFormModal = ({ Users }) => {
               />
             </div>
             <div className="form-group col-md-6">
-              <label htmlFor="compania">Compania:</label>
+              <label htmlFor="companiaID">Compania:</label>
               <select
-                value={compania}
+                value={companiaID}
                 className="form-select"
                 onChange={handleChange}
               >
@@ -99,7 +104,11 @@ const ProductFormModal = ({ Users }) => {
                   Seleccion proveedor
                 </option>
                 {Users?.map((user) => (
-                  <option key={user.usuario_id} value={user.usuario_id}>
+                  <option
+                    key={user.usuario_id}
+                    value={user.usuario_id}
+                    data-user-compania={user.Compania}
+                  >
                     {user.Compania}
                   </option>
                 ))}

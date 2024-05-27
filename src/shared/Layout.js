@@ -33,11 +33,11 @@ const Layout = ({ children, title }) => {
                 switch (title) {
                   case "home":
                     return "home";
-                  case "users":
+                  case "usuarios":
                     return "Users";
-                  case "settings":
+                  case "config":
                     return "Settings";
-                  case "sales":
+                  case "ventas":
                     return "Sales";
                   default:
                     return capitalizeFirstLetter(title);
@@ -60,17 +60,17 @@ const Layout = ({ children, title }) => {
             <FaHome className="iconMenu" />
           </Link>
 
-          <Link to="/sales">
+          <Link to="/ventas">
             <FaShoppingCart className="iconMenu" />
           </Link>
-          <Link to="/products">
+          <Link to="/productos">
             <FaBoxArchive className="iconMenu" />
           </Link>
-          <Link to="/users">
+          <Link to="/usuarios">
             <HiUsers className="iconMenu" />
           </Link>
 
-          <Link to="/settings">
+          <Link to="/config">
             <FaGear className="iconMenu" />
           </Link>
         </nav>
@@ -80,20 +80,20 @@ const Layout = ({ children, title }) => {
             <FaHome className="iconMenu" />
             <span>Home</span>
           </Link>
-          <Link className="itemMenu" to="/sales">
+          <Link className="itemMenu" to="/ventas">
             <FaShoppingCart className="iconMenu" />
             <span>Ventas</span>
           </Link>
-          <Link className="itemMenu" to="/products">
+          <Link className="itemMenu" to="/productos">
             <FaBoxArchive className="iconMenu" />
             <span>Productos</span>
           </Link>
-          <Link className="itemMenu" to="/users">
+          <Link className="itemMenu" to="/usuarios">
             <HiUsers className="iconMenu" />
             <span>Usuarios</span>
           </Link>
 
-          <Link className="itemMenu" to="/settings">
+          <Link className="itemMenu" to="/config">
             <FaGear className="iconMenu" />
             <span>Configuración</span>
           </Link>

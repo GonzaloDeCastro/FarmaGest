@@ -282,7 +282,7 @@ nav.bigActive span {
 .iconABM:hover {
   color: #1353c9;
 }
-.buttonNewProduct {
+.buttonNewItem {
   display: flex;
   align-items: center;
   background-color: #abd34e;

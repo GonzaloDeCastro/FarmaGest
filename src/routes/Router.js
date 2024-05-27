@@ -7,11 +7,11 @@ import {
 import Layout from "../shared/Layout";
 import FormLogin from "../components/login/FormLogin";
 import Home from "../components/Home/Home";
-import Sales from "../components/Sales/Sales";
-import Settings from "../components/Settings/Setting";
-import Users from "../components/Users/Users";
+import Ventas from "../components/Ventas/Ventas";
+import Config from "../components/Config/Config";
 import { useState } from "react";
-import Products from "../components/Products/Products";
+import Products from "../components/Productos/Products";
+import Usuarios from "../components/Usuarios/Usuarios";
 
 const AppRouter = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -44,11 +44,11 @@ const AppRouter = () => {
           }
         />
         <Route
-          path="/sales"
+          path="/ventas"
           element={
             isLoggedIn ? (
-              <Layout title={"sales"}>
-                <Sales />
+              <Layout title={"ventas"}>
+                <Ventas />
               </Layout>
             ) : (
               <Navigate to="/" />
@@ -56,10 +56,10 @@ const AppRouter = () => {
           }
         />
         <Route
-          path="/products"
+          path="/productos"
           element={
             isLoggedIn ? (
-              <Layout title={"products"}>
+              <Layout title={"productos"}>
                 <Products />
               </Layout>
             ) : (
@@ -68,11 +68,11 @@ const AppRouter = () => {
           }
         />
         <Route
-          path="/users"
+          path="/usuarios"
           element={
             isLoggedIn ? (
-              <Layout title={"users"}>
-                <Users />
+              <Layout title={"usuarios"}>
+                <Usuarios />
               </Layout>
             ) : (
               <Navigate to="/" />
@@ -80,11 +80,11 @@ const AppRouter = () => {
           }
         />
         <Route
-          path="/settings"
+          path="/config"
           element={
             isLoggedIn ? (
-              <Layout title={"settings"}>
-                <Settings />
+              <Layout title={"config"}>
+                <Config />
               </Layout>
             ) : (
               <Navigate to="/" />

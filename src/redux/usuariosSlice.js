@@ -6,11 +6,18 @@ import API from "../config";
 const usuarioDataSlice = createSlice({
   name: "usuario",
   initialState: {},
+  rolesState: {},
   reducers: {
     getUsuarioData: (state, action) => {
       return {
         ...state,
         initialState: action.payload,
+      };
+    },
+    getRolesData: (state, action) => {
+      return {
+        ...state,
+        rolesState: action.payload,
       };
     },
     addUsuarioData: (state, action) => {
@@ -44,12 +51,14 @@ const usuarioDataSlice = createSlice({
 export const {
   addUsuarioData,
   getUsuarioData,
+  getRolesData,
   deleteUsuarioData,
   editUsuarioData,
 } = usuarioDataSlice.actions;
 
 export const addUsuarioDataAPI = (usuarioData) => async (dispatch) => {
-  const { nombre, apellido, correo } = usuarioData;
+  const { nombre, apellido, correo_electronico } = usuarioData;
+  console.log("que llega al agregado usuario ", usuarioData);
   try {
     const response = await axios.post(`${API}usuarios/`, usuarioData);
     if (response.status === 200) {
@@ -57,7 +66,7 @@ export const addUsuarioDataAPI = (usuarioData) => async (dispatch) => {
         usuario_id: response.data.insertId,
         Usuario: nombre,
         Apellido: apellido,
-        Correo: correo,
+        Correo: correo_electronico,
       };
 
       const action = addUsuarioData(newUsuario);
@@ -132,6 +141,20 @@ export const getUsuarioDataAPI = () => {
       const response = await axios.get(`${API}usuarios/all`);
       if (response.status === 200) {
         const action = getUsuarioData(response.data);
+        dispatch(action);
+      }
+    } catch (error) {
+      console.log("error ", error);
+    }
+  };
+};
+
+export const getRolesDataAPI = () => {
+  return async (dispatch) => {
+    try {
+      const response = await axios.get(`${API}usuarios/roles`);
+      if (response.status === 200) {
+        const action = getRolesData(response.data);
         dispatch(action);
       }
     } catch (error) {

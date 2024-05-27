@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getProductDataAPI,
   deleteProductDataAPI,
-} from "../../redux/productsSlice";
+} from "../../redux/productosSlice";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { getUsuarioDataAPI } from "../../redux/usuariosSlice";
 
@@ -19,8 +19,8 @@ const Products = () => {
     dispatch(getUsuarioDataAPI());
   }, [dispatch]);
 
-  const Products = useSelector((state) => state?.product);
-  const Users = useSelector((state) => state.user.initialState);
+  const Products = useSelector((state) => state?.producto);
+  const Users = useSelector((state) => state.usuario.initialState);
 
   const [searchText, setSearchText] = useState("");
   const handleSearch = (event) => {
@@ -74,7 +74,8 @@ const Products = () => {
               {keys.map(
                 (column) =>
                   //quito columna producto_id
-                  column !== "producto_id" && <th key={column}>{column}</th>
+                  column !== "producto_id" &&
+                  column !== "UsuarioID" && <th key={column}>{column}</th>
               )}
 
               <th style={{ width: "70px" }}>Opciones</th>
@@ -91,7 +92,10 @@ const Products = () => {
               filteredProducts?.map((dato) => (
                 <tr key={dato.producto_id}>
                   {keys
-                    ?.filter((column) => column !== "producto_id") //filtro para que no aparezca la columna producto_id
+                    ?.filter(
+                      (column) =>
+                        column !== "producto_id" && column !== "UsuarioID"
+                    ) //filtro para que no aparezca la columna producto_id
                     .map((column) => (
                       <td key={`${dato.producto_id}-${column}`}>
                         {dato[column]}

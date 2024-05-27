@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { FaSave } from "react-icons/fa";
-import { editarProductDataAPI } from "../../redux/productsSlice";
+import { editarProductDataAPI } from "../../redux/productosSlice";
 import { useDispatch } from "react-redux";
 import { MdEdit } from "react-icons/md";
 const EditProductFormModal = ({ productSelected, Users }) => {
@@ -11,6 +11,7 @@ const EditProductFormModal = ({ productSelected, Users }) => {
   const [price, setPrice] = useState(productSelected?.Precio);
   const [quantity, setQuantity] = useState(productSelected?.Cantidad);
   const [compania, setCompania] = useState(productSelected?.UsuarioID);
+  const [companiaDesc, setCompaniaDesc] = useState(productSelected.Compania);
   console.log("productSelected", productSelected);
 
   const handleClose = () => setShow(false);
@@ -24,6 +25,7 @@ const EditProductFormModal = ({ productSelected, Users }) => {
           precio: price,
           cantidad: quantity,
           proveedor_id: compania,
+          Compania: companiaDesc,
         })
       );
       handleClose();
@@ -31,6 +33,9 @@ const EditProductFormModal = ({ productSelected, Users }) => {
   };
   const handleChange = (e) => {
     setCompania(e.target.value);
+    const selectedCompaniaDesc =
+      e.target.selectedOptions[0].getAttribute("data-user-compania");
+    setCompaniaDesc(selectedCompaniaDesc);
   };
   return (
     <>
@@ -88,7 +93,11 @@ const EditProductFormModal = ({ productSelected, Users }) => {
                   Section area
                 </option>
                 {Users?.map((user) => (
-                  <option key={user.usuario_id} value={user.usuario_id}>
+                  <option
+                    key={user.usuario_id}
+                    value={user.usuario_id}
+                    data-user-compania={user.Compania}
+                  >
                     {user.Compania}
                   </option>
                 ))}
