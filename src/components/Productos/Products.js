@@ -13,24 +13,17 @@ import EditProductFormModal from "./EditProductForm";
 
 const Products = () => {
   const dispatch = useDispatch();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(7);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    dispatch(getProductDataAPI());
+    dispatch(getProductDataAPI(page, pageSize, search));
     dispatch(getUsuarioDataAPI());
-  }, [dispatch]);
+  }, [page, pageSize, search, dispatch]);
 
   const Products = useSelector((state) => state?.producto);
   const Users = useSelector((state) => state.usuario.initialState);
-
-  const [searchText, setSearchText] = useState("");
-  const handleSearch = (event) => {
-    setSearchText(event.target.value);
-  };
-
-  const filteredProducts = Products?.initialState?.filter((product) => {
-    const Products = `${product.Producto} ${product.Precio}`.toLowerCase();
-    return Products.includes(searchText.toLowerCase());
-  });
 
   const keys = Object?.keys(
     (Products && Products.initialState && Products.initialState[0]) || {}
@@ -50,6 +43,15 @@ const Products = () => {
       }
     });
   };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
   return (
     <div className="containerSelected">
       <div className="headerSelected">
@@ -57,8 +59,8 @@ const Products = () => {
           <input
             className="inputSearch"
             type="text"
-            onChange={handleSearch}
-            value={searchText}
+            onChange={handleSearchChange}
+            value={search}
             placeholder=" &#xF002; Buscar..."
           />
         </div>
@@ -89,8 +91,8 @@ const Products = () => {
                 style={{ marginTop: "10%", width: "100px", height: "100px" }}
                 role="status"
               />
-            ) : filteredProducts?.length > 0 ? (
-              filteredProducts?.map((dato) => (
+            ) : Products?.initialState?.length > 0 ? (
+              Products?.initialState?.map((dato) => (
                 <tr key={dato.producto_id}>
                   {keys
                     ?.filter(
@@ -127,6 +129,23 @@ const Products = () => {
             )}
           </tbody>
         </table>
+        <div>
+          <button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 1}
+            className="buttonPage"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => handlePageChange(page + 1)}
+            style={{ marginLeft: "10px" }}
+            disabled={Products?.initialState?.length < 6}
+            className="buttonPage"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

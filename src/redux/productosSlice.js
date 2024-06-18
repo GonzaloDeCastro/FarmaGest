@@ -130,10 +130,16 @@ export const editarProductDataAPI = (productData) => {
   };
 };
 
-export const getProductDataAPI = () => {
+export const getProductDataAPI = (page = 1, pageSize = 5, search = "") => {
   return async (dispatch) => {
     try {
-      const response = await axios.get(`${API}productos/all`);
+      const response = await axios.get(`${API}productos/all`, {
+        params: {
+          page,
+          pageSize,
+          search,
+        },
+      });
       if (response.status === 200) {
         const action = getProductData(response.data);
         dispatch(action);

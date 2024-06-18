@@ -284,6 +284,23 @@ nav.bigActive span {
 .iconABM:hover {
   color: #1353c9;
 }
+.buttonPage {
+  background-color: #abd34e;
+  padding: 7px 10px 7px 10px;
+  color: #000;
+  border-radius: 10px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.5);
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+.buttonPage:hover {
+  background-color: #d5ff71;
+}
+.buttonPage:disabled {
+  background-color: rgb(145, 167, 96);
+}
 .buttonNewItem {
   display: flex;
   align-items: center;

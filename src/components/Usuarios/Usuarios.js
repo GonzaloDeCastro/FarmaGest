@@ -13,25 +13,18 @@ import EditUsuarioFormModal from "./EditUsuarioForm";
 
 const Usuarios = () => {
   const dispatch = useDispatch();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(7);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    dispatch(getUsuarioDataAPI());
+    dispatch(getUsuarioDataAPI(page, pageSize, search));
     dispatch(getRolesDataAPI());
-  }, [dispatch]);
+  }, [page, pageSize, search, dispatch]);
   const [roleID, setRoleID] = useState(0);
   const [roleDesc, setRoleDesc] = useState("");
   const Usuarios = useSelector((state) => state?.usuario);
   const Roles = useSelector((state) => state && state?.usuario?.rolesState);
-  const [searchText, setSearchText] = useState("");
-  const handleSearch = (event) => {
-    setSearchText(event.target.value);
-  };
-
-  const filteredUsuarios = Usuarios?.initialState?.filter((usuario) => {
-    const Usuarios =
-      `${usuario.Nombre} ${usuario.Apellido}  ${usuario.Email}`.toLowerCase();
-    return Usuarios.includes(searchText.toLowerCase());
-  });
 
   const keys = Object?.keys(
     (Usuarios && Usuarios.initialState && Usuarios.initialState[0]) || {}
@@ -59,7 +52,14 @@ const Usuarios = () => {
       e.target.selectedOptions[0].getAttribute("data-user-role");
     setRoleDesc(selectedCompaniaDesc);
   };
-  console.log("rol ", roleID);
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
   return (
     <div className="containerSelected">
       <div className="headerSelected">
@@ -67,8 +67,8 @@ const Usuarios = () => {
           <input
             className="inputSearch"
             type="text"
-            onChange={handleSearch}
-            value={searchText}
+            value={search}
+            onChange={handleSearchChange}
             placeholder=" &#xF002; Buscar..."
           />
 
@@ -140,8 +140,8 @@ const Usuarios = () => {
                 style={{ marginTop: "10%", width: "100px", height: "100px" }}
                 role="status"
               />
-            ) : filteredUsuarios?.length > 0 ? (
-              filteredUsuarios
+            ) : Usuarios?.initialState?.length > 0 ? (
+              Usuarios?.initialState
                 ?.filter((user) => roleID == 0 || user.rol_id == roleID)
                 .map((dato) => (
                   <tr key={dato.usuario_id}>
@@ -194,6 +194,23 @@ const Usuarios = () => {
             )}
           </tbody>
         </table>
+        <div>
+          <button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 1}
+            className="buttonPage"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => handlePageChange(page + 1)}
+            style={{ marginLeft: "10px" }}
+            disabled={Usuarios?.initialState?.length < 6}
+            className="buttonPage"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

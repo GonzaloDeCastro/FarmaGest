@@ -201,12 +201,20 @@ export const editarUsuarioDataAPI = (usuarioData) => {
   };
 };
 
-export const getUsuarioDataAPI = () => {
+export const getUsuarioDataAPI = (page = 1, pageSize = 5, search = "") => {
   return async (dispatch) => {
     try {
-      const response = await axios.get(`${API}usuarios/all`);
+      const response = await axios.get(`${API}usuarios/all`, {
+        params: {
+          page,
+          pageSize,
+          search,
+        },
+      });
+
       if (response.status === 200) {
         const action = getUsuarioData(response.data);
+        console.log("first first", action);
         dispatch(action);
       }
     } catch (error) {
