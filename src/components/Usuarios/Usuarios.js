@@ -16,12 +16,12 @@ const Usuarios = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(7);
   const [search, setSearch] = useState("");
-
-  useEffect(() => {
-    dispatch(getUsuarioDataAPI(page, pageSize, search));
-    dispatch(getRolesDataAPI());
-  }, [page, pageSize, search, dispatch]);
   const [roleID, setRoleID] = useState(0);
+  useEffect(() => {
+    dispatch(getUsuarioDataAPI(page, pageSize, search, roleID));
+    dispatch(getRolesDataAPI());
+  }, [page, pageSize, search, roleID, dispatch]);
+
   const [roleDesc, setRoleDesc] = useState("");
   const Usuarios = useSelector((state) => state?.usuario);
   const Roles = useSelector((state) => state && state?.usuario?.rolesState);
@@ -30,7 +30,6 @@ const Usuarios = () => {
     (Usuarios && Usuarios.initialState && Usuarios.initialState[0]) || {}
   );
   const handleDelete = (dato) => {
-    console.log("dato ", dato);
     Swal.fire({
       title: "Warning!",
       text: `¿Esta seguro que desea eliminar el usuario ${dato.Nombre} ${dato.Apellido}? `,
@@ -141,54 +140,52 @@ const Usuarios = () => {
                 role="status"
               />
             ) : Usuarios?.initialState?.length > 0 ? (
-              Usuarios?.initialState
-                ?.filter((user) => roleID == 0 || user.rol_id == roleID)
-                .map((dato) => (
-                  <tr key={dato.usuario_id}>
-                    {keys
-                      ?.filter((column) => {
-                        // Excluir "usuario_id", "rol_id", y "cuit"
-                        if (
-                          column === "usuario_id" ||
-                          column === "rol_id" ||
-                          column === "cuit" ||
-                          column === "codigo"
-                        ) {
-                          return false;
-                        }
-                        // Excluir "compania" si roleID no es igual a 2
-                        if (column === "Compania" && roleID != 2) {
-                          return false;
-                        }
-                        if (column === "obra_social" && roleID != 1) {
-                          return false;
-                        }
-                        return true;
-                      }) //filtro para que no aparezca la columna usuario_id
-                      .map((column) => (
-                        <td key={`${dato.usuario_id}-${column}`}>
-                          {column == "Compania" && dato[column] == null
-                            ? "-"
-                            : dato[column]}
-                        </td>
-                      ))}
+              Usuarios?.initialState?.map((dato) => (
+                <tr key={dato.usuario_id}>
+                  {keys
+                    ?.filter((column) => {
+                      // Excluir "usuario_id", "rol_id", y "cuit"
+                      if (
+                        column === "usuario_id" ||
+                        column === "rol_id" ||
+                        column === "cuit" ||
+                        column === "codigo"
+                      ) {
+                        return false;
+                      }
+                      // Excluir "compania" si roleID no es igual a 2
+                      if (column === "Compania" && roleID != 2) {
+                        return false;
+                      }
+                      if (column === "obra_social" && roleID != 1) {
+                        return false;
+                      }
+                      return true;
+                    }) //filtro para que no aparezca la columna usuario_id
+                    .map((column) => (
+                      <td key={`${dato.usuario_id}-${column}`}>
+                        {column == "Compania" && dato[column] == null
+                          ? "-"
+                          : dato[column]}
+                      </td>
+                    ))}
 
-                    <td
-                      style={{
-                        flexWrap: "nowrap",
-                      }}
-                    >
-                      <EditUsuarioFormModal
-                        usuarioSelected={dato}
-                        Users={Usuarios}
-                      />
-                      <FaRegTrashCan
-                        className="iconABM"
-                        onClick={() => handleDelete(dato)}
-                      />
-                    </td>
-                  </tr>
-                ))
+                  <td
+                    style={{
+                      flexWrap: "nowrap",
+                    }}
+                  >
+                    <EditUsuarioFormModal
+                      usuarioSelected={dato}
+                      Users={Usuarios}
+                    />
+                    <FaRegTrashCan
+                      className="iconABM"
+                      onClick={() => handleDelete(dato)}
+                    />
+                  </td>
+                </tr>
+              ))
             ) : (
               <div className="NoData">sin datos </div>
             )}

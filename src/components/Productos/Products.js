@@ -19,7 +19,7 @@ const Products = () => {
 
   useEffect(() => {
     dispatch(getProductDataAPI(page, pageSize, search));
-    dispatch(getUsuarioDataAPI());
+    dispatch(getUsuarioDataAPI(0, 999, ""));
   }, [page, pageSize, search, dispatch]);
 
   const Products = useSelector((state) => state?.producto);
@@ -113,8 +113,7 @@ const Products = () => {
                     <EditProductFormModal
                       productSelected={dato}
                       Users={
-                        Users &&
-                        Users?.filter((users) => users.Rol === "proveedor")
+                        Users && Users?.filter((users) => users.rol_id == 2)
                       }
                     />
                     <FaRegTrashCan

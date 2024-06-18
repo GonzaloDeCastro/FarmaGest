@@ -153,7 +153,6 @@ export const editarUsuarioDataAPI = (usuarioData) => {
           `${API}usuarios/obra-social/${parseInt(usuario_id)}`
         );
       }
-      console.log("llega hasta aca?");
 
       const userRole = {
         usuario_id: parseInt(usuario_id),
@@ -201,7 +200,12 @@ export const editarUsuarioDataAPI = (usuarioData) => {
   };
 };
 
-export const getUsuarioDataAPI = (page = 1, pageSize = 5, search = "") => {
+export const getUsuarioDataAPI = (
+  page = 1,
+  pageSize = 5,
+  search = "",
+  rolID = 0
+) => {
   return async (dispatch) => {
     try {
       const response = await axios.get(`${API}usuarios/all`, {
@@ -209,12 +213,13 @@ export const getUsuarioDataAPI = (page = 1, pageSize = 5, search = "") => {
           page,
           pageSize,
           search,
+          rolID,
         },
       });
 
       if (response.status === 200) {
         const action = getUsuarioData(response.data);
-        console.log("first first", action);
+
         dispatch(action);
       }
     } catch (error) {

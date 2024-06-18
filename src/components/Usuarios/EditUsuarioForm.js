@@ -11,7 +11,7 @@ import { MdEdit } from "react-icons/md";
 const EditUsuarioFormModal = ({ usuarioSelected, Users }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
-  console.log("usuarioSelected ", usuarioSelected);
+
   const Roles = useSelector((state) => state && state?.usuario?.rolesState);
   const ObrasSociales = useSelector(
     (state) => state && state?.usuario?.obrasSocialesState
@@ -129,6 +129,7 @@ const EditUsuarioFormModal = ({ usuarioSelected, Users }) => {
               value={roleID}
               className="form-select"
               onChange={handleChange}
+              disabled
             >
               <option value="" className="default-option">
                 Seleccionar rol

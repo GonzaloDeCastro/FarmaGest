@@ -36,6 +36,7 @@ const EditProductFormModal = ({ productSelected, Users }) => {
       e.target.selectedOptions[0].getAttribute("data-user-compania");
     setCompaniaDesc(selectedCompaniaDesc);
   };
+
   return (
     <>
       <MdEdit className="iconABM" onClick={handleShow} />

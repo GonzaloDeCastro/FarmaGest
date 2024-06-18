@@ -75,7 +75,7 @@ const UsuarioFormModal = ({ Users }) => {
       setCuit(value);
     }
   };
-  console.log("obra social", obraSocial);
+
   return (
     <>
       <div className="buttonNewItem" onClick={handleShow}>
