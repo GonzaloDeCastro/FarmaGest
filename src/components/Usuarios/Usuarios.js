@@ -19,7 +19,7 @@ const Usuarios = () => {
   }, [dispatch]);
 
   const Usuarios = useSelector((state) => state?.usuario);
-  console.log("Usuarios ", Usuarios);
+
   const [searchText, setSearchText] = useState("");
   const handleSearch = (event) => {
     setSearchText(event.target.value);
@@ -31,7 +31,6 @@ const Usuarios = () => {
     return Usuarios.includes(searchText.toLowerCase());
   });
 
-  console.log("filteredUsuarios ", filteredUsuarios);
   const keys = Object?.keys(
     (Usuarios && Usuarios.initialState && Usuarios.initialState[0]) || {}
   );
@@ -73,7 +72,9 @@ const Usuarios = () => {
               {keys.map(
                 (column) =>
                   //quito columna usuario_id
-                  column !== "usuario_id" && <th key={column}>{column}</th>
+                  column !== "usuario_id" &&
+                  column !== "rol_id" &&
+                  column !== "cuit" && <th key={column}>{column}</th>
               )}
 
               <th style={{ width: "70px" }}>Opciones</th>
@@ -90,7 +91,12 @@ const Usuarios = () => {
               filteredUsuarios?.map((dato) => (
                 <tr key={dato.usuario_id}>
                   {keys
-                    ?.filter((column) => column !== "usuario_id") //filtro para que no aparezca la columna usuario_id
+                    ?.filter(
+                      (column) =>
+                        column !== "usuario_id" &&
+                        column !== "rol_id" &&
+                        column !== "cuit"
+                    ) //filtro para que no aparezca la columna usuario_id
                     .map((column) => (
                       <td key={`${dato.usuario_id}-${column}`}>
                         {column == "Compania" && dato[column] == null

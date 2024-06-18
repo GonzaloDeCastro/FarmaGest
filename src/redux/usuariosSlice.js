@@ -57,18 +57,25 @@ export const {
 } = usuarioDataSlice.actions;
 
 export const addUsuarioDataAPI = (usuarioData) => async (dispatch) => {
-  const { nombre, apellido, correo_electronico } = usuarioData;
-  console.log("que llega al agregado usuario ", usuarioData);
+  const { nombre, apellido, correo_electronico, Rol, rol_id, compania } =
+    usuarioData;
+
   try {
     const response = await axios.post(`${API}usuarios/`, usuarioData);
     if (response.status === 200) {
       const newUsuario = {
         usuario_id: response.data.insertId,
-        Usuario: nombre,
+        Nombre: nombre,
         Apellido: apellido,
-        Correo: correo_electronico,
+        Email: correo_electronico,
+        Rol: Rol,
+        Compania: compania,
       };
-
+      const userRole = {
+        usuario_id: response.data.insertId,
+        rol_id: parseInt(rol_id),
+      };
+      await axios.post(`${API}usuarios/rol/`, userRole);
       const action = addUsuarioData(newUsuario);
       dispatch(action);
       Swal.fire({
@@ -85,10 +92,13 @@ export const deleteUsuarioDataAPI = (usuarioData) => {
   return async (dispatch) => {
     try {
       const response = await axios.delete(
-        `${API}usuarios/${parseInt(usuarioData.usuario_id)}`
+        `${API}usuarios/rol/${parseInt(usuarioData.usuario_id)}`
       );
 
       if (response.status === 200) {
+        await axios.delete(
+          `${API}usuarios/${parseInt(usuarioData.usuario_id)}`
+        );
         const action = deleteUsuarioData(usuarioData.usuario_id);
         dispatch(action);
 
@@ -103,27 +113,49 @@ export const deleteUsuarioDataAPI = (usuarioData) => {
 };
 
 export const editarUsuarioDataAPI = (usuarioData) => {
-  const { nombre, apellido, correo, usuario_id } = usuarioData;
+  const {
+    nombre,
+    apellido,
+    correo_electronico,
+    usuario_id,
+    Rol,
+    compania,
+    rol_id,
+  } = usuarioData;
   return async (dispatch) => {
     try {
-      const response = await axios.put(
-        `${API}usuarios/${parseInt(usuarioData.usuario_id)}`,
-        usuarioData
+      const response = await axios.delete(
+        `${API}usuarios/rol/${parseInt(usuario_id)}`
       );
-      if (response.status === 200) {
-        const editUsuario = {
-          usuario_id: usuario_id,
-          Usuario: nombre,
-          Apellido: apellido,
-          Correo: correo,
-        };
-        const action = editUsuarioData(editUsuario);
-        dispatch(action);
-        Swal.fire({
-          title: "Success!",
-          text: `Usuario ${usuarioData.nombre} ha sido actualizado!`,
-          icon: "success",
-        });
+      const userRole = {
+        usuario_id: parseInt(usuario_id),
+        rol_id: parseInt(rol_id),
+      };
+
+      const response2 = await axios.post(`${API}usuarios/rol/`, userRole);
+
+      if (response.status === 200 && response2.status === 200) {
+        const response3 = await axios.put(
+          `${API}usuarios/${parseInt(usuarioData.usuario_id)}`,
+          usuarioData
+        );
+        if (response3.status === 200) {
+          const editUsuario = {
+            usuario_id: usuario_id,
+            Nombre: nombre,
+            Apellido: apellido,
+            Email: correo_electronico,
+            Rol: Rol,
+            Compania: compania,
+          };
+          const action = editUsuarioData(editUsuario);
+          dispatch(action);
+          Swal.fire({
+            title: "Success!",
+            text: `Usuario ${usuarioData.nombre} ha sido actualizado!`,
+            icon: "success",
+          });
+        }
       }
     } catch (error) {
       Swal.fire({

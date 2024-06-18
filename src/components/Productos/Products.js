@@ -32,7 +32,6 @@ const Products = () => {
     return Products.includes(searchText.toLowerCase());
   });
 
-  console.log("filteredProducts ", filteredProducts);
   const keys = Object?.keys(
     (Products && Products.initialState && Products.initialState[0]) || {}
   );
@@ -64,7 +63,9 @@ const Products = () => {
           />
         </div>
         <div style={{ display: "flex" }}>
-          <ProductForm Users={Users} />
+          <ProductForm
+            Users={Users && Users?.filter((users) => users.Rol === "proveedor")}
+          />
         </div>
       </div>
       <div className="containerTableAndPagesSelected">
@@ -109,7 +110,10 @@ const Products = () => {
                   >
                     <EditProductFormModal
                       productSelected={dato}
-                      Users={Users}
+                      Users={
+                        Users &&
+                        Users?.filter((users) => users.Rol === "proveedor")
+                      }
                     />
                     <FaRegTrashCan
                       className="iconABM"

@@ -63,7 +63,7 @@ const ProductFormModal = ({ Users }) => {
         </Modal.Header>
         <Modal.Body>
           <div className="form-row">
-            <div className="form-group col-md-6">
+            <div className="form-group col-md-12">
               <label htmlFor="productName">Nombre del producto:</label>
               <input
                 type="text"
@@ -73,7 +73,7 @@ const ProductFormModal = ({ Users }) => {
                 onChange={(e) => setProductName(e.target.value)}
               />
             </div>
-            <div className="form-group col-md-6">
+            <div className="form-group col-md-12">
               <label htmlFor="price">Precio:</label>
               <input
                 type="number"
@@ -83,7 +83,7 @@ const ProductFormModal = ({ Users }) => {
                 onChange={(e) => setPrice(e.target.value)}
               />
             </div>
-            <div className="form-group col-md-6">
+            <div className="form-group col-md-12">
               <label htmlFor="quantity">Cantidad:</label>
               <input
                 type="number"
@@ -93,7 +93,7 @@ const ProductFormModal = ({ Users }) => {
                 onChange={(e) => setQuantity(e.target.value)}
               />
             </div>
-            <div className="form-group col-md-6">
+            <div className="form-group col-md-12">
               <label htmlFor="companiaID">Compania:</label>
               <select
                 value={companiaID}

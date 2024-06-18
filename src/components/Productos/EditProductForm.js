@@ -12,7 +12,6 @@ const EditProductFormModal = ({ productSelected, Users }) => {
   const [quantity, setQuantity] = useState(productSelected?.Cantidad);
   const [compania, setCompania] = useState(productSelected?.UsuarioID);
   const [companiaDesc, setCompaniaDesc] = useState(productSelected.Compania);
-  console.log("productSelected", productSelected);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -52,7 +51,7 @@ const EditProductFormModal = ({ productSelected, Users }) => {
         </Modal.Header>
         <Modal.Body>
           <div className="form-row">
-            <div className="form-group col-md-6">
+            <div className="form-group col-md-12">
               <label htmlFor="productName">Product Name:</label>
               <input
                 type="text"
@@ -62,7 +61,7 @@ const EditProductFormModal = ({ productSelected, Users }) => {
                 onChange={(e) => setProductName(e.target.value)}
               />
             </div>
-            <div className="form-group col-md-6">
+            <div className="form-group col-md-12">
               <label htmlFor="price">Price:</label>
               <input
                 type="number"
@@ -72,7 +71,7 @@ const EditProductFormModal = ({ productSelected, Users }) => {
                 onChange={(e) => setPrice(e.target.value)}
               />
             </div>
-            <div className="form-group col-md-6">
+            <div className="form-group col-md-12">
               <label htmlFor="quantity">Quantity:</label>
               <input
                 type="number"
@@ -82,7 +81,7 @@ const EditProductFormModal = ({ productSelected, Users }) => {
                 onChange={(e) => setQuantity(e.target.value)}
               />
             </div>
-            <div className="form-group col-md-6">
+            <div className="form-group col-md-12">
               <label htmlFor="compania">Compania:</label>
               <select
                 value={compania}
@@ -90,17 +89,18 @@ const EditProductFormModal = ({ productSelected, Users }) => {
                 onChange={handleChange}
               >
                 <option value="" className="default-option">
-                  Section area
+                  Seleccion proveedor
                 </option>
-                {Users?.map((user) => (
-                  <option
-                    key={user.usuario_id}
-                    value={user.usuario_id}
-                    data-user-compania={user.Compania}
-                  >
-                    {user.Compania}
-                  </option>
-                ))}
+                {Users &&
+                  Users?.map((user) => (
+                    <option
+                      key={user.usuario_id}
+                      value={user.usuario_id}
+                      data-user-compania={user.Compania}
+                    >
+                      {user.Compania}
+                    </option>
+                  ))}
               </select>
             </div>
           </div>
