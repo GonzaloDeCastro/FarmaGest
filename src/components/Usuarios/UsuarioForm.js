@@ -1,22 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { FaPlusCircle, FaSave } from "react-icons/fa";
-import { addUsuarioDataAPI, getRolesDataAPI } from "../../redux/usuariosSlice";
+import {
+  addUsuarioDataAPI,
+  getRolesDataAPI,
+  getObrasSocialesDataAPI,
+} from "../../redux/usuariosSlice";
 
 import { useDispatch, useSelector } from "react-redux";
 
 const UsuarioFormModal = ({ Users }) => {
   const dispatch = useDispatch();
   const Roles = useSelector((state) => state && state?.usuario?.rolesState);
+  const ObrasSociales = useSelector(
+    (state) => state && state?.usuario?.obrasSocialesState
+  );
 
   const [show, setShow] = useState(false);
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [correo, setCorreo] = useState("");
-  const [roleID, setRoleID] = useState(0);
+
   const [compania, setCompania] = useState("");
   const [cuit, setCuit] = useState(0);
-
+  const [obraSocial, setObraSocial] = useState(0);
+  const [roleID, setRoleID] = useState(0);
   const [roleDesc, setRoleDesc] = useState("");
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -32,6 +40,7 @@ const UsuarioFormModal = ({ Users }) => {
           Rol: roleDesc,
           compania: roleID == 2 ? compania : "-",
           cuit: roleID == 2 && cuit.toString(),
+          obraSocial: obraSocial,
           /*  descripcion: roleDesc, */
         })
       );
@@ -50,18 +59,23 @@ const UsuarioFormModal = ({ Users }) => {
       e.target.selectedOptions[0].getAttribute("data-user-role");
     setRoleDesc(selectedCompaniaDesc);
   };
+
+  const handleChangeObraSocial = (e) => {
+    setObraSocial(e.target.value);
+  };
   useEffect(() => {
     dispatch(getRolesDataAPI());
+    dispatch(getObrasSocialesDataAPI());
   }, [dispatch]);
 
   const handleCuitChange = (e) => {
     const value = e.target.value;
 
-    if (/^\d{0,12}$/.test(value)) {
+    if (/^\d{0,11}$/.test(value)) {
       setCuit(value);
     }
   };
-
+  console.log("obra social", obraSocial);
   return (
     <>
       <div className="buttonNewItem" onClick={handleShow}>
@@ -134,7 +148,7 @@ const UsuarioFormModal = ({ Users }) => {
               ))}
             </select>
           </div>
-          {roleID == 2 && (
+          {roleID == 2 ? (
             <>
               <div className="form-group col-md-12">
                 <label htmlFor="compania">Compania:</label>
@@ -159,6 +173,30 @@ const UsuarioFormModal = ({ Users }) => {
                 />
               </div>
             </>
+          ) : (
+            roleID == 1 && (
+              <div className="form-group col-md-12">
+                <label htmlFor="roleID">Obra Social:</label>
+                <select
+                  value={obraSocial}
+                  className="form-select"
+                  onChange={handleChangeObraSocial}
+                >
+                  <option value="" className="default-option">
+                    Seleccionar Obra Social
+                  </option>
+                  {ObrasSociales?.map((os) => (
+                    <option
+                      key={os.codigo}
+                      value={os.codigo}
+                      data-user-os={os.obra_social}
+                    >
+                      {os.obra_social}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )
           )}
         </Modal.Body>
         <Modal.Footer>

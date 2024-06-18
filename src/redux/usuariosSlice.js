@@ -7,6 +7,7 @@ const usuarioDataSlice = createSlice({
   name: "usuario",
   initialState: {},
   rolesState: {},
+  obrasSocialesState: {},
   reducers: {
     getUsuarioData: (state, action) => {
       return {
@@ -18,6 +19,12 @@ const usuarioDataSlice = createSlice({
       return {
         ...state,
         rolesState: action.payload,
+      };
+    },
+    getObrasSocialesData: (state, action) => {
+      return {
+        ...state,
+        obrasSocialesState: action.payload,
       };
     },
     addUsuarioData: (state, action) => {
@@ -54,10 +61,11 @@ export const {
   getRolesData,
   deleteUsuarioData,
   editUsuarioData,
+  getObrasSocialesData,
 } = usuarioDataSlice.actions;
 
 export const addUsuarioDataAPI = (usuarioData) => async (dispatch) => {
-  const { nombre, apellido, correo_electronico, Rol, rol_id, compania } =
+  const { nombre, apellido, correo_electronico, Rol, rol_id, obraSocial } =
     usuarioData;
 
   try {
@@ -69,13 +77,21 @@ export const addUsuarioDataAPI = (usuarioData) => async (dispatch) => {
         Apellido: apellido,
         Email: correo_electronico,
         Rol: Rol,
-        Compania: compania,
       };
       const userRole = {
         usuario_id: response.data.insertId,
         rol_id: parseInt(rol_id),
       };
+
       await axios.post(`${API}usuarios/rol/`, userRole);
+      const userOs = {
+        usuario_id: response.data.insertId,
+        codigo: parseInt(obraSocial),
+      };
+      if (rol_id == 1) {
+        await axios.post(`${API}usuarios/obra-social/`, userOs);
+      }
+
       const action = addUsuarioData(newUsuario);
       dispatch(action);
       Swal.fire({
@@ -89,12 +105,17 @@ export const addUsuarioDataAPI = (usuarioData) => async (dispatch) => {
   }
 };
 export const deleteUsuarioDataAPI = (usuarioData) => {
+  const { rol_id } = usuarioData;
   return async (dispatch) => {
     try {
       const response = await axios.delete(
         `${API}usuarios/rol/${parseInt(usuarioData.usuario_id)}`
       );
-
+      if (rol_id == 1) {
+        await axios.delete(
+          `${API}usuarios/obra-social/${parseInt(usuarioData.usuario_id)}`
+        );
+      }
       if (response.status === 200) {
         await axios.delete(
           `${API}usuarios/${parseInt(usuarioData.usuario_id)}`
@@ -119,7 +140,7 @@ export const editarUsuarioDataAPI = (usuarioData) => {
     correo_electronico,
     usuario_id,
     Rol,
-    compania,
+    obraSocial,
     rol_id,
   } = usuarioData;
   return async (dispatch) => {
@@ -127,12 +148,26 @@ export const editarUsuarioDataAPI = (usuarioData) => {
       const response = await axios.delete(
         `${API}usuarios/rol/${parseInt(usuario_id)}`
       );
+      if (rol_id == 1) {
+        await axios.delete(
+          `${API}usuarios/obra-social/${parseInt(usuario_id)}`
+        );
+      }
+      console.log("llega hasta aca?");
+
       const userRole = {
         usuario_id: parseInt(usuario_id),
         rol_id: parseInt(rol_id),
       };
 
       const response2 = await axios.post(`${API}usuarios/rol/`, userRole);
+      const userOs = {
+        usuario_id: usuario_id,
+        codigo: parseInt(obraSocial),
+      };
+      if (rol_id == 1) {
+        await axios.post(`${API}usuarios/obra-social/`, userOs);
+      }
 
       if (response.status === 200 && response2.status === 200) {
         const response3 = await axios.put(
@@ -146,7 +181,6 @@ export const editarUsuarioDataAPI = (usuarioData) => {
             Apellido: apellido,
             Email: correo_electronico,
             Rol: Rol,
-            Compania: compania,
           };
           const action = editUsuarioData(editUsuario);
           dispatch(action);
@@ -187,6 +221,20 @@ export const getRolesDataAPI = () => {
       const response = await axios.get(`${API}usuarios/roles`);
       if (response.status === 200) {
         const action = getRolesData(response.data);
+        dispatch(action);
+      }
+    } catch (error) {
+      console.log("error ", error);
+    }
+  };
+};
+
+export const getObrasSocialesDataAPI = () => {
+  return async (dispatch) => {
+    try {
+      const response = await axios.get(`${API}usuarios/obras-sociales`);
+      if (response.status === 200) {
+        const action = getObrasSocialesData(response.data);
         dispatch(action);
       }
     } catch (error) {

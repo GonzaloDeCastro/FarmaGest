@@ -4,14 +4,18 @@ import { FaSave } from "react-icons/fa";
 import {
   editarUsuarioDataAPI,
   getRolesDataAPI,
+  getObrasSocialesDataAPI,
 } from "../../redux/usuariosSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { MdEdit } from "react-icons/md";
 const EditUsuarioFormModal = ({ usuarioSelected, Users }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
-
+  console.log("usuarioSelected ", usuarioSelected);
   const Roles = useSelector((state) => state && state?.usuario?.rolesState);
+  const ObrasSociales = useSelector(
+    (state) => state && state?.usuario?.obrasSocialesState
+  );
 
   const [nombre, setNombre] = useState(usuarioSelected?.Nombre);
   const [apellido, setApellido] = useState(usuarioSelected?.Apellido);
@@ -19,6 +23,7 @@ const EditUsuarioFormModal = ({ usuarioSelected, Users }) => {
   const [roleID, setRoleID] = useState(usuarioSelected?.role_id);
   const [compania, setCompania] = useState(usuarioSelected?.Compania);
   const [roleDesc, setRoleDesc] = useState(usuarioSelected?.Rol);
+  const [obraSocial, setObraSocial] = useState(usuarioSelected?.codigo);
   const [cuit, setCuit] = useState(0);
 
   const handleClose = () => setShow(false);
@@ -35,6 +40,7 @@ const EditUsuarioFormModal = ({ usuarioSelected, Users }) => {
           Rol: roleDesc,
           compania: roleID == 2 ? compania : "-",
           cuit: roleID == 2 && cuit.toString(),
+          obraSocial: obraSocial,
         })
       );
       handleClose();
@@ -56,6 +62,7 @@ const EditUsuarioFormModal = ({ usuarioSelected, Users }) => {
   };
   useEffect(() => {
     dispatch(getRolesDataAPI());
+    dispatch(getObrasSocialesDataAPI());
     setNombre(usuarioSelected && usuarioSelected.Nombre);
     setApellido(usuarioSelected && usuarioSelected.Apellido);
     setCorreo(usuarioSelected && usuarioSelected.Email);
@@ -63,7 +70,12 @@ const EditUsuarioFormModal = ({ usuarioSelected, Users }) => {
     setCompania(usuarioSelected && usuarioSelected.Compania);
     setCuit(usuarioSelected && usuarioSelected.cuit);
     setRoleDesc(usuarioSelected && usuarioSelected.Rol);
+    setObraSocial(usuarioSelected && usuarioSelected.codigo);
   }, [dispatch]);
+
+  const handleChangeObraSocial = (e) => {
+    setObraSocial(e.target.value);
+  };
 
   return (
     <>
@@ -133,7 +145,7 @@ const EditUsuarioFormModal = ({ usuarioSelected, Users }) => {
               ))}
             </select>
           </div>
-          {roleID == 2 && (
+          {roleID == 2 ? (
             <>
               <div className="form-group col-md-12">
                 <label htmlFor="compania">Compania:</label>
@@ -158,6 +170,30 @@ const EditUsuarioFormModal = ({ usuarioSelected, Users }) => {
                 />
               </div>
             </>
+          ) : (
+            roleID == 1 && (
+              <div className="form-group col-md-12">
+                <label htmlFor="roleID">Obra Social:</label>
+                <select
+                  value={obraSocial}
+                  className="form-select"
+                  onChange={handleChangeObraSocial}
+                >
+                  <option value="" className="default-option">
+                    Seleccionar Obra Social
+                  </option>
+                  {ObrasSociales?.map((os) => (
+                    <option
+                      key={os.codigo}
+                      value={os.codigo}
+                      data-user-os={os.obra_social}
+                    >
+                      {os.obra_social}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )
           )}
         </Modal.Body>
         <Modal.Footer>
