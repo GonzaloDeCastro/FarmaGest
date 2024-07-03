@@ -118,7 +118,7 @@ const Usuarios = () => {
                   if (
                     column == "usuario_id" ||
                     column == "rol_id" ||
-                    column == "cuit" ||
+                    column == "compania_id" ||
                     column == "codigo"
                   ) {
                     return null;
@@ -159,7 +159,7 @@ const Usuarios = () => {
                       if (
                         column == "usuario_id" ||
                         column == "rol_id" ||
-                        column == "cuit" ||
+                        column == "compania_id" ||
                         column == "codigo"
                       ) {
                         return false;

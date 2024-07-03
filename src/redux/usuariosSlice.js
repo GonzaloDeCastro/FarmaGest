@@ -140,6 +140,11 @@ export const deleteUsuarioDataAPI = (usuarioData) => {
           `${API}usuarios/obra-social/${parseInt(usuarioData.usuario_id)}`
         );
       }
+      if (rol_id == 2) {
+        await axios.delete(
+          `${API}usuarios/compania/${parseInt(usuarioData.usuario_id)}`
+        );
+      }
 
       if (response.status == 200) {
         await axios.delete(
@@ -167,7 +172,9 @@ export const editarUsuarioDataAPI = (usuarioData) => {
     Rol,
     obraSocial,
     rol_id,
+    compania_id,
   } = usuarioData;
+
   return async (dispatch) => {
     try {
       const response = await axios.delete(
@@ -177,6 +184,9 @@ export const editarUsuarioDataAPI = (usuarioData) => {
         await axios.delete(
           `${API}usuarios/obra-social/${parseInt(usuario_id)}`
         );
+      }
+      if (rol_id == 2) {
+        await axios.delete(`${API}usuarios/compania/${parseInt(usuario_id)}`);
       }
 
       const userRole = {
@@ -191,6 +201,13 @@ export const editarUsuarioDataAPI = (usuarioData) => {
       };
       if (rol_id == 1) {
         await axios.post(`${API}usuarios/obra-social/`, userOs);
+      }
+      const userCompania = {
+        usuario_id: usuario_id,
+        compania_id: parseInt(compania_id),
+      };
+      if (rol_id == 2) {
+        await axios.post(`${API}usuarios/compania/`, userCompania);
       }
 
       if (response.status == 200 && response2.status == 200) {

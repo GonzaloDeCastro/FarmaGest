@@ -5,7 +5,12 @@ import { FaSave } from "react-icons/fa";
 import { editarUsuarioDataAPI } from "../../redux/usuariosSlice";
 import { useDispatch } from "react-redux";
 import { MdEdit } from "react-icons/md";
-const EditUsuarioFormModal = ({ usuarioSelected, Roles, ObrasSociales }) => {
+const EditUsuarioFormModal = ({
+  usuarioSelected,
+  Roles,
+  ObrasSociales,
+  Companias,
+}) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
 
@@ -13,14 +18,13 @@ const EditUsuarioFormModal = ({ usuarioSelected, Roles, ObrasSociales }) => {
   const [apellido, setApellido] = useState(usuarioSelected?.Apellido);
   const [correo, setCorreo] = useState(usuarioSelected?.Email);
   const [roleID, setRoleID] = useState(usuarioSelected?.role_id);
-  const [compania, setCompania] = useState(usuarioSelected?.Compania);
+  const [compania, setCompania] = useState(usuarioSelected?.compania_id);
   const [roleDesc, setRoleDesc] = useState(usuarioSelected?.Rol);
   const [obraSocial, setObraSocial] = useState(usuarioSelected?.codigo);
-  const [cuit, setCuit] = useState(0);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const handleAddUsuario = () => {
+  const handleEditUsuario = () => {
     try {
       dispatch(
         editarUsuarioDataAPI({
@@ -30,8 +34,7 @@ const EditUsuarioFormModal = ({ usuarioSelected, Roles, ObrasSociales }) => {
           correo_electronico: correo,
           rol_id: roleID == 0 ? null : roleID,
           Rol: roleDesc,
-          compania: roleID == 2 ? compania : "-",
-          cuit: roleID == 2 && cuit.toString(),
+          compania_id: roleID == 2 ? compania : "-",
           obraSocial: obraSocial,
         })
       );
@@ -45,26 +48,22 @@ const EditUsuarioFormModal = ({ usuarioSelected, Roles, ObrasSociales }) => {
       e.target.selectedOptions[0].getAttribute("data-user-role");
     setRoleDesc(selectedCompaniaDesc);
   };
-  const handleCuitChange = (e) => {
-    const value = e.target.value;
 
-    if (/^\d{0,11}$/.test(value)) {
-      setCuit(value);
-    }
-  };
   useEffect(() => {
     setNombre(usuarioSelected && usuarioSelected.Nombre);
     setApellido(usuarioSelected && usuarioSelected.Apellido);
     setCorreo(usuarioSelected && usuarioSelected.Email);
     setRoleID(usuarioSelected && usuarioSelected.rol_id);
-    setCompania(usuarioSelected && usuarioSelected.Compania);
-    setCuit(usuarioSelected && usuarioSelected.cuit);
+    setCompania(usuarioSelected && usuarioSelected.compania_id);
     setRoleDesc(usuarioSelected && usuarioSelected.Rol);
     setObraSocial(usuarioSelected && usuarioSelected.codigo);
   }, [dispatch, usuarioSelected]);
 
   const handleChangeObraSocial = (e) => {
     setObraSocial(e.target.value);
+  };
+  const handleChangeCompania = (e) => {
+    setCompania(e.target.value);
   };
 
   return (
@@ -137,30 +136,27 @@ const EditUsuarioFormModal = ({ usuarioSelected, Roles, ObrasSociales }) => {
             </select>
           </div>
           {roleID == 2 ? (
-            <>
-              <div className="form-group col-md-12">
-                <label htmlFor="compania">Compania:</label>
-                <input
-                  type="text"
-                  usuario_id="compania"
-                  className="form-control"
-                  value={compania}
-                  onChange={(e) => setCompania(e.target.value)}
-                />
-              </div>
-              <div className="form-group col-md-12">
-                <label htmlFor="cuit">C.U.I.T.:</label>
-                <input
-                  type="number"
-                  usuario_id="cuit"
-                  className="form-control"
-                  value={cuit}
-                  max={99999999999}
-                  onChange={handleCuitChange}
-                  /* onChange={(e) => setCuit(parseInt(e.target.value))} */
-                />
-              </div>
-            </>
+            <div className="form-group col-md-12">
+              <label htmlFor="roleID">Compania:</label>
+              <select
+                value={compania}
+                className="form-select"
+                onChange={handleChangeCompania}
+              >
+                <option value="" className="default-option">
+                  Seleccionar Compania
+                </option>
+                {Companias?.map((compania) => (
+                  <option
+                    key={compania.compania_id}
+                    value={compania.compania_id}
+                    data-compania={compania.compania}
+                  >
+                    {compania.compania}
+                  </option>
+                ))}
+              </select>
+            </div>
           ) : (
             roleID == 1 && (
               <div className="form-group col-md-12">
@@ -188,7 +184,7 @@ const EditUsuarioFormModal = ({ usuarioSelected, Roles, ObrasSociales }) => {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button className="buttonConfirm" onClick={handleAddUsuario}>
+          <Button className="buttonConfirm" onClick={handleEditUsuario}>
             <FaSave className="iconConfirm" />
             Editar
           </Button>
