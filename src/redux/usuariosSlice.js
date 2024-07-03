@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -8,6 +9,7 @@ const usuarioDataSlice = createSlice({
   initialState: {},
   rolesState: {},
   obrasSocialesState: {},
+  companiasState: {},
   reducers: {
     getUsuarioData: (state, action) => {
       return {
@@ -25,6 +27,12 @@ const usuarioDataSlice = createSlice({
       return {
         ...state,
         obrasSocialesState: action.payload,
+      };
+    },
+    getCompaniasData: (state, action) => {
+      return {
+        ...state,
+        companiasState: action.payload,
       };
     },
     addUsuarioData: (state, action) => {
@@ -46,7 +54,7 @@ const usuarioDataSlice = createSlice({
       return {
         ...state,
         initialState: state.initialState.map((usuarioData) =>
-          usuarioData?.usuario_id === action?.payload?.usuario_id
+          usuarioData?.usuario_id == action?.payload?.usuario_id
             ? action.payload
             : usuarioData
         ),
@@ -62,15 +70,23 @@ export const {
   deleteUsuarioData,
   editUsuarioData,
   getObrasSocialesData,
+  getCompaniasData,
 } = usuarioDataSlice.actions;
 
 export const addUsuarioDataAPI = (usuarioData) => async (dispatch) => {
-  const { nombre, apellido, correo_electronico, Rol, rol_id, obraSocial } =
-    usuarioData;
+  const {
+    nombre,
+    apellido,
+    correo_electronico,
+    Rol,
+    rol_id,
+    obraSocial,
+    compania,
+  } = usuarioData;
 
   try {
     const response = await axios.post(`${API}usuarios/`, usuarioData);
-    if (response.status === 200) {
+    if (response.status == 200) {
       const newUsuario = {
         usuario_id: response.data.insertId,
         Nombre: nombre,
@@ -90,6 +106,14 @@ export const addUsuarioDataAPI = (usuarioData) => async (dispatch) => {
       };
       if (rol_id == 1) {
         await axios.post(`${API}usuarios/obra-social/`, userOs);
+      }
+      const userCompania = {
+        usuario_id: response.data.insertId,
+        compania_id: parseInt(compania),
+      };
+      console.log("userCompania ", userCompania);
+      if (rol_id == 2) {
+        await axios.post(`${API}usuarios/compania/`, userCompania);
       }
 
       const action = addUsuarioData(newUsuario);
@@ -116,7 +140,8 @@ export const deleteUsuarioDataAPI = (usuarioData) => {
           `${API}usuarios/obra-social/${parseInt(usuarioData.usuario_id)}`
         );
       }
-      if (response.status === 200) {
+
+      if (response.status == 200) {
         await axios.delete(
           `${API}usuarios/${parseInt(usuarioData.usuario_id)}`
         );
@@ -168,12 +193,12 @@ export const editarUsuarioDataAPI = (usuarioData) => {
         await axios.post(`${API}usuarios/obra-social/`, userOs);
       }
 
-      if (response.status === 200 && response2.status === 200) {
+      if (response.status == 200 && response2.status == 200) {
         const response3 = await axios.put(
           `${API}usuarios/${parseInt(usuarioData.usuario_id)}`,
           usuarioData
         );
-        if (response3.status === 200) {
+        if (response3.status == 200) {
           const editUsuario = {
             usuario_id: usuario_id,
             Nombre: nombre,
@@ -217,7 +242,7 @@ export const getUsuarioDataAPI = (
         },
       });
 
-      if (response.status === 200) {
+      if (response.status == 200) {
         const action = getUsuarioData(response.data);
 
         dispatch(action);
@@ -232,7 +257,7 @@ export const getRolesDataAPI = () => {
   return async (dispatch) => {
     try {
       const response = await axios.get(`${API}usuarios/roles`);
-      if (response.status === 200) {
+      if (response.status == 200) {
         const action = getRolesData(response.data);
         dispatch(action);
       }
@@ -246,8 +271,22 @@ export const getObrasSocialesDataAPI = () => {
   return async (dispatch) => {
     try {
       const response = await axios.get(`${API}usuarios/obras-sociales`);
-      if (response.status === 200) {
+      if (response.status == 200) {
         const action = getObrasSocialesData(response.data);
+        dispatch(action);
+      }
+    } catch (error) {
+      console.log("error ", error);
+    }
+  };
+};
+
+export const getCompaniasDataAPI = () => {
+  return async (dispatch) => {
+    try {
+      const response = await axios.get(`${API}usuarios/companias`);
+      if (response.status == 200) {
+        const action = getCompaniasData(response.data);
         dispatch(action);
       }
     } catch (error) {

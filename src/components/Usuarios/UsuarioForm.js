@@ -1,28 +1,20 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable eqeqeq */
+import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { FaPlusCircle, FaSave } from "react-icons/fa";
-import {
-  addUsuarioDataAPI,
-  getRolesDataAPI,
-  getObrasSocialesDataAPI,
-} from "../../redux/usuariosSlice";
+import { addUsuarioDataAPI } from "../../redux/usuariosSlice";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
-const UsuarioFormModal = ({ Users }) => {
+const UsuarioFormModal = ({ Roles, ObrasSociales, Companias }) => {
   const dispatch = useDispatch();
-  const Roles = useSelector((state) => state && state?.usuario?.rolesState);
-  const ObrasSociales = useSelector(
-    (state) => state && state?.usuario?.obrasSocialesState
-  );
 
   const [show, setShow] = useState(false);
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [correo, setCorreo] = useState("");
-
   const [compania, setCompania] = useState("");
-  const [cuit, setCuit] = useState(0);
+
   const [obraSocial, setObraSocial] = useState(0);
   const [roleID, setRoleID] = useState(0);
   const [roleDesc, setRoleDesc] = useState("");
@@ -36,10 +28,9 @@ const UsuarioFormModal = ({ Users }) => {
           nombre: nombre,
           apellido: apellido,
           correo_electronico: correo,
-          rol_id: roleID === 0 ? null : roleID,
+          rol_id: roleID == 0 ? null : roleID,
           Rol: roleDesc,
           compania: roleID == 2 ? compania : "-",
-          cuit: roleID == 2 && cuit.toString(),
           obraSocial: obraSocial,
           /*  descripcion: roleDesc, */
         })
@@ -60,20 +51,12 @@ const UsuarioFormModal = ({ Users }) => {
     setRoleDesc(selectedCompaniaDesc);
   };
 
+  const handleChangeCompania = (e) => {
+    setCompania(e.target.value);
+  };
+  console.log("compania ", compania);
   const handleChangeObraSocial = (e) => {
     setObraSocial(e.target.value);
-  };
-  useEffect(() => {
-    dispatch(getRolesDataAPI());
-    dispatch(getObrasSocialesDataAPI());
-  }, [dispatch]);
-
-  const handleCuitChange = (e) => {
-    const value = e.target.value;
-
-    if (/^\d{0,11}$/.test(value)) {
-      setCuit(value);
-    }
   };
 
   return (
@@ -149,30 +132,27 @@ const UsuarioFormModal = ({ Users }) => {
             </select>
           </div>
           {roleID == 2 ? (
-            <>
-              <div className="form-group col-md-12">
-                <label htmlFor="compania">Compania:</label>
-                <input
-                  type="text"
-                  usuario_id="compania"
-                  className="form-control"
-                  value={compania}
-                  onChange={(e) => setCompania(e.target.value)}
-                />
-              </div>
-              <div className="form-group col-md-12">
-                <label htmlFor="cuit">C.U.I.T.:</label>
-                <input
-                  type="number"
-                  usuario_id="cuit"
-                  className="form-control"
-                  value={cuit}
-                  max={99999999999}
-                  onChange={handleCuitChange}
-                  /* onChange={(e) => setCuit(parseInt(e.target.value))} */
-                />
-              </div>
-            </>
+            <div className="form-group col-md-12">
+              <label htmlFor="roleID">Compania:</label>
+              <select
+                value={compania}
+                className="form-select"
+                onChange={handleChangeCompania}
+              >
+                <option value="" className="default-option">
+                  Seleccionar Compania
+                </option>
+                {Companias?.map((compania) => (
+                  <option
+                    key={compania.compania_id}
+                    value={compania.compania_id}
+                    data-compania={compania.compania}
+                  >
+                    {compania.compania}
+                  </option>
+                ))}
+              </select>
+            </div>
           ) : (
             roleID == 1 && (
               <div className="form-group col-md-12">

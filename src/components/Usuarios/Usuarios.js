@@ -1,9 +1,12 @@
+/* eslint-disable eqeqeq */
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getUsuarioDataAPI,
   deleteUsuarioDataAPI,
   getRolesDataAPI,
+  getObrasSocialesDataAPI,
+  getCompaniasDataAPI,
 } from "../../redux/usuariosSlice";
 import { FaRegTrashCan } from "react-icons/fa6";
 
@@ -14,17 +17,24 @@ import EditUsuarioFormModal from "./EditUsuarioForm";
 const Usuarios = () => {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(7);
+
   const [search, setSearch] = useState("");
   const [roleID, setRoleID] = useState(0);
+  const pageSize = 7;
   useEffect(() => {
     dispatch(getUsuarioDataAPI(page, pageSize, search, roleID));
     dispatch(getRolesDataAPI());
+    dispatch(getObrasSocialesDataAPI());
+    dispatch(getCompaniasDataAPI());
   }, [page, pageSize, search, roleID, dispatch]);
-
-  const [roleDesc, setRoleDesc] = useState("");
   const Usuarios = useSelector((state) => state?.usuario);
   const Roles = useSelector((state) => state && state?.usuario?.rolesState);
+  const ObrasSociales = useSelector(
+    (state) => state && state?.usuario?.obrasSocialesState
+  );
+  const Companias = useSelector(
+    (state) => state && state?.usuario?.companiasState
+  );
 
   const keys = Object?.keys(
     (Usuarios && Usuarios.initialState && Usuarios.initialState[0]) || {}
@@ -47,9 +57,6 @@ const Usuarios = () => {
 
   const handleChange = (e) => {
     setRoleID(e.target.value);
-    const selectedCompaniaDesc =
-      e.target.selectedOptions[0].getAttribute("data-user-role");
-    setRoleDesc(selectedCompaniaDesc);
   };
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -94,7 +101,11 @@ const Usuarios = () => {
           </select>
         </div>
         <div style={{ display: "flex" }}>
-          <UsuarioForm Users={Usuarios} />
+          <UsuarioForm
+            Roles={Roles}
+            ObrasSociales={ObrasSociales}
+            Companias={Companias}
+          />
         </div>
       </div>
       <div className="containerTableAndPagesSelected">
@@ -105,19 +116,19 @@ const Usuarios = () => {
                 //quito columna usuario_id
                 {
                   if (
-                    column === "usuario_id" ||
-                    column === "rol_id" ||
-                    column === "cuit" ||
-                    column === "codigo"
+                    column == "usuario_id" ||
+                    column == "rol_id" ||
+                    column == "cuit" ||
+                    column == "codigo"
                   ) {
                     return null;
                   }
 
                   // Mostrar "compania" solo si roleID es igual a 2
-                  if (column === "Compania" && roleID != 2) {
+                  if (column == "Compania" && roleID !== 2) {
                     return null;
                   }
-                  if (column === "obra_social" && roleID != 1) {
+                  if (column == "obra_social" && roleID !== 1) {
                     return null;
                   }
 
@@ -133,7 +144,7 @@ const Usuarios = () => {
             </tr>
           </thead>
           <tbody>
-            {Object?.keys(Usuarios)?.length === 0 ? (
+            {Object?.keys(Usuarios)?.length == 0 ? (
               <div
                 className="spinner-border"
                 style={{ marginTop: "10%", width: "100px", height: "100px" }}
@@ -146,18 +157,18 @@ const Usuarios = () => {
                     ?.filter((column) => {
                       // Excluir "usuario_id", "rol_id", y "cuit"
                       if (
-                        column === "usuario_id" ||
-                        column === "rol_id" ||
-                        column === "cuit" ||
-                        column === "codigo"
+                        column == "usuario_id" ||
+                        column == "rol_id" ||
+                        column == "cuit" ||
+                        column == "codigo"
                       ) {
                         return false;
                       }
                       // Excluir "compania" si roleID no es igual a 2
-                      if (column === "Compania" && roleID != 2) {
+                      if (column == "Compania" && roleID !== 2) {
                         return false;
                       }
-                      if (column === "obra_social" && roleID != 1) {
+                      if (column == "obra_social" && roleID !== 1) {
                         return false;
                       }
                       return true;
@@ -177,7 +188,9 @@ const Usuarios = () => {
                   >
                     <EditUsuarioFormModal
                       usuarioSelected={dato}
-                      Users={Usuarios}
+                      Roles={Roles}
+                      ObrasSociales={ObrasSociales}
+                      Companias={Companias}
                     />
                     <FaRegTrashCan
                       className="iconABM"
@@ -194,7 +207,7 @@ const Usuarios = () => {
         <div>
           <button
             onClick={() => handlePageChange(page - 1)}
-            disabled={page === 1}
+            disabled={page == 1}
             className="buttonPage"
           >
             Previous

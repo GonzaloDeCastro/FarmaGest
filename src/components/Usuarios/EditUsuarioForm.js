@@ -1,21 +1,13 @@
+/* eslint-disable eqeqeq */
 import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { FaSave } from "react-icons/fa";
-import {
-  editarUsuarioDataAPI,
-  getRolesDataAPI,
-  getObrasSocialesDataAPI,
-} from "../../redux/usuariosSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { editarUsuarioDataAPI } from "../../redux/usuariosSlice";
+import { useDispatch } from "react-redux";
 import { MdEdit } from "react-icons/md";
-const EditUsuarioFormModal = ({ usuarioSelected, Users }) => {
+const EditUsuarioFormModal = ({ usuarioSelected, Roles, ObrasSociales }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
-
-  const Roles = useSelector((state) => state && state?.usuario?.rolesState);
-  const ObrasSociales = useSelector(
-    (state) => state && state?.usuario?.obrasSocialesState
-  );
 
   const [nombre, setNombre] = useState(usuarioSelected?.Nombre);
   const [apellido, setApellido] = useState(usuarioSelected?.Apellido);
@@ -36,7 +28,7 @@ const EditUsuarioFormModal = ({ usuarioSelected, Users }) => {
           nombre: nombre,
           apellido: apellido,
           correo_electronico: correo,
-          rol_id: roleID === 0 ? null : roleID,
+          rol_id: roleID == 0 ? null : roleID,
           Rol: roleDesc,
           compania: roleID == 2 ? compania : "-",
           cuit: roleID == 2 && cuit.toString(),
@@ -61,8 +53,6 @@ const EditUsuarioFormModal = ({ usuarioSelected, Users }) => {
     }
   };
   useEffect(() => {
-    dispatch(getRolesDataAPI());
-    dispatch(getObrasSocialesDataAPI());
     setNombre(usuarioSelected && usuarioSelected.Nombre);
     setApellido(usuarioSelected && usuarioSelected.Apellido);
     setCorreo(usuarioSelected && usuarioSelected.Email);
@@ -71,7 +61,7 @@ const EditUsuarioFormModal = ({ usuarioSelected, Users }) => {
     setCuit(usuarioSelected && usuarioSelected.cuit);
     setRoleDesc(usuarioSelected && usuarioSelected.Rol);
     setObraSocial(usuarioSelected && usuarioSelected.codigo);
-  }, [dispatch]);
+  }, [dispatch, usuarioSelected]);
 
   const handleChangeObraSocial = (e) => {
     setObraSocial(e.target.value);
