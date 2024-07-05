@@ -26,7 +26,7 @@ const EditClienteForm = ({ clienteSelected, ObrasSociales, Ciudades }) => {
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  console.log("clienteSelected ", clienteSelected);
+
   const handleEditCliente = () => {
     try {
       dispatch(

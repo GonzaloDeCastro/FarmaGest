@@ -17,7 +17,7 @@ const EditProductFormModal = ({ productSelected, Categorias }) => {
   const [categoriaDesc, setCategoriaDesc] = useState(
     productSelected?.Categoria
   );
-  console.log("productSelected ", productSelected);
+
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const handleAddProduct = () => {

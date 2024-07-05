@@ -72,7 +72,6 @@ const Usuarios = () => {
             onChange={handleSearchChange}
             placeholder=" &#xF002; Buscar..."
           />
-
           <select
             value={roleID}
             className="inputSearch"

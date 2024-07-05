@@ -95,7 +95,6 @@ export const getClientesAPI = (
 };
 
 export const addClienteAPI = (clienteData) => {
-  console.log("clienteData ", clienteData);
   return async (dispatch) => {
     try {
       const response = await axios.post(`${API}/clientes`, clienteData);
@@ -199,7 +198,6 @@ export const getObrasSocialesAPI = () => {
       const response = await axios.get(`${API}/clientes/obras-sociales`);
 
       if (response.status === 200) {
-        console.log("response", response);
         dispatch(getObrasSociales(response.data));
       }
     } catch (error) {
@@ -214,7 +212,6 @@ export const getCiudadesAPI = () => {
       const response = await axios.get(`${API}/clientes/ciudades`);
 
       if (response.status === 200) {
-        console.log("response", response);
         dispatch(getCiudades(response.data));
       }
     } catch (error) {
