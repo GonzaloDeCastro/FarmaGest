@@ -1,14 +1,197 @@
-import React from "react";
-import { IoMdConstruct } from "react-icons/io";
+/* eslint-disable eqeqeq */
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getClientesAPI,
+  deleteClienteAPI,
+  getObrasSocialesAPI,
+  getCiudadesAPI,
+} from "../../redux/clientesSlice";
+import { FaRegTrashAlt } from "react-icons/fa";
+import Swal from "sweetalert2";
+import ClienteForm from "./ClienteForm";
+import EditClienteForm from "./EditClienteForm";
 
 const Clientes = () => {
+  const dispatch = useDispatch();
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [obraSocialID, setObraSocialID] = useState(0);
+  const [ciudadID, setCiudadID] = useState(0);
+  const pageSize = 7;
+
+  const clientes = useSelector(
+    (state) => state && state.cliente && state.cliente
+  );
+  const ObrasSociales = useSelector(
+    (state) => state && state.cliente && state.cliente.obrasSocialesState
+  );
+  const Ciudades = useSelector(
+    (state) => state && state.cliente && state.cliente.ciudadesState
+  );
+
+  useEffect(() => {
+    dispatch(getClientesAPI(page, pageSize, search, obraSocialID, ciudadID));
+    dispatch(getObrasSocialesAPI());
+    dispatch(getCiudadesAPI());
+  }, [dispatch, page, pageSize, search, obraSocialID, ciudadID]);
+
+  const keys = Object.keys(
+    (clientes && clientes.initialState && clientes.initialState[0]) || {}
+  );
+
+  const handleDelete = (cliente) => {
+    Swal.fire({
+      title: "Warning!",
+      text: `¿Está seguro que desea eliminar al cliente ${cliente.Nombre} ${cliente.Apellido}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteClienteAPI(cliente));
+      }
+    });
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
+  const handleObraSocialChange = (e) => {
+    setObraSocialID(e.target.value);
+  };
+
+  const handleCiudadChange = (e) => {
+    setCiudadID(e.target.value);
+  };
+
   return (
-    <div className="buildPage">
-      <div>
-        <IoMdConstruct className="iconBuild" />
+    <div className="containerSelected">
+      <div className="headerSelected">
+        <div style={{ display: "flex" }}>
+          <input
+            className="inputSearch"
+            type="text"
+            value={search}
+            onChange={handleSearchChange}
+            placeholder="&#xF002; Buscar..."
+          />
+
+          <select
+            value={obraSocialID}
+            className="inputSearch"
+            onChange={handleObraSocialChange}
+            style={{ marginLeft: "10px" }}
+          >
+            <option value="">Seleccionar obra social</option>
+            {/* Opciones de obra social */}
+          </select>
+
+          <select
+            value={ciudadID}
+            className="inputSearch"
+            onChange={handleCiudadChange}
+            style={{ marginLeft: "10px" }}
+          >
+            <option value="">Seleccionar ciudad</option>
+            {/* Opciones de ciudad */}
+          </select>
+        </div>
+        <div style={{ display: "flex" }}>
+          <ClienteForm />
+        </div>
       </div>
-      Página Clientes en construcción
+      <div className="containerTableAndPagesSelected">
+        <table className="headerTable">
+          <thead>
+            <tr>
+              {keys.map((column) => {
+                if (
+                  column === "cliente_id" ||
+                  column === "obra_social" ||
+                  column === "ciudad_id"
+                ) {
+                  return null;
+                }
+                return <th key={column}>{column}</th>;
+              })}
+              <th style={{ width: "70px" }}>Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {clientes &&
+            clientes.initialState &&
+            clientes.initialState.length === 0 ? (
+              <tr>
+                <td colSpan={keys.length + 1} className="NoData">
+                  Sin datos
+                </td>
+              </tr>
+            ) : (
+              clientes &&
+              clientes.initialState &&
+              clientes.initialState.map((cliente) => (
+                <tr key={cliente.cliente_id}>
+                  {keys.map((column) => {
+                    if (
+                      column === "cliente_id" ||
+                      column === "obra_social" ||
+                      column === "ciudad_id"
+                    ) {
+                      return null;
+                    }
+                    return (
+                      <td key={`${cliente.cliente_id}-${column}`}>
+                        {cliente[column]}
+                      </td>
+                    );
+                  })}
+                  <td style={{ flexWrap: "nowrap" }}>
+                    <EditClienteForm
+                      cliente={cliente}
+                      ObrasSociales={ObrasSociales && ObrasSociales}
+                      Ciudades={Ciudades && Ciudades}
+                    />
+                    <FaRegTrashAlt
+                      className="iconABM"
+                      onClick={() => handleDelete(cliente)}
+                    />
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+        <div>
+          <button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 1}
+            className="buttonPage"
+          >
+            Anterior
+          </button>
+          <button
+            onClick={() => handlePageChange(page + 1)}
+            style={{ marginLeft: "10px" }}
+            disabled={
+              clientes &&
+              clientes.initialState &&
+              clientes.initialState.length < pageSize
+            }
+            className="buttonPage"
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
+
 export default Clientes;

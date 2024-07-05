@@ -17,7 +17,7 @@ const EditProveedorForm = ({ proveedorSelected }) => {
   const [email, setEmail] = useState(proveedorSelected?.Email);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  console.log("proveedorSelected ", proveedorSelected);
+
   const handleEditProveedor = () => {
     try {
       dispatch(

@@ -27,7 +27,7 @@ const Proveedores = () => {
     (Proveedores && Proveedores.initialState && Proveedores.initialState[0]) ||
       {}
   );
-  console.log("Proveedores ", Proveedores);
+
   const handleDelete = (dato) => {
     Swal.fire({
       title: "Warning!",
