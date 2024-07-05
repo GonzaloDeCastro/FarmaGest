@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import productosReducer from "../redux/productosSlice";
-import usuarioReducer from "../redux/usuariosSlice";
+import productoDataSlice from "../redux/productosSlice";
+import usuarioDataSlice from "../redux/usuariosSlice";
+import proveedorDataSlice from "../redux/proveedoresSlice";
 
 export default configureStore({
   reducer: {
-    producto: productosReducer,
-    usuario: usuarioReducer,
+    producto: productoDataSlice,
+    usuario: usuarioDataSlice,
+    proveedor: proveedorDataSlice,
   },
 });

@@ -2,40 +2,32 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { FaSave } from "react-icons/fa";
-import { editarUsuarioDataAPI } from "../../redux/usuariosSlice";
+import { editUsuarioAPI } from "../../redux/usuariosSlice";
 import { useDispatch } from "react-redux";
 import { MdEdit } from "react-icons/md";
-const EditUsuarioFormModal = ({
-  usuarioSelected,
-  Roles,
-  ObrasSociales,
-  Companias,
-}) => {
+const EditUsuarioFormModal = ({ usuarioSelected, Roles }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
 
   const [nombre, setNombre] = useState(usuarioSelected?.Nombre);
   const [apellido, setApellido] = useState(usuarioSelected?.Apellido);
-  const [correo, setCorreo] = useState(usuarioSelected?.Email);
-  const [roleID, setRoleID] = useState(usuarioSelected?.role_id);
-  const [compania, setCompania] = useState(usuarioSelected?.compania_id);
+  const [correo, setCorreo] = useState(usuarioSelected?.Correo);
+  const [roleID, setRoleID] = useState(usuarioSelected?.rol_id);
   const [roleDesc, setRoleDesc] = useState(usuarioSelected?.Rol);
-  const [obraSocial, setObraSocial] = useState(usuarioSelected?.codigo);
+  const [userID, setUserID] = useState(usuarioSelected?.usuario_id);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const handleEditUsuario = () => {
     try {
       dispatch(
-        editarUsuarioDataAPI({
-          usuario_id: usuarioSelected && parseInt(usuarioSelected.usuario_id),
+        editUsuarioAPI({
+          usuario_id: parseInt(userID),
           nombre: nombre,
           apellido: apellido,
-          correo_electronico: correo,
+          correo: correo,
           rol_id: roleID == 0 ? null : roleID,
           Rol: roleDesc,
-          compania_id: roleID == 2 ? compania : "-",
-          obraSocial: obraSocial,
         })
       );
       handleClose();
@@ -52,19 +44,11 @@ const EditUsuarioFormModal = ({
   useEffect(() => {
     setNombre(usuarioSelected && usuarioSelected.Nombre);
     setApellido(usuarioSelected && usuarioSelected.Apellido);
-    setCorreo(usuarioSelected && usuarioSelected.Email);
+    setCorreo(usuarioSelected && usuarioSelected.Correo);
     setRoleID(usuarioSelected && usuarioSelected.rol_id);
-    setCompania(usuarioSelected && usuarioSelected.compania_id);
     setRoleDesc(usuarioSelected && usuarioSelected.Rol);
-    setObraSocial(usuarioSelected && usuarioSelected.codigo);
+    setUserID(usuarioSelected && usuarioSelected.usuario_id);
   }, [dispatch, usuarioSelected]);
-
-  const handleChangeObraSocial = (e) => {
-    setObraSocial(e.target.value);
-  };
-  const handleChangeCompania = (e) => {
-    setCompania(e.target.value);
-  };
 
   return (
     <>
@@ -118,7 +102,6 @@ const EditUsuarioFormModal = ({
               value={roleID}
               className="form-select"
               onChange={handleChange}
-              disabled
             >
               <option value="" className="default-option">
                 Seleccionar rol
@@ -127,61 +110,13 @@ const EditUsuarioFormModal = ({
                 <option
                   key={rol.rol_id}
                   value={rol.rol_id}
-                  data-user-role={rol.descripcion}
+                  data-user-role={rol.rol}
                 >
-                  {rol.descripcion.charAt(0).toUpperCase() +
-                    rol.descripcion.slice(1)}
+                  {rol.rol.charAt(0).toUpperCase() + rol.rol.slice(1)}
                 </option>
               ))}
             </select>
           </div>
-          {roleID == 2 ? (
-            <div className="form-group col-md-12">
-              <label htmlFor="roleID">Compania:</label>
-              <select
-                value={compania}
-                className="form-select"
-                onChange={handleChangeCompania}
-              >
-                <option value="" className="default-option">
-                  Seleccionar Compania
-                </option>
-                {Companias?.map((compania) => (
-                  <option
-                    key={compania.compania_id}
-                    value={compania.compania_id}
-                    data-compania={compania.compania}
-                  >
-                    {compania.compania}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ) : (
-            roleID == 1 && (
-              <div className="form-group col-md-12">
-                <label htmlFor="roleID">Obra Social:</label>
-                <select
-                  value={obraSocial}
-                  className="form-select"
-                  onChange={handleChangeObraSocial}
-                >
-                  <option value="" className="default-option">
-                    Seleccionar Obra Social
-                  </option>
-                  {ObrasSociales?.map((os) => (
-                    <option
-                      key={os.codigo}
-                      value={os.codigo}
-                      data-user-os={os.obra_social}
-                    >
-                      {os.obra_social}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )
-          )}
         </Modal.Body>
         <Modal.Footer>
           <Button className="buttonConfirm" onClick={handleEditUsuario}>

@@ -1,19 +1,21 @@
 import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { FaPlusCircle, FaSave } from "react-icons/fa";
-import { addProductDataAPI } from "../../redux/productosSlice";
+import { addProductoAPI } from "../../redux/productosSlice";
 
 import { useDispatch } from "react-redux";
 
-const ProductFormModal = ({ Users }) => {
+const ProductFormModal = ({ Categorias }) => {
   const dispatch = useDispatch();
 
   const [show, setShow] = useState(false);
-  const [productName, setProductName] = useState("");
-  const [price, setPrice] = useState(0);
-  const [quantity, setQuantity] = useState("");
-  const [companiaID, setCompaniaID] = useState(0);
-  const [companiaDesc, setCompaniaDesc] = useState("");
+  const [productoNombre, setProductoNombre] = useState("");
+  const [codigo, setCodigo] = useState("");
+  const [marca, setMarca] = useState("");
+  const [precio, setPrecio] = useState(0);
+  const [cantidad, setCantidad] = useState("");
+  const [categoriaID, setCategoria] = useState(0);
+  const [categoriaDesc, setCategoriaDesc] = useState("");
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -21,27 +23,30 @@ const ProductFormModal = ({ Users }) => {
   const handleAddProduct = () => {
     try {
       dispatch(
-        addProductDataAPI({
-          nombre_producto: productName,
-          precio: price,
-          cantidad: quantity,
-          proveedor_id: companiaID === 0 ? null : companiaID,
-          Compania: companiaDesc,
+        addProductoAPI({
+          nombre: productoNombre,
+          codigo: codigo,
+          marca: marca,
+          categoria_id: categoriaID === 0 ? null : categoriaID,
+          precio: precio,
+          stock: cantidad,
+          Categoria: categoriaDesc,
         })
       );
       handleClose();
-      setCompaniaID(0);
-      setProductName("");
-      setPrice(0);
-      setQuantity(0);
+      setCategoria(0);
+      setProductoNombre("");
+      setPrecio(0);
+      setCantidad(0);
     } catch {}
   };
 
   const handleChange = (e) => {
-    setCompaniaID(e.target.value);
-    const selectedCompaniaDesc =
-      e.target.selectedOptions[0].getAttribute("data-user-compania");
-    setCompaniaDesc(selectedCompaniaDesc);
+    setCategoria(e.target.value);
+    const selectedCategoriaDesc = e.target.selectedOptions[0].getAttribute(
+      "data-user-categoria"
+    );
+    setCategoriaDesc(selectedCategoriaDesc);
   };
 
   return (
@@ -64,52 +69,72 @@ const ProductFormModal = ({ Users }) => {
         <Modal.Body>
           <div className="form-row">
             <div className="form-group col-md-12">
-              <label htmlFor="productName">Nombre del producto:</label>
+              <label htmlFor="productoNombre">Nombre del producto:</label>
               <input
                 type="text"
-                producto_id="productName"
+                producto_id="productoNombre"
                 className="form-control"
-                value={productName}
-                onChange={(e) => setProductName(e.target.value)}
+                value={productoNombre}
+                onChange={(e) => setProductoNombre(e.target.value)}
               />
             </div>
             <div className="form-group col-md-12">
-              <label htmlFor="price">Precio:</label>
+              <label htmlFor="codigo">Codigo:</label>
+              <input
+                type="text"
+                producto_id="codigo"
+                className="form-control"
+                value={codigo}
+                onChange={(e) => setCodigo(e.target.value)}
+              />
+            </div>
+            <div className="form-group col-md-12">
+              <label htmlFor="productoNombre">Marca:</label>
+              <input
+                type="text"
+                producto_id="marca"
+                className="form-control"
+                value={marca}
+                onChange={(e) => setMarca(e.target.value)}
+              />
+            </div>
+            <div className="form-group col-md-12">
+              <label htmlFor="precio">Precio:</label>
               <input
                 type="number"
-                producto_id="price"
+                producto_id="precio"
                 className="form-control"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                value={precio}
+                onChange={(e) => setPrecio(e.target.value)}
               />
             </div>
             <div className="form-group col-md-12">
-              <label htmlFor="quantity">Cantidad:</label>
+              <label htmlFor="cantidad">Cantidad:</label>
               <input
                 type="number"
-                producto_id="quantity"
+                producto_id="cantidad"
                 className="form-control"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
+                value={cantidad}
+                onChange={(e) => setCantidad(e.target.value)}
               />
             </div>
             <div className="form-group col-md-12">
-              <label htmlFor="companiaID">Compania:</label>
+              <label htmlFor="categoriaID">Categoria:</label>
               <select
-                value={companiaID}
+                value={categoriaID}
                 className="form-select"
                 onChange={handleChange}
               >
                 <option value="" className="default-option">
-                  Seleccion proveedor
+                  Seleccionar Categoria
                 </option>
-                {Users?.map((user) => (
+                {Categorias?.map((categoria) => (
                   <option
-                    key={user.usuario_id}
-                    value={user.usuario_id}
-                    data-user-compania={user.Compania}
+                    key={categoria.categoria_id}
+                    value={categoria.categoria_id}
+                    data-user-categoria={categoria.nombre}
                   >
-                    {user.Compania}
+                    {categoria.nombre}
                   </option>
                 ))}
               </select>

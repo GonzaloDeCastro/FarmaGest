@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getProductosAPI,
-  deleteProductoAPI,
-  getCategoriasAPI,
-} from "../../redux/productosSlice";
+  getProveedoresAPI,
+  deleteProveedorAPI,
+} from "../../redux/proveedoresSlice";
 import { FaRegTrashCan } from "react-icons/fa6";
 
 import Swal from "sweetalert2";
-import ProductForm from "./ProductForm";
-import EditProductFormModal from "./EditProductForm";
+import ProveedorForm from "./ProveedorForm";
+import EditProveedorForm from "./EditProveedorForm";
 
-const Products = () => {
+const Proveedores = () => {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -19,29 +18,26 @@ const Products = () => {
   const pageSize = 7;
 
   useEffect(() => {
-    dispatch(getProductosAPI(page, pageSize, search));
-    dispatch(getCategoriasAPI());
+    dispatch(getProveedoresAPI(page, pageSize, search));
   }, [page, pageSize, search, dispatch]);
 
-  const Products = useSelector((state) => state && state?.producto);
-  const Categorias = useSelector(
-    (state) => state && state?.producto && state?.producto?.categoriasState
-  );
+  const Proveedores = useSelector((state) => state && state?.proveedor);
 
   const keys = Object?.keys(
-    (Products && Products.initialState && Products.initialState[0]) || {}
+    (Proveedores && Proveedores.proveedores && Proveedores.proveedores[0]) || {}
   );
+
   const handleDelete = (dato) => {
     Swal.fire({
       title: "Warning!",
-      text: `¿Esta seguro que desea eliminar el producto ${dato.Producto}? `,
+      text: `¿Está seguro que desea eliminar el proveedor ${dato.razon_social}?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes",
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        const action = deleteProductoAPI(dato);
+        const action = deleteProveedorAPI(dato.id);
         dispatch(action);
       }
     });
@@ -68,7 +64,7 @@ const Products = () => {
           />
         </div>
         <div style={{ display: "flex" }}>
-          <ProductForm Categorias={Categorias} />
+          <ProveedorForm />
         </div>
       </div>
       <div className="containerTableAndPagesSelected">
@@ -77,44 +73,37 @@ const Products = () => {
             <tr>
               {keys.map(
                 (column) =>
-                  //quito columna producto_id
-                  column !== "producto_id" &&
-                  column !== "categoria_id" && <th key={column}>{column}</th>
+                  //quito columna id
+                  column !== "proveedor_id" && (
+                    <th key={column}>
+                      {column == "razon_social" ? "Razon Social" : column}
+                    </th>
+                  )
               )}
-
               <th style={{ width: "70px" }}>Opciones</th>
             </tr>
           </thead>
           <tbody>
-            {Object?.keys(Products)?.length === 0 ? (
+            {Object?.keys(Proveedores)?.length === 0 ? (
               <div
                 className="spinner-border"
                 style={{ marginTop: "10%", width: "100px", height: "100px" }}
                 role="status"
               />
-            ) : Products?.initialState?.length > 0 ? (
-              Products?.initialState?.map((dato) => (
-                <tr key={dato.producto_id}>
+            ) : Proveedores?.proveedores?.length > 0 ? (
+              Proveedores?.proveedores?.map((dato) => (
+                <tr key={dato.id}>
                   {keys
-                    ?.filter(
-                      (column) =>
-                        column !== "producto_id" && column !== "categoria_id"
-                    ) //filtro para que no aparezca la columna producto_id
+                    ?.filter((column) => column !== "proveedor_id") //filtro para que no aparezca la columna id
                     .map((column) => (
-                      <td key={`${dato.producto_id}-${column}`}>
-                        {dato[column]}
-                      </td>
+                      <td key={`${dato.id}-${column}`}>{dato[column]}</td>
                     ))}
-
                   <td
                     style={{
                       flexWrap: "nowrap",
                     }}
                   >
-                    <EditProductFormModal
-                      productSelected={dato}
-                      Categorias={Categorias}
-                    />
+                    <EditProveedorForm proveedorSelected={dato} />
                     <FaRegTrashCan
                       className="iconABM"
                       onClick={() => handleDelete(dato)}
@@ -123,7 +112,7 @@ const Products = () => {
                 </tr>
               ))
             ) : (
-              <div className="NoData">sin datos </div>
+              <div className="NoData">sin datos</div>
             )}
           </tbody>
         </table>
@@ -138,7 +127,7 @@ const Products = () => {
           <button
             onClick={() => handlePageChange(page + 1)}
             style={{ marginLeft: "10px" }}
-            disabled={Products?.initialState?.length < 6}
+            disabled={Proveedores?.proveedores?.length < pageSize}
             className="buttonPage"
           >
             Next
@@ -148,4 +137,5 @@ const Products = () => {
     </div>
   );
 };
-export default Products;
+
+export default Proveedores;

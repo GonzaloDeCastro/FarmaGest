@@ -2,20 +2,16 @@
 import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { FaPlusCircle, FaSave } from "react-icons/fa";
-import { addUsuarioDataAPI } from "../../redux/usuariosSlice";
-
+import { addUsuarioAPI } from "../../redux/usuariosSlice";
 import { useDispatch } from "react-redux";
 
-const UsuarioFormModal = ({ Roles, ObrasSociales, Companias }) => {
+const UsuarioFormModal = ({ Roles }) => {
   const dispatch = useDispatch();
 
   const [show, setShow] = useState(false);
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [correo, setCorreo] = useState("");
-  const [compania, setCompania] = useState("");
-
-  const [obraSocial, setObraSocial] = useState(0);
   const [roleID, setRoleID] = useState(0);
   const [roleDesc, setRoleDesc] = useState("");
   const handleClose = () => setShow(false);
@@ -24,15 +20,12 @@ const UsuarioFormModal = ({ Roles, ObrasSociales, Companias }) => {
   const handleAddUsuario = () => {
     try {
       dispatch(
-        addUsuarioDataAPI({
+        addUsuarioAPI({
           nombre: nombre,
           apellido: apellido,
-          correo_electronico: correo,
-          rol_id: roleID == 0 ? null : roleID,
+          correo: correo,
+          rol_id: roleID == 0 ? null : parseInt(roleID),
           Rol: roleDesc,
-          compania: roleID == 2 ? compania : "-",
-          obraSocial: obraSocial,
-          /*  descripcion: roleDesc, */
         })
       );
       handleClose();
@@ -49,14 +42,6 @@ const UsuarioFormModal = ({ Roles, ObrasSociales, Companias }) => {
     const selectedCompaniaDesc =
       e.target.selectedOptions[0].getAttribute("data-user-role");
     setRoleDesc(selectedCompaniaDesc);
-  };
-
-  const handleChangeCompania = (e) => {
-    setCompania(e.target.value);
-  };
-  console.log("compania ", compania);
-  const handleChangeObraSocial = (e) => {
-    setObraSocial(e.target.value);
   };
 
   return (
@@ -123,61 +108,13 @@ const UsuarioFormModal = ({ Roles, ObrasSociales, Companias }) => {
                 <option
                   key={rol.rol_id}
                   value={rol.rol_id}
-                  data-user-role={rol.descripcion}
+                  data-user-role={rol.rol}
                 >
-                  {rol.descripcion.charAt(0).toUpperCase() +
-                    rol.descripcion.slice(1)}
+                  {rol.rol.charAt(0).toUpperCase() + rol.rol.slice(1)}
                 </option>
               ))}
             </select>
           </div>
-          {roleID == 2 ? (
-            <div className="form-group col-md-12">
-              <label htmlFor="roleID">Compania:</label>
-              <select
-                value={compania}
-                className="form-select"
-                onChange={handleChangeCompania}
-              >
-                <option value="" className="default-option">
-                  Seleccionar Compania
-                </option>
-                {Companias?.map((compania) => (
-                  <option
-                    key={compania.compania_id}
-                    value={compania.compania_id}
-                    data-compania={compania.compania}
-                  >
-                    {compania.compania}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ) : (
-            roleID == 1 && (
-              <div className="form-group col-md-12">
-                <label htmlFor="roleID">Obra Social:</label>
-                <select
-                  value={obraSocial}
-                  className="form-select"
-                  onChange={handleChangeObraSocial}
-                >
-                  <option value="" className="default-option">
-                    Seleccionar Obra Social
-                  </option>
-                  {ObrasSociales?.map((os) => (
-                    <option
-                      key={os.codigo}
-                      value={os.codigo}
-                      data-user-os={os.obra_social}
-                    >
-                      {os.obra_social}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )
-          )}
         </Modal.Body>
         <Modal.Footer>
           <Button className="buttonConfirm" onClick={handleAddUsuario}>

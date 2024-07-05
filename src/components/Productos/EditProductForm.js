@@ -1,42 +1,50 @@
 import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { FaSave } from "react-icons/fa";
-import { editarProductDataAPI } from "../../redux/productosSlice";
+import { editProductoAPI } from "../../redux/productosSlice";
 import { useDispatch } from "react-redux";
 import { MdEdit } from "react-icons/md";
-const EditProductFormModal = ({ productSelected, Users }) => {
+const EditProductFormModal = ({ productSelected, Categorias }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
-  const [productName, setProductName] = useState(productSelected?.Producto);
-  const [price, setPrice] = useState(productSelected?.Precio);
-  const [quantity, setQuantity] = useState(productSelected?.Cantidad);
-  const [compania, setCompania] = useState(productSelected?.UsuarioID);
-  const [companiaDesc, setCompaniaDesc] = useState(productSelected.Compania);
 
+  const [productoNombre, setProductoNombre] = useState(productSelected?.Nombre);
+  const [codigo, setCodigo] = useState(productSelected?.Codigo);
+  const [marca, setMarca] = useState(productSelected?.Marca);
+  const [precio, setPrecio] = useState(productSelected?.Precio);
+  const [cantidad, setCantidad] = useState(productSelected?.Stock);
+  const [categoriaID, setCategoria] = useState(productSelected?.categoria_id);
+  const [categoriaDesc, setCategoriaDesc] = useState(
+    productSelected?.Categoria
+  );
+  console.log("productSelected ", productSelected);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const handleAddProduct = () => {
     try {
       dispatch(
-        editarProductDataAPI({
+        editProductoAPI({
           producto_id: productSelected?.producto_id,
-          nombre_producto: productName,
-          precio: price,
-          cantidad: quantity,
-          proveedor_id: compania,
-          Compania: companiaDesc,
+          nombre: productoNombre,
+          codigo: codigo,
+          marca: marca,
+          categoria_id: categoriaID === 0 ? null : categoriaID,
+          precio: precio,
+          stock: cantidad,
+          Categoria: categoriaDesc,
         })
       );
       handleClose();
     } catch {}
   };
-  const handleChange = (e) => {
-    setCompania(e.target.value);
-    const selectedCompaniaDesc =
-      e.target.selectedOptions[0].getAttribute("data-user-compania");
-    setCompaniaDesc(selectedCompaniaDesc);
-  };
 
+  const handleChange = (e) => {
+    setCategoria(e.target.value);
+    const selectedCategoriaDesc = e.target.selectedOptions[0].getAttribute(
+      "data-user-categoria"
+    );
+    setCategoriaDesc(selectedCategoriaDesc);
+  };
   return (
     <>
       <MdEdit className="iconABM" onClick={handleShow} />
@@ -48,60 +56,79 @@ const EditProductFormModal = ({ productSelected, Users }) => {
         dialogClassName="custom-modal"
       >
         <Modal.Header closeButton>
-          <Modal.Title>Edit Product</Modal.Title>
+          <Modal.Title>Editar Producto</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="form-row">
             <div className="form-group col-md-12">
-              <label htmlFor="productName">Product Name:</label>
+              <label htmlFor="productoNombre">Producto:</label>
               <input
                 type="text"
-                producto_id="productName"
+                producto_id="productoNombre"
                 className="form-control"
-                value={productName}
-                onChange={(e) => setProductName(e.target.value)}
+                value={productoNombre}
+                onChange={(e) => setProductoNombre(e.target.value)}
               />
             </div>
             <div className="form-group col-md-12">
-              <label htmlFor="price">Price:</label>
+              <label htmlFor="codigo">Codigo:</label>
+              <input
+                type="text"
+                producto_id="codigo"
+                className="form-control"
+                value={codigo}
+                onChange={(e) => setCodigo(e.target.value)}
+              />
+            </div>
+            <div className="form-group col-md-12">
+              <label htmlFor="productoNombre">Marca:</label>
+              <input
+                type="text"
+                producto_id="marca"
+                className="form-control"
+                value={marca}
+                onChange={(e) => setMarca(e.target.value)}
+              />
+            </div>
+            <div className="form-group col-md-12">
+              <label htmlFor="price">Precio:</label>
               <input
                 type="number"
                 producto_id="price"
                 className="form-control"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                value={precio}
+                onChange={(e) => setPrecio(e.target.value)}
               />
             </div>
             <div className="form-group col-md-12">
-              <label htmlFor="quantity">Quantity:</label>
+              <label htmlFor="cantidad">Cantidad:</label>
               <input
                 type="number"
-                producto_id="quantity"
+                producto_id="cantidad"
                 className="form-control"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
+                value={cantidad}
+                onChange={(e) => setCantidad(e.target.value)}
               />
             </div>
             <div className="form-group col-md-12">
-              <label htmlFor="compania">Compania:</label>
+              <label htmlFor="categoriaID">Categoría:</label>
               <select
-                value={compania}
+                value={categoriaID}
                 className="form-select"
                 onChange={handleChange}
               >
                 <option value="" className="default-option">
-                  Seleccion proveedor
+                  Seleccionar Categoria
                 </option>
-                {Users &&
-                  Users?.map((user) => (
-                    <option
-                      key={user.usuario_id}
-                      value={user.usuario_id}
-                      data-user-compania={user.Compania}
-                    >
-                      {user.Compania}
-                    </option>
-                  ))}
+                {Categorias?.map((categoria) => (
+                  <option
+                    key={categoria.categoria_id}
+                    value={categoria.categoria_id}
+                    data-user-categoria={categoria.nombre}
+                  >
+                    {categoria.nombre}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

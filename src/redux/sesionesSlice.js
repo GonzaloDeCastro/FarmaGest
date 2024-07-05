@@ -65,12 +65,12 @@ export const getLoginDataAPI = (dataLogin) => {
         const action = response?.data;
 
         if (action !== 1) {
-          const { user_id, role_id, is_active } = action;
+          const { user_id, rol_id, is_active } = action;
 
           if (is_active) {
             const { password, ...dataWithoutPassword } = dataLogin;
             const NewSesion = { ...dataWithoutPassword, user_id: user_id };
-            if (role_id != 8) {
+            if (rol_id != 8) {
               const response2 = await axios.post(`${API}sesion/`, NewSesion);
               if (response2?.status === 200) {
                 const sesionID = getSesionData(response2.data.sesionID);

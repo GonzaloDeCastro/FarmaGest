@@ -6,7 +6,8 @@ import { Link } from "react-router-dom";
 import { FaBoxArchive, FaGear } from "react-icons/fa6";
 import { HiUsers } from "react-icons/hi";
 import { FaBell, FaHome, FaUserCircle, FaShoppingCart } from "react-icons/fa";
-
+import { ImUserTie } from "react-icons/im";
+import { RiShakeHandsFill } from "react-icons/ri";
 const Layout = ({ children, title }) => {
   const [isOpen, setOpen] = useState(false);
   function capitalizeFirstLetter(value) {
@@ -59,9 +60,14 @@ const Layout = ({ children, title }) => {
           <Link to="/home">
             <FaHome className="iconMenu" />
           </Link>
-
+          <Link to="/proveedores">
+            <ImUserTie className="iconMenu" />
+          </Link>
           <Link to="/ventas">
             <FaShoppingCart className="iconMenu" />
+          </Link>
+          <Link to="/clientes">
+            <RiShakeHandsFill className="iconMenu" />
           </Link>
           <Link to="/productos">
             <FaBoxArchive className="iconMenu" />
@@ -80,9 +86,17 @@ const Layout = ({ children, title }) => {
             <FaHome className="iconMenu" />
             <span>Home</span>
           </Link>
+          <Link className="itemMenu" to="/home">
+            <ImUserTie className="iconMenu" />
+            <span>Proveedores</span>
+          </Link>
           <Link className="itemMenu" to="/ventas">
             <FaShoppingCart className="iconMenu" />
             <span>Ventas</span>
+          </Link>
+          <Link className="itemMenu" to="/home">
+            <RiShakeHandsFill className="iconMenu" />
+            <span>Clientes</span>
           </Link>
           <Link className="itemMenu" to="/productos">
             <FaBoxArchive className="iconMenu" />

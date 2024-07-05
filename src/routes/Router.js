@@ -12,6 +12,8 @@ import Config from "../components/Config/Config";
 import { useState } from "react";
 import Products from "../components/Productos/Products";
 import Usuarios from "../components/Usuarios/Usuarios";
+import Proveedores from "../components/Proveedores/Proveedores";
+import Clientes from "../components/Clientes/Clientes";
 
 const AppRouter = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -44,11 +46,35 @@ const AppRouter = () => {
           }
         />
         <Route
+          path="/proveedores"
+          element={
+            isLoggedIn ? (
+              <Layout title={"proveedores"}>
+                <Proveedores />
+              </Layout>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
           path="/ventas"
           element={
             isLoggedIn ? (
               <Layout title={"ventas"}>
                 <Ventas />
+              </Layout>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="/clientes"
+          element={
+            isLoggedIn ? (
+              <Layout title={"clientes"}>
+                <Clientes />
               </Layout>
             ) : (
               <Navigate to="/" />
