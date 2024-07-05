@@ -6,36 +6,36 @@ import API from "../config";
 
 const proveedorDataSlice = createSlice({
   name: "proveedor",
-  initialState: {
-    proveedores: [],
-    proveedor: null,
-  },
+  initialState: {},
   reducers: {
     getProveedores: (state, action) => {
       return {
         ...state,
-        proveedores: action.payload,
+        initialState: action.payload,
       };
     },
     addProveedor: (state, action) => {
       return {
         ...state,
-        proveedores: [action.payload, ...state.proveedores],
+        initialState: [action.payload, ...state.initialState],
       };
     },
     deleteProveedor: (state, action) => {
       return {
         ...state,
-        proveedores: state.proveedores.filter(
-          (proveedor) => proveedor.id !== action.payload
+        initialState: state.initialState.filter(
+          (proveedor) => proveedor.proveedor_id !== action.payload
         ),
       };
     },
     editProveedor: (state, action) => {
+      console.log("action ", action);
       return {
         ...state,
-        proveedores: state.proveedores.map((proveedor) =>
-          proveedor.id === action.payload.id ? action.payload : proveedor
+        initialState: state.initialState.map((proveedor) =>
+          proveedor.proveedor_id == action.payload.proveedor_id
+            ? action.payload
+            : proveedor
         ),
       };
     },
@@ -70,8 +70,16 @@ export const addProveedorAPI = (proveedorData) => {
   return async (dispatch) => {
     try {
       const response = await axios.post(`${API}/proveedores`, proveedorData);
+      console.log("response", response);
       if (response.status === 201) {
-        dispatch(addProveedor(response.data));
+        const nuevoProveedor = {
+          proveedor_id: response.data.proveedor_id,
+          razon_social: proveedorData.razon_social,
+          Telefono: proveedorData.telefono,
+          Direccion: proveedorData.direccion,
+          Email: proveedorData.email,
+        };
+        dispatch(addProveedor(nuevoProveedor));
         Swal.fire({
           icon: "success",
           title: "Proveedor agregado",
@@ -116,11 +124,19 @@ export const editProveedorAPI = (proveedorData) => {
   return async (dispatch) => {
     try {
       const response = await axios.put(
-        `${API}/proveedores/${proveedorData.id}`,
+        `${API}/proveedores/${proveedorData.proveedor_id}`,
         proveedorData
       );
       if (response.status === 200) {
-        dispatch(editProveedor(response.data));
+        const EditProveedor = {
+          proveedor_id: proveedorData.proveedor_id,
+          razon_social: proveedorData.razon_social,
+          Telefono: proveedorData.telefono,
+          Direccion: proveedorData.direccion,
+          Email: proveedorData.email,
+        };
+        dispatch(editProveedor(EditProveedor));
+
         Swal.fire({
           icon: "success",
           title: "Proveedor actualizado",

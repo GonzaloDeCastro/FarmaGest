@@ -11,7 +11,7 @@ const ProveedorForm = () => {
   const [razonSocial, setRazonSocial] = useState("");
   const [telefono, setTelefono] = useState("");
   const [direccion, setDireccion] = useState("");
-
+  const [email, setEmail] = useState("");
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
@@ -22,6 +22,7 @@ const ProveedorForm = () => {
           razon_social: razonSocial,
           telefono: telefono,
           direccion: direccion,
+          email: email,
         })
       );
       handleClose();
@@ -63,6 +64,16 @@ const ProveedorForm = () => {
               />
             </div>
             <div className="form-group col-md-12">
+              <label htmlFor="direccion">Dirección:</label>
+              <input
+                type="text"
+                id="direccion"
+                className="form-control"
+                value={direccion}
+                onChange={(e) => setDireccion(e.target.value)}
+              />
+            </div>
+            <div className="form-group col-md-12">
               <label htmlFor="telefono">Teléfono:</label>
               <input
                 type="text"
@@ -72,14 +83,15 @@ const ProveedorForm = () => {
                 onChange={(e) => setTelefono(e.target.value)}
               />
             </div>
+
             <div className="form-group col-md-12">
-              <label htmlFor="direccion">Dirección:</label>
+              <label htmlFor="email">Email:</label>
               <input
-                type="text"
-                id="direccion"
+                type="email"
+                usuario_id="email"
                 className="form-control"
-                value={direccion}
-                onChange={(e) => setDireccion(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
           </div>

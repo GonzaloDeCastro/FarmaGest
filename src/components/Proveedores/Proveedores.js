@@ -24,9 +24,10 @@ const Proveedores = () => {
   const Proveedores = useSelector((state) => state && state?.proveedor);
 
   const keys = Object?.keys(
-    (Proveedores && Proveedores.proveedores && Proveedores.proveedores[0]) || {}
+    (Proveedores && Proveedores.initialState && Proveedores.initialState[0]) ||
+      {}
   );
-
+  console.log("Proveedores ", Proveedores);
   const handleDelete = (dato) => {
     Swal.fire({
       title: "Warning!",
@@ -37,7 +38,7 @@ const Proveedores = () => {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        const action = deleteProveedorAPI(dato.id);
+        const action = deleteProveedorAPI(dato.proveedor_id);
         dispatch(action);
       }
     });
@@ -90,8 +91,8 @@ const Proveedores = () => {
                 style={{ marginTop: "10%", width: "100px", height: "100px" }}
                 role="status"
               />
-            ) : Proveedores?.proveedores?.length > 0 ? (
-              Proveedores?.proveedores?.map((dato) => (
+            ) : Proveedores?.initialState?.length > 0 ? (
+              Proveedores?.initialState?.map((dato) => (
                 <tr key={dato.id}>
                   {keys
                     ?.filter((column) => column !== "proveedor_id") //filtro para que no aparezca la columna id
@@ -127,7 +128,7 @@ const Proveedores = () => {
           <button
             onClick={() => handlePageChange(page + 1)}
             style={{ marginLeft: "10px" }}
-            disabled={Proveedores?.proveedores?.length < pageSize}
+            disabled={Proveedores?.initialState?.length < pageSize}
             className="buttonPage"
           >
             Next

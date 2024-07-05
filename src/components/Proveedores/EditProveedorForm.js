@@ -12,20 +12,21 @@ const EditProveedorForm = ({ proveedorSelected }) => {
   const [razonSocial, setRazonSocial] = useState(
     proveedorSelected?.razon_social
   );
-  const [telefono, setTelefono] = useState(proveedorSelected?.telefono);
-  const [direccion, setDireccion] = useState(proveedorSelected?.direccion);
-
+  const [telefono, setTelefono] = useState(proveedorSelected?.Telefono);
+  const [direccion, setDireccion] = useState(proveedorSelected?.Direccion);
+  const [email, setEmail] = useState(proveedorSelected?.Email);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
+  console.log("proveedorSelected ", proveedorSelected);
   const handleEditProveedor = () => {
     try {
       dispatch(
         editProveedorAPI({
-          id: proveedorSelected?.id,
+          proveedor_id: proveedorSelected && proveedorSelected?.proveedor_id,
           razon_social: razonSocial,
           telefono: telefono,
           direccion: direccion,
+          email: email,
         })
       );
       handleClose();
@@ -60,6 +61,16 @@ const EditProveedorForm = ({ proveedorSelected }) => {
               />
             </div>
             <div className="form-group col-md-12">
+              <label htmlFor="direccion">Dirección:</label>
+              <input
+                type="text"
+                id="direccion"
+                className="form-control"
+                value={direccion}
+                onChange={(e) => setDireccion(e.target.value)}
+              />
+            </div>
+            <div className="form-group col-md-12">
               <label htmlFor="telefono">Teléfono:</label>
               <input
                 type="text"
@@ -69,14 +80,15 @@ const EditProveedorForm = ({ proveedorSelected }) => {
                 onChange={(e) => setTelefono(e.target.value)}
               />
             </div>
+
             <div className="form-group col-md-12">
-              <label htmlFor="direccion">Dirección:</label>
+              <label htmlFor="email">Email:</label>
               <input
-                type="text"
-                id="direccion"
+                type="email"
+                usuario_id="email"
                 className="form-control"
-                value={direccion}
-                onChange={(e) => setDireccion(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
           </div>
