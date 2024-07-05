@@ -22,7 +22,7 @@ const ObrasSociales = () => {
   }, [page, pageSize, search, dispatch]);
 
   const ObrasSociales = useSelector((state) => state && state?.obrasocial);
-  console.log("ObrasSociales ", ObrasSociales);
+
   const keys = Object?.keys(
     (ObrasSociales &&
       ObrasSociales.initialState &&
@@ -95,11 +95,13 @@ const ObrasSociales = () => {
               />
             ) : ObrasSociales?.initialState?.length > 0 ? (
               ObrasSociales?.initialState?.map((dato) => (
-                <tr key={dato.id}>
+                <tr key={dato.obra_social_id}>
                   {keys
                     ?.filter((column) => column !== "obra_social_id") //filtro para que no aparezca la columna id
                     .map((column) => (
-                      <td key={`${dato.id}-${column}`}>{dato[column]}</td>
+                      <td key={`${dato.obra_social_id}-${column}`}>
+                        {dato[column]}
+                      </td>
                     ))}
                   <td
                     style={{

@@ -8,7 +8,7 @@ import { MdEdit } from "react-icons/md";
 const EditObraSocialForm = ({ obraSocialSelected }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
-  console.log("obraSocialSelected ", obraSocialSelected);
+
   const [obraSocial, setObraSocial] = useState(obraSocialSelected?.obra_social);
   const [plan, setPlan] = useState(obraSocialSelected?.Plan);
   const [descuento, setDescuento] = useState(obraSocialSelected?.Descuento);

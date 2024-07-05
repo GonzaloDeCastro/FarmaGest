@@ -61,7 +61,6 @@ export const getObrasSocialesAPI = (page = 1, pageSize = 5, search = "") => {
         },
       });
       if (response.status === 200) {
-        console.log("responde ", response);
         dispatch(getObrasSociales(response.data));
       }
     } catch (error) {

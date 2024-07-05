@@ -73,10 +73,10 @@ const Proveedores = () => {
           <thead>
             <tr>
               {keys.map(
-                (column) =>
+                (column, index) =>
                   //quito columna id
                   column !== "proveedor_id" && (
-                    <th key={column}>
+                    <th key={index}>
                       {column == "razon_social" ? "Razon Social" : column}
                     </th>
                   )
@@ -93,7 +93,7 @@ const Proveedores = () => {
               />
             ) : Proveedores?.initialState?.length > 0 ? (
               Proveedores?.initialState?.map((dato) => (
-                <tr key={dato.id}>
+                <tr key={dato.proveedor_id}>
                   {keys
                     ?.filter((column) => column !== "proveedor_id") //filtro para que no aparezca la columna id
                     .map((column) => (
