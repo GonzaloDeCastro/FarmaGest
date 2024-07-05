@@ -31,7 +31,7 @@ const clientesSlice = createSlice({
     addCliente: (state, action) => {
       return {
         ...state,
-        initialState: [action.payload, ...state.clientes],
+        initialState: [action.payload, ...state.initialState],
       };
     },
     deleteCliente: (state, action) => {
@@ -95,6 +95,7 @@ export const getClientesAPI = (
 };
 
 export const addClienteAPI = (clienteData) => {
+  console.log("clienteData ", clienteData);
   return async (dispatch) => {
     try {
       const response = await axios.post(`${API}/clientes`, clienteData);
@@ -105,8 +106,10 @@ export const addClienteAPI = (clienteData) => {
           Nombre: clienteData.nombre,
           Apellido: clienteData.apellido,
           DNI: clienteData.dni,
-          ObraSocial: clienteData.obraSocial,
-          Ciudad: clienteData.ciudad,
+          obra_social_id: clienteData.obra_social_id,
+          obra_social: clienteData.obra_social,
+          ciudad_id: clienteData.ciudad_id,
+          Ciudad: clienteData.Ciudad,
         };
 
         dispatch(addCliente(newCliente));
@@ -167,8 +170,10 @@ export const editClienteAPI = (clienteData) => {
           Nombre: clienteData.nombre,
           Apellido: clienteData.apellido,
           DNI: clienteData.dni,
-          ObraSocial: clienteData.obraSocial,
-          Ciudad: clienteData.ciudad,
+          obra_social_id: clienteData.obra_social_id,
+          obra_social: clienteData.obra_social,
+          ciudad_id: clienteData.ciudad_id,
+          Ciudad: clienteData.Ciudad,
         };
         dispatch(editCliente(editarCliente));
         Swal.fire({

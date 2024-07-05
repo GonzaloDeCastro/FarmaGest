@@ -1,14 +1,14 @@
 import React from "react";
 import { IoMdConstruct } from "react-icons/io";
 
-const Config = () => {
+const ObrasSociales = () => {
   return (
     <div className="buildPage">
       <div>
         <IoMdConstruct className="iconBuild" />
       </div>
-      Página Configuración en construcción
+      Página Obras sociales en construcción
     </div>
   );
 };
-export default Config;
+export default ObrasSociales;

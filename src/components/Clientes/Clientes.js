@@ -82,29 +82,12 @@ const Clientes = () => {
             onChange={handleSearchChange}
             placeholder="&#xF002; Buscar..."
           />
-
-          <select
-            value={obraSocialID}
-            className="inputSearch"
-            onChange={handleObraSocialChange}
-            style={{ marginLeft: "10px" }}
-          >
-            <option value="">Seleccionar obra social</option>
-            {/* Opciones de obra social */}
-          </select>
-
-          <select
-            value={ciudadID}
-            className="inputSearch"
-            onChange={handleCiudadChange}
-            style={{ marginLeft: "10px" }}
-          >
-            <option value="">Seleccionar ciudad</option>
-            {/* Opciones de ciudad */}
-          </select>
         </div>
         <div style={{ display: "flex" }}>
-          <ClienteForm />
+          <ClienteForm
+            ObrasSociales={ObrasSociales && ObrasSociales}
+            Ciudades={Ciudades && Ciudades}
+          />
         </div>
       </div>
       <div className="containerTableAndPagesSelected">
@@ -114,12 +97,16 @@ const Clientes = () => {
               {keys.map((column) => {
                 if (
                   column === "cliente_id" ||
-                  column === "obra_social" ||
+                  column === "obra_social_id" ||
                   column === "ciudad_id"
                 ) {
                   return null;
                 }
-                return <th key={column}>{column}</th>;
+                return (
+                  <th key={column}>
+                    {column == "obra_social" ? "Obra Social" : column}
+                  </th>
+                );
               })}
               <th style={{ width: "70px" }}>Opciones</th>
             </tr>
@@ -141,7 +128,7 @@ const Clientes = () => {
                   {keys.map((column) => {
                     if (
                       column === "cliente_id" ||
-                      column === "obra_social" ||
+                      column === "obra_social_id" ||
                       column === "ciudad_id"
                     ) {
                       return null;
@@ -154,7 +141,7 @@ const Clientes = () => {
                   })}
                   <td style={{ flexWrap: "nowrap" }}>
                     <EditClienteForm
-                      cliente={cliente}
+                      clienteSelected={cliente}
                       ObrasSociales={ObrasSociales && ObrasSociales}
                       Ciudades={Ciudades && Ciudades}
                     />

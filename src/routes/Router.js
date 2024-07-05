@@ -8,12 +8,12 @@ import Layout from "../shared/Layout";
 import FormLogin from "../components/login/FormLogin";
 import Home from "../components/Home/Home";
 import Ventas from "../components/Ventas/Ventas";
-import Config from "../components/Config/Config";
 import { useState } from "react";
 import Products from "../components/Productos/Products";
 import Usuarios from "../components/Usuarios/Usuarios";
 import Proveedores from "../components/Proveedores/Proveedores";
 import Clientes from "../components/Clientes/Clientes";
+import ObrasSociales from "../components/ObrasSociales/ObrasSociales";
 
 const AppRouter = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -106,11 +106,11 @@ const AppRouter = () => {
           }
         />
         <Route
-          path="/config"
+          path="/obras-sociales"
           element={
             isLoggedIn ? (
-              <Layout title={"config"}>
-                <Config />
+              <Layout title={"obras-sociales"}>
+                <ObrasSociales />
               </Layout>
             ) : (
               <Navigate to="/" />
