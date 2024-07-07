@@ -15,7 +15,7 @@ const ObrasSociales = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
-  const pageSize = 7;
+  const pageSize = 8;
 
   useEffect(() => {
     dispatch(getObrasSocialesAPI(page, pageSize, search));
@@ -121,23 +121,23 @@ const ObrasSociales = () => {
             )}
           </tbody>
         </table>
-        <div>
-          <button
-            onClick={() => handlePageChange(page - 1)}
-            disabled={page === 1}
-            className="buttonPage"
-          >
-            Previous
-          </button>
-          <button
-            onClick={() => handlePageChange(page + 1)}
-            style={{ marginLeft: "10px" }}
-            disabled={ObrasSociales?.initialState?.length < pageSize}
-            className="buttonPage"
-          >
-            Next
-          </button>
-        </div>
+      </div>
+      <div>
+        <button
+          onClick={() => handlePageChange(page - 1)}
+          disabled={page === 1}
+          className="buttonPage"
+        >
+          Anterior
+        </button>
+        <button
+          onClick={() => handlePageChange(page + 1)}
+          style={{ marginLeft: "10px" }}
+          disabled={ObrasSociales?.initialState?.length < pageSize}
+          className="buttonPage"
+        >
+          Siguiente
+        </button>
       </div>
     </div>
   );

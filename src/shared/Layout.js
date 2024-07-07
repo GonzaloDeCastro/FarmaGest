@@ -3,12 +3,13 @@ import Hamburger from "hamburger-react";
 import logo from "../imgs/logoNav.png";
 import Section from "./Section";
 import { Link } from "react-router-dom";
-import { FaBoxArchive, FaHandshake } from "react-icons/fa6";
+import { FaHandshake } from "react-icons/fa6";
 import { LiaAddressCardSolid } from "react-icons/lia";
 import { AiFillProduct } from "react-icons/ai";
+import { RiShoppingBag4Fill } from "react-icons/ri";
 
 import { HiUsers } from "react-icons/hi";
-import { FaBell, FaHome, FaUserCircle, FaShoppingCart } from "react-icons/fa";
+import { FaBell, FaUserCircle, FaShoppingCart } from "react-icons/fa";
 import { ImUserTie } from "react-icons/im";
 
 const Layout = ({ children, title }) => {
@@ -65,15 +66,15 @@ const Layout = ({ children, title }) => {
       </header>
       <div className="bodyContainer">
         <nav className={!isOpen ? "smallActive" : "smallInactive"}>
-          {/*         <Link to="/home">
-            <FaHome className="iconMenu" />
-          </Link> */}
+          <Link to="/pedidos">
+            <RiShoppingBag4Fill className="iconMenu" />
+          </Link>
           <Link to="/proveedores">
             <ImUserTie className="iconMenu" />
           </Link>
-          {/*  <Link to="/ventas">
+          <Link to="/ventas">
             <FaShoppingCart className="iconMenu" />
-          </Link> */}
+          </Link>
           <Link to="/clientes">
             <FaHandshake className="iconMenu" />
           </Link>
@@ -89,18 +90,18 @@ const Layout = ({ children, title }) => {
         </nav>
 
         <nav className={isOpen ? "bigActive" : "bigInactive"}>
-          {/*  <Link className="itemMenu" to="/home">
-            <FaHome className="iconMenu" />
-            <span>Home</span>
-          </Link> */}
+          <Link className="itemMenu" to="/pedidos">
+            <RiShoppingBag4Fill className="iconMenu" />
+            <span>Pedidos</span>
+          </Link>
           <Link className="itemMenu" to="/proveedores">
             <ImUserTie className="iconMenu" />
             <span>Proveedores</span>
           </Link>
-          {/*  <Link className="itemMenu" to="/ventas">
+          <Link className="itemMenu" to="/ventas">
             <FaShoppingCart className="iconMenu" />
             <span>Ventas</span>
-          </Link> */}
+          </Link>
           <Link className="itemMenu" to="/clientes">
             <FaHandshake className="iconMenu" />
             <span>Clientes</span>

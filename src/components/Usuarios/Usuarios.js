@@ -18,7 +18,7 @@ const Usuarios = () => {
 
   const [search, setSearch] = useState("");
   const [roleID, setRoleID] = useState(0);
-  const pageSize = 7;
+  const pageSize = 8;
 
   const Usuarios = useSelector(
     (state) => state && state?.usuario && state?.usuario
@@ -181,23 +181,23 @@ const Usuarios = () => {
             )}
           </tbody>
         </table>
-        <div>
-          <button
-            onClick={() => handlePageChange(page - 1)}
-            disabled={page == 1}
-            className="buttonPage"
-          >
-            Previous
-          </button>
-          <button
-            onClick={() => handlePageChange(page + 1)}
-            style={{ marginLeft: "10px" }}
-            disabled={Usuarios?.initialState?.length < 6}
-            className="buttonPage"
-          >
-            Next
-          </button>
-        </div>
+      </div>
+      <div>
+        <button
+          onClick={() => handlePageChange(page - 1)}
+          disabled={page == 1}
+          className="buttonPage"
+        >
+          Anterior
+        </button>
+        <button
+          onClick={() => handlePageChange(page + 1)}
+          style={{ marginLeft: "10px" }}
+          disabled={Usuarios?.initialState?.length < 6}
+          className="buttonPage"
+        >
+          Siguiente
+        </button>
       </div>
     </div>
   );

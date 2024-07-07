@@ -15,7 +15,7 @@ const Proveedores = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
-  const pageSize = 7;
+  const pageSize = 8;
 
   useEffect(() => {
     dispatch(getProveedoresAPI(page, pageSize, search));
@@ -117,23 +117,23 @@ const Proveedores = () => {
             )}
           </tbody>
         </table>
-        <div>
-          <button
-            onClick={() => handlePageChange(page - 1)}
-            disabled={page === 1}
-            className="buttonPage"
-          >
-            Previous
-          </button>
-          <button
-            onClick={() => handlePageChange(page + 1)}
-            style={{ marginLeft: "10px" }}
-            disabled={Proveedores?.initialState?.length < pageSize}
-            className="buttonPage"
-          >
-            Next
-          </button>
-        </div>
+      </div>
+      <div>
+        <button
+          onClick={() => handlePageChange(page - 1)}
+          disabled={page === 1}
+          className="buttonPage"
+        >
+          Anterior
+        </button>
+        <button
+          onClick={() => handlePageChange(page + 1)}
+          style={{ marginLeft: "10px" }}
+          disabled={Proveedores?.initialState?.length < pageSize}
+          className="buttonPage"
+        >
+          Siguiente
+        </button>
       </div>
     </div>
   );

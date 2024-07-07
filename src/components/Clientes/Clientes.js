@@ -18,7 +18,7 @@ const Clientes = () => {
   const [search, setSearch] = useState("");
   const [obraSocialID, setObraSocialID] = useState(0);
   const [ciudadID, setCiudadID] = useState(0);
-  const pageSize = 7;
+  const pageSize = 8;
 
   const clientes = useSelector(
     (state) => state && state.cliente && state.cliente
@@ -155,27 +155,27 @@ const Clientes = () => {
             )}
           </tbody>
         </table>
-        <div>
-          <button
-            onClick={() => handlePageChange(page - 1)}
-            disabled={page === 1}
-            className="buttonPage"
-          >
-            Anterior
-          </button>
-          <button
-            onClick={() => handlePageChange(page + 1)}
-            style={{ marginLeft: "10px" }}
-            disabled={
-              clientes &&
-              clientes.initialState &&
-              clientes.initialState.length < pageSize
-            }
-            className="buttonPage"
-          >
-            Siguiente
-          </button>
-        </div>
+      </div>
+      <div /* style={{ border: "solid 1px" }} */>
+        <button
+          onClick={() => handlePageChange(page - 1)}
+          disabled={page === 1}
+          className="buttonPage"
+        >
+          Anterior
+        </button>
+        <button
+          onClick={() => handlePageChange(page + 1)}
+          style={{ marginLeft: "10px" }}
+          disabled={
+            clientes &&
+            clientes.initialState &&
+            clientes.initialState.length < pageSize
+          }
+          className="buttonPage"
+        >
+          Siguiente
+        </button>
       </div>
     </div>
   );

@@ -6,7 +6,6 @@ import {
 } from "react-router-dom";
 import Layout from "../shared/Layout";
 import FormLogin from "../components/login/FormLogin";
-import Home from "../components/Home/Home";
 import Ventas from "../components/Ventas/Ventas";
 import { useState } from "react";
 import Products from "../components/Productos/Products";
@@ -14,6 +13,7 @@ import Usuarios from "../components/Usuarios/Usuarios";
 import Proveedores from "../components/Proveedores/Proveedores";
 import Clientes from "../components/Clientes/Clientes";
 import ObrasSociales from "../components/ObrasSociales/ObrasSociales";
+import Pedidos from "../components/Pedidos/Pedidos";
 
 const AppRouter = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -34,11 +34,11 @@ const AppRouter = () => {
 
         {/* Rutas privadas */}
         <Route
-          path="/home"
+          path="/pedidos"
           element={
             isLoggedIn ? (
-              <Layout title={"home"}>
-                <Home />
+              <Layout title={"pedidos"}>
+                <Pedidos />
               </Layout>
             ) : (
               <Navigate to="/" />
