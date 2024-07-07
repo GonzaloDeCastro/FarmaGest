@@ -1,10 +1,10 @@
 /* eslint-disable eqeqeq */
 import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import { FaSave } from "react-icons/fa";
+import { FaSave, FaEdit } from "react-icons/fa";
 import { editUsuarioAPI } from "../../redux/usuariosSlice";
 import { useDispatch } from "react-redux";
-import { MdEdit } from "react-icons/md";
+
 const EditUsuarioFormModal = ({ usuarioSelected, Roles }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
@@ -52,7 +52,7 @@ const EditUsuarioFormModal = ({ usuarioSelected, Roles }) => {
 
   return (
     <>
-      <MdEdit className="iconABM" onClick={handleShow} />
+      <FaEdit className="iconABM" onClick={handleShow} />
 
       <Modal
         show={show}

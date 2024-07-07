@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import { FaSave } from "react-icons/fa";
+import { FaSave, FaEdit } from "react-icons/fa";
 import { editObraSocialAPI } from "../../redux/obrasSocialesSlice";
 import { useDispatch } from "react-redux";
-import { MdEdit } from "react-icons/md";
 
 const EditObraSocialForm = ({ obraSocialSelected }) => {
   const dispatch = useDispatch();
@@ -43,7 +42,7 @@ const EditObraSocialForm = ({ obraSocialSelected }) => {
 
   return (
     <>
-      <MdEdit className="iconABM" onClick={handleShow} />
+      <FaEdit className="iconABM" onClick={handleShow} />
 
       <Modal
         show={show}

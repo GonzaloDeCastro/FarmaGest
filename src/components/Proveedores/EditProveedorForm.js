@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import { FaSave } from "react-icons/fa";
+import { FaSave, FaEdit } from "react-icons/fa";
 import { editProveedorAPI } from "../../redux/proveedoresSlice";
 import { useDispatch } from "react-redux";
-import { MdEdit } from "react-icons/md";
 
 const EditProveedorForm = ({ proveedorSelected }) => {
   const dispatch = useDispatch();
@@ -37,7 +36,7 @@ const EditProveedorForm = ({ proveedorSelected }) => {
 
   return (
     <>
-      <MdEdit className="iconABM" onClick={handleShow} />
+      <FaEdit className="iconABM" onClick={handleShow} />
 
       <Modal
         show={show}

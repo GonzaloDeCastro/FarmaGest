@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import { FaSave } from "react-icons/fa";
+import { FaSave, FaEdit } from "react-icons/fa";
 import { editProductoAPI } from "../../redux/productosSlice";
 import { useDispatch } from "react-redux";
-import { MdEdit } from "react-icons/md";
+
 const EditProductFormModal = ({ productSelected, Categorias }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
@@ -47,7 +47,7 @@ const EditProductFormModal = ({ productSelected, Categorias }) => {
   };
   return (
     <>
-      <MdEdit className="iconABM" onClick={handleShow} />
+      <FaEdit className="iconABM" onClick={handleShow} />
 
       <Modal
         show={show}
