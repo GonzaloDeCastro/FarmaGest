@@ -42,7 +42,7 @@ const Clientes = () => {
 
   const handleDelete = (cliente) => {
     Swal.fire({
-      title: "Warning!",
+      title: "Advertencia!",
       text: `¿Está seguro que desea eliminar al cliente ${cliente.Nombre} ${cliente.Apellido}?`,
       icon: "warning",
       showCancelButton: true,

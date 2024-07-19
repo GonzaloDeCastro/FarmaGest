@@ -30,7 +30,7 @@ const Proveedores = () => {
 
   const handleDelete = (dato) => {
     Swal.fire({
-      title: "Warning!",
+      title: "Advertencia!",
       text: `¿Está seguro que desea eliminar el proveedor ${dato.razon_social}?`,
       icon: "warning",
       showCancelButton: true,

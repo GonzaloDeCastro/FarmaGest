@@ -33,7 +33,7 @@ const Products = () => {
   );
   const handleDelete = (dato) => {
     Swal.fire({
-      title: "Warning!",
+      title: "Advertencia!",
       text: `¿Esta seguro que desea eliminar el producto ${dato.Producto}? `,
       icon: "warning",
       showCancelButton: true,

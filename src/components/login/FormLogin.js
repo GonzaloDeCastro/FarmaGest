@@ -1,19 +1,46 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../../imgs/logoFG.png";
-const FormLogin = ({ setIsLoggedIn }) => {
-  const [user, setUser] = useState("");
+import { useNavigate } from "react-router-dom";
+import { getUsuarioLoginAPI } from "../../redux/usuariosSlice";
+import { useDispatch, useSelector } from "react-redux";
+import Swal from "sweetalert2";
+const FormLogin = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [correo, setCorreo] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
-
+  const UsuarioLogin = useSelector((state) => state.usuario.loginState);
+  console.log("UsuarioLogin ", UsuarioLogin);
+  const logged = JSON.parse(sessionStorage.getItem("logged"));
+  const sesionProvisorio = {
+    nombre: "Gonzalo",
+    apellido: "De Castro",
+    correo: "corre@ejemplo.com",
+    rol_desc: "Admin",
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (user === "" || password === "") {
-      setError(true);
-      return;
-    }
     setError(false);
-    setIsLoggedIn([user]);
+    dispatch(getUsuarioLoginAPI(correo, password));
   };
+
+  useEffect(() => {
+    console.log("entra aca claramente");
+    if (UsuarioLogin && UsuarioLogin.length > 0) {
+      sessionStorage.setItem(
+        "logged",
+        JSON.stringify({ sesion: sesionProvisorio })
+      );
+      navigate("/productos");
+    } else if (UsuarioLogin && UsuarioLogin.length == 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Error en Login",
+        text: "El usuario o contraseña es incorrecto.",
+      });
+    }
+  }, [handleSubmit]);
 
   return (
     <div className="login">
@@ -22,11 +49,11 @@ const FormLogin = ({ setIsLoggedIn }) => {
       </div>
 
       <form className="formulario" onSubmit={handleSubmit}>
-        <label htmlFor="user">Usuario</label>
+        <label htmlFor="correo">Usuario / Correo</label>
         <input
           type="text"
-          value={user}
-          onChange={(e) => setUser(e.target.value)}
+          value={correo}
+          onChange={(e) => setCorreo(e.target.value)}
         />
         <label htmlFor="password">Contraseña</label>
         <input

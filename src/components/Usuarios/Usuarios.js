@@ -36,7 +36,7 @@ const Usuarios = () => {
   );
   const handleDelete = (dato) => {
     Swal.fire({
-      title: "Warning!",
+      title: "Advertencia!",
       text: `¿Esta seguro que desea eliminar el usuario ${dato.Nombre} ${dato.Apellido}? `,
       icon: "warning",
       showCancelButton: true,

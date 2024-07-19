@@ -9,14 +9,13 @@ import { AiFillProduct } from "react-icons/ai";
 import { RiShoppingBag4Fill } from "react-icons/ri";
 
 import { HiUsers } from "react-icons/hi";
-import { FaBell, FaUserCircle, FaShoppingCart } from "react-icons/fa";
+import { FaBell, FaShoppingCart } from "react-icons/fa";
 import { ImUserTie } from "react-icons/im";
+import UsuarioLogout from "../components/Usuarios/UsuarioLogout";
 
 const Layout = ({ children, title }) => {
-  console.log("llega algo? ", title);
   const [isOpen, setOpen] = useState(false);
   function capitalizeFirstLetter(value) {
-    console.log("value llega ", value);
     return `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
   }
 
@@ -60,7 +59,8 @@ const Layout = ({ children, title }) => {
           </div>
           <div>
             <FaBell className="iconUser" />
-            <FaUserCircle className="iconUser" />
+
+            <UsuarioLogout />
           </div>
         </div>
       </header>

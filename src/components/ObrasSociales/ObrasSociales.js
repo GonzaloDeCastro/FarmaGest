@@ -32,7 +32,7 @@ const ObrasSociales = () => {
 
   const handleDelete = (dato) => {
     Swal.fire({
-      title: "Warning!",
+      title: "Advertencia!",
       text: `¿Está seguro que desea eliminar la obra social ${dato.obra_social}?`,
       icon: "warning",
       showCancelButton: true,

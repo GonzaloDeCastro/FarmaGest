@@ -8,7 +8,20 @@ const usuarioDataSlice = createSlice({
   name: "usuario",
   initialState: {},
   rolesState: {},
+  loginState: {},
   reducers: {
+    getUsuarioLogin: (state, action) => {
+      return {
+        ...state,
+        loginState: action.payload,
+      };
+    },
+    logoutUsuario: (state) => {
+      return {
+        ...state,
+        loginState: {},
+      };
+    },
     getUsuarios: (state, action) => {
       return {
         ...state,
@@ -49,8 +62,15 @@ const usuarioDataSlice = createSlice({
   },
 });
 
-export const { getUsuarios, getRoles, addUsuario, deleteUsuario, editUsuario } =
-  usuarioDataSlice.actions;
+export const {
+  getUsuarioLogin,
+  logoutUsuario,
+  getUsuarios,
+  getRoles,
+  addUsuario,
+  deleteUsuario,
+  editUsuario,
+} = usuarioDataSlice.actions;
 
 // Funciones API para interactuar con el backend
 
@@ -184,6 +204,25 @@ export const editUsuarioAPI = (usuarioData) => {
         title: "Error",
         text: "Hubo un problema al actualizar el usuario.",
       });
+    }
+  };
+};
+
+export const getUsuarioLoginAPI = (correo, password) => {
+  return async (dispatch) => {
+    try {
+      const response = await axios.get(`${API}/usuarios/login`, {
+        params: {
+          correo: correo && correo,
+          contrasena: password && password,
+        },
+      });
+      console.log("response ", response);
+      if (response.status === 200) {
+        dispatch(getUsuarioLogin(response.data));
+      }
+    } catch (error) {
+      console.log("Error al loguearse:", error);
     }
   };
 };
