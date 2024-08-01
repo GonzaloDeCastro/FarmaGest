@@ -7,7 +7,6 @@ import { FaHandshake } from "react-icons/fa6";
 import { LiaAddressCardSolid } from "react-icons/lia";
 import { AiFillProduct } from "react-icons/ai";
 import { RiShoppingBag4Fill } from "react-icons/ri";
-
 import { HiUsers } from "react-icons/hi";
 import { FaBell, FaShoppingCart } from "react-icons/fa";
 import { ImUserTie } from "react-icons/im";
@@ -18,7 +17,10 @@ const Layout = ({ children, title }) => {
   function capitalizeFirstLetter(value) {
     return `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
   }
-
+  const logged = JSON.parse(sessionStorage.getItem("logged"));
+  console.log("logged ", logged);
+  const permisos = logged.sesion[0].permisos;
+  console.log("permisos ", permisos);
   return (
     <div className="containerGeneralAPP">
       <header>
@@ -66,58 +68,86 @@ const Layout = ({ children, title }) => {
       </header>
       <div className="bodyContainer">
         <nav className={!isOpen ? "smallActive" : "smallInactive"}>
-          <Link to="/pedidos">
-            <RiShoppingBag4Fill className="iconMenu" />
-          </Link>
-          <Link to="/proveedores">
-            <ImUserTie className="iconMenu" />
-          </Link>
-          <Link to="/ventas">
-            <FaShoppingCart className="iconMenu" />
-          </Link>
-          <Link to="/clientes">
-            <FaHandshake className="iconMenu" />
-          </Link>
-          <Link to="/obras-sociales">
-            <LiaAddressCardSolid className="iconMenu" />
-          </Link>
-          <Link to="/productos">
-            <AiFillProduct className="iconMenu" />
-          </Link>
-          <Link to="/usuarios">
-            <HiUsers className="iconMenu" />
-          </Link>
+          {permisos.includes("gestion_pedidos") && (
+            <Link to="/pedidos">
+              <RiShoppingBag4Fill className="iconMenu" />
+            </Link>
+          )}
+          {permisos.includes("gestion_proveedores") && (
+            <Link to="/proveedores">
+              <ImUserTie className="iconMenu" />
+            </Link>
+          )}
+          {permisos.includes("gestion_ventas") && (
+            <Link to="/ventas">
+              <FaShoppingCart className="iconMenu" />
+            </Link>
+          )}
+          {permisos.includes("gestion_clientes") && (
+            <Link to="/clientes">
+              <FaHandshake className="iconMenu" />
+            </Link>
+          )}
+          {permisos.includes("gestion_obras_sociales") && (
+            <Link to="/obras-sociales">
+              <LiaAddressCardSolid className="iconMenu" />
+            </Link>
+          )}
+          {permisos.includes("gestion_productos") && (
+            <Link to="/productos">
+              <AiFillProduct className="iconMenu" />
+            </Link>
+          )}
+          {permisos.includes("gestion_usuarios") && (
+            <Link to="/usuarios">
+              <HiUsers className="iconMenu" />
+            </Link>
+          )}
         </nav>
 
         <nav className={isOpen ? "bigActive" : "bigInactive"}>
-          <Link className="itemMenu" to="/pedidos">
-            <RiShoppingBag4Fill className="iconMenu" />
-            <span>Pedidos</span>
-          </Link>
-          <Link className="itemMenu" to="/proveedores">
-            <ImUserTie className="iconMenu" />
-            <span>Proveedores</span>
-          </Link>
-          <Link className="itemMenu" to="/ventas">
-            <FaShoppingCart className="iconMenu" />
-            <span>Ventas</span>
-          </Link>
-          <Link className="itemMenu" to="/clientes">
-            <FaHandshake className="iconMenu" />
-            <span>Clientes</span>
-          </Link>
-          <Link className="itemMenu" to="/obras-sociales">
-            <LiaAddressCardSolid className="iconMenu" />
-            <span>Obras Sociales</span>
-          </Link>
-          <Link className="itemMenu" to="/productos">
-            <AiFillProduct className="iconMenu" />
-            <span>Productos</span>
-          </Link>
-          <Link className="itemMenu" to="/usuarios">
-            <HiUsers className="iconMenu" />
-            <span>Usuarios</span>
-          </Link>
+          {permisos.includes("gestion_pedidos") && (
+            <Link className="itemMenu" to="/pedidos">
+              <RiShoppingBag4Fill className="iconMenu" />
+              <span>Pedidos</span>
+            </Link>
+          )}
+          {permisos.includes("gestion_proveedores") && (
+            <Link className="itemMenu" to="/proveedores">
+              <ImUserTie className="iconMenu" />
+              <span>Proveedores</span>
+            </Link>
+          )}
+          {permisos.includes("gestion_ventas") && (
+            <Link className="itemMenu" to="/ventas">
+              <FaShoppingCart className="iconMenu" />
+              <span>Ventas</span>
+            </Link>
+          )}
+          {permisos.includes("gestion_clientes") && (
+            <Link className="itemMenu" to="/clientes">
+              <FaHandshake className="iconMenu" />
+              <span>Clientes</span>
+            </Link>
+          )}
+          {permisos.includes("gestion_obras_sociales") && (
+            <Link className="itemMenu" to="/obras-sociales">
+              <LiaAddressCardSolid className="iconMenu" />
+              <span>Obras Sociales</span>
+            </Link>
+          )}
+          {permisos.includes("gestion_productos") && (
+            <Link className="itemMenu" to="/productos">
+              <AiFillProduct className="iconMenu" />
+              <span>Productos</span>
+            </Link>
+          )}
+          {permisos.includes("gestion_usuarios") && (
+            <Link className="itemMenu" to="/usuarios">
+              <HiUsers className="iconMenu" />
+              <span>Usuarios</span>
+            </Link>
+          )}
         </nav>
 
         <section>

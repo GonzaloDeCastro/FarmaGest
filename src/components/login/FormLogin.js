@@ -12,13 +12,7 @@ const FormLogin = () => {
   const [error, setError] = useState(false);
   const UsuarioLogin = useSelector((state) => state.usuario.loginState);
   console.log("UsuarioLogin ", UsuarioLogin);
-  const logged = JSON.parse(sessionStorage.getItem("logged"));
-  const sesionProvisorio = {
-    nombre: "Gonzalo",
-    apellido: "De Castro",
-    correo: "corre@ejemplo.com",
-    rol_desc: "Admin",
-  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setError(false);
@@ -26,11 +20,10 @@ const FormLogin = () => {
   };
 
   useEffect(() => {
-    console.log("entra aca claramente");
     if (UsuarioLogin && UsuarioLogin.length > 0) {
       sessionStorage.setItem(
         "logged",
-        JSON.stringify({ sesion: sesionProvisorio })
+        JSON.stringify({ sesion: UsuarioLogin })
       );
       navigate("/productos");
     } else if (UsuarioLogin && UsuarioLogin.length == 0) {

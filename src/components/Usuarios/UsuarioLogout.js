@@ -14,6 +14,7 @@ const UsuarioLogout = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const logged = JSON.parse(sessionStorage.getItem("logged"));
+  console.log("logged ", logged);
 
   const handleLogout = () => {
     sessionStorage.removeItem("logged");
@@ -50,15 +51,15 @@ const UsuarioLogout = () => {
             >
               <div>
                 <strong>User: </strong>
-                {`${logged?.sesion?.nombre} ${logged?.sesion?.apellido}`}
+                {`${logged?.sesion[0]?.nombre} ${logged?.sesion[0]?.apellido}`}
               </div>
               <div>
                 <strong>Rol: </strong>
-                {logged?.sesion?.rol_desc}
+                {logged?.sesion[0]?.rol}
               </div>
               <div>
                 <strong>Correo: </strong>
-                {logged?.sesion?.correo}
+                {logged?.sesion[0]?.correo}
               </div>
             </div>
             <div
