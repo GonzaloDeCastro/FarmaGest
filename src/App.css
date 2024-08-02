@@ -270,6 +270,21 @@ nav.bigActive span {
   background-color: #f2f2f2;
   color: #333;
 }
+.itemProfile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 1.3rem;
+  margin-top: 10px;
+  width: 100%;
+  background-color: #e8e8e8;
+  padding: 10px;
+}
+.itemProfile:hover {
+  background-color: #ddd;
+}
 .NoData {
   margin-top: 20px;
   font-size: 20px;

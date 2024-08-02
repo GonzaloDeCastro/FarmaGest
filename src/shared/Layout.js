@@ -18,9 +18,9 @@ const Layout = ({ children, title }) => {
     return `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
   }
   const logged = JSON.parse(sessionStorage.getItem("logged"));
-  console.log("logged ", logged);
+
   const permisos = logged.sesion[0].permisos;
-  console.log("permisos ", permisos);
+
   return (
     <div className="containerGeneralAPP">
       <header>
@@ -94,7 +94,7 @@ const Layout = ({ children, title }) => {
             </Link>
           )}
           {permisos.includes("gestion_productos") && (
-            <Link to="/productos">
+            <Link to="/">
               <AiFillProduct className="iconMenu" />
             </Link>
           )}
@@ -137,7 +137,7 @@ const Layout = ({ children, title }) => {
             </Link>
           )}
           {permisos.includes("gestion_productos") && (
-            <Link className="itemMenu" to="/productos">
+            <Link className="itemMenu" to="/">
               <AiFillProduct className="iconMenu" />
               <span>Productos</span>
             </Link>

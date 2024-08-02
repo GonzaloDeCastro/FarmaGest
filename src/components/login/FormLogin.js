@@ -11,7 +11,6 @@ const FormLogin = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
   const UsuarioLogin = useSelector((state) => state.usuario.loginState);
-  console.log("UsuarioLogin ", UsuarioLogin);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -25,7 +24,7 @@ const FormLogin = () => {
         "logged",
         JSON.stringify({ sesion: UsuarioLogin })
       );
-      navigate("/productos");
+      navigate("/");
     } else if (UsuarioLogin && UsuarioLogin.length == 0) {
       Swal.fire({
         icon: "error",

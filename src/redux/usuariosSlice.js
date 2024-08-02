@@ -118,7 +118,7 @@ export const addUsuarioAPI = (usuarioData) => {
   return async (dispatch) => {
     try {
       const response = await axios.post(`${API}/usuarios`, usuarioData);
-
+      console.log("response", response);
       if (response.status === 201) {
         const newUsuario = {
           usuario_id: response.data.usuario_id,
@@ -128,7 +128,6 @@ export const addUsuarioAPI = (usuarioData) => {
           Rol: usuarioData.Rol,
           rol_id: usuarioData.rol_id,
         };
-
         dispatch(addUsuario(newUsuario));
         Swal.fire({
           icon: "success",
@@ -137,12 +136,19 @@ export const addUsuarioAPI = (usuarioData) => {
         });
       }
     } catch (error) {
-      console.error("Error al agregar usuario:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Hubo un problema al agregar el usuario.",
-      });
+      if (error.response.status === 409) {
+        Swal.fire({
+          icon: "warning",
+          title: "Advertencia!",
+          text: error.response.data.mensaje,
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.response.data.mensaje,
+        });
+      }
     }
   };
 };
@@ -217,13 +223,58 @@ export const getUsuarioLoginAPI = (correo, password) => {
           contrasena: password && password,
         },
       });
-      console.log("response ", response);
+
       if (response.status === 200) {
+        console.log("llega aca al loguear?", response);
         dispatch(getUsuarioLogin(response.data));
       }
     } catch (error) {
       console.log("Error al loguearse:", error);
     }
+  };
+};
+
+export const updatePasswordDataAPI = (dataUser) => {
+  const { correo, currentPassword } = dataUser;
+
+  return async (dispatch) => {
+    try {
+      const response = await axios.get(`${API}/usuarios/login`, {
+        params: {
+          correo: correo && correo,
+          contrasena: currentPassword && currentPassword,
+        },
+      });
+      if (response?.data.length > 0) {
+        const action = response?.data;
+        console.log("llega ?");
+        if (action !== 1) {
+          const response2 = await axios.put(
+            `${API}/usuarios/pwd/${correo}`,
+            dataUser
+          );
+          if (response2?.status === 200) {
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: "Password actualizado",
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Password no pudo actualizarse",
+            });
+          }
+        }
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Password invalido",
+        });
+      }
+    } catch (error) {}
   };
 };
 

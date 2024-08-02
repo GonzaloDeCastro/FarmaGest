@@ -70,7 +70,7 @@ const AppRouter = () => {
             />
           </Route>
           <Route
-            path="/productos"
+            path="/"
             element={
               <Layout title={"productos"}>
                 <Products />

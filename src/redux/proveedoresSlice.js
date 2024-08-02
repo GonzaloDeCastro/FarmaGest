@@ -29,7 +29,6 @@ const proveedorDataSlice = createSlice({
       };
     },
     editProveedor: (state, action) => {
-      console.log("action ", action);
       return {
         ...state,
         initialState: state.initialState.map((proveedor) =>
@@ -70,7 +69,7 @@ export const addProveedorAPI = (proveedorData) => {
   return async (dispatch) => {
     try {
       const response = await axios.post(`${API}/proveedores`, proveedorData);
-      console.log("response", response);
+
       if (response.status === 201) {
         const nuevoProveedor = {
           proveedor_id: response.data.proveedor_id,

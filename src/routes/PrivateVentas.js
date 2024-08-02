@@ -3,7 +3,7 @@ import React from "react";
 import { Outlet, Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
-const PrivateRouteVentas = ({ redirect = "/productos" }) => {
+const PrivateRouteVentas = ({ redirect = "/" }) => {
   const logged = JSON.parse(sessionStorage.getItem("logged"));
   if (logged.sesion[0].permisos.includes("gestion_ventas")) {
     return <Outlet context={{ logged }} />;
