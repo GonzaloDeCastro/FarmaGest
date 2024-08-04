@@ -46,7 +46,7 @@ const UsuarioLogout = () => {
     const { currentPassword, password, repeatPassword } = data;
     if (passwordError === false && password === repeatPassword) {
       try {
-        const correo = logged.sesion[0].correo;
+        const correo = logged.sesion.correo;
         dispatch(updatePasswordDataAPI({ correo, currentPassword, password }));
         // Clean form
         reset();
@@ -120,15 +120,15 @@ const UsuarioLogout = () => {
             >
               <div>
                 <strong>User: </strong>
-                {`${logged?.sesion[0]?.nombre} ${logged?.sesion[0]?.apellido}`}
+                {`${logged?.sesion?.nombre} ${logged?.sesion?.apellido}`}
               </div>
               <div>
                 <strong>Rol: </strong>
-                {logged?.sesion[0]?.rol}
+                {logged?.sesion?.rol}
               </div>
               <div>
                 <strong>Correo: </strong>
-                {logged?.sesion[0]?.correo}
+                {logged?.sesion?.correo}
               </div>
             </div>
             <div style={{ textAlign: "center", width: "40%" }}>

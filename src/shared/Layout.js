@@ -19,7 +19,7 @@ const Layout = ({ children, title }) => {
   }
   const logged = JSON.parse(sessionStorage.getItem("logged"));
 
-  const permisos = logged.sesion[0].permisos;
+  const permisos = logged.sesion.permisos;
 
   return (
     <div className="containerGeneralAPP">

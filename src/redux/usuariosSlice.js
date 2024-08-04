@@ -118,7 +118,7 @@ export const addUsuarioAPI = (usuarioData) => {
   return async (dispatch) => {
     try {
       const response = await axios.post(`${API}/usuarios`, usuarioData);
-      console.log("response", response);
+
       if (response.status === 201) {
         const newUsuario = {
           usuario_id: response.data.usuario_id,
@@ -228,7 +228,19 @@ export const getUsuarioLoginAPI = (correo, password) => {
         dispatch(getUsuarioLogin(response.data));
       }
     } catch (error) {
-      console.log("Error al loguearse:", error);
+      if (error.response.status === 401) {
+        Swal.fire({
+          icon: "warning",
+          title: "Advertencia!",
+          text: error.response.data,
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Advertencia!",
+          text: "Error 500",
+        });
+      }
     }
   };
 };
@@ -244,7 +256,8 @@ export const updatePasswordDataAPI = (dataUser) => {
           contrasena: currentPassword && currentPassword,
         },
       });
-      if (response?.data.length > 0) {
+      console.log("response ", response);
+      if (response?.data.correo !== undefined) {
         const action = response?.data;
         console.log("llega ?");
         if (action !== 1) {
@@ -273,7 +286,22 @@ export const updatePasswordDataAPI = (dataUser) => {
           text: "Password invalido",
         });
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log("error ", error);
+      if (error.response.status === 401) {
+        Swal.fire({
+          icon: "warning",
+          title: "Advertencia!",
+          text: error.response.data,
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: error.response.data,
+        });
+      }
+    }
   };
 };
 

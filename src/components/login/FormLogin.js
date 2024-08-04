@@ -19,13 +19,14 @@ const FormLogin = () => {
   const onSubmit = (data) => {
     dispatch(getUsuarioLoginAPI(data.correo, data.password));
   };
-
+  console.log("UsuarioLogin ", UsuarioLogin);
   useEffect(() => {
-    if (UsuarioLogin && UsuarioLogin.length > 0) {
+    if (UsuarioLogin && UsuarioLogin.correo !== undefined) {
       sessionStorage.setItem(
         "logged",
         JSON.stringify({ sesion: UsuarioLogin })
       );
+      console.log("aca llega?");
       navigate("/");
     } else if (UsuarioLogin && UsuarioLogin.length === 0) {
       Swal.fire({

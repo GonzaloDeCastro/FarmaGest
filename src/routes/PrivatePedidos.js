@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 
 const PrivateRoutePedidos = ({ redirect = "/" }) => {
   const logged = JSON.parse(sessionStorage.getItem("logged"));
-  if (logged.sesion[0].permisos.includes("gestion_pedidos")) {
+  if (logged !== null && logged.sesion.permisos.includes("gestion_pedidos")) {
     return <Outlet context={{ logged }} />;
   } else {
     Swal.fire({

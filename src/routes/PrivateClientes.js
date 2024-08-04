@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 
 const PrivateRouteClientes = ({ redirect = "/" }) => {
   const logged = JSON.parse(sessionStorage.getItem("logged"));
-  if (logged.sesion[0].permisos.includes("gestion_clientes")) {
+  if (logged !== null && logged.sesion.permisos.includes("gestion_clientes")) {
     return <Outlet context={{ logged }} />;
   } else {
     Swal.fire({
