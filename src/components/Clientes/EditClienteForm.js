@@ -1,75 +1,68 @@
-/* eslint-disable eqeqeq */
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { FaSave, FaEdit } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { editClienteAPI } from "../../redux/clientesSlice";
+import { useForm } from "react-hook-form";
 
 const EditClienteForm = ({ clienteSelected, ObrasSociales, Ciudades }) => {
   const dispatch = useDispatch();
-  const [show, setShow] = useState(false);
+  const [show, setShow] = React.useState(false);
 
-  const [nombre, setNombre] = useState(clienteSelected?.Nombre);
-  const [apellido, setApellido] = useState(clienteSelected?.Apellido);
-  const [DNI, setDNI] = useState(clienteSelected?.DNI);
-  /*  const [correo, setCorreo] = useState(clienteSelected?.Correo); */
-  const [obraSocialID, setObraSocialID] = useState(
-    clienteSelected?.obra_social_id
-  );
-  const [obraSocialDesc, setObraSocialDesc] = useState(
-    clienteSelected?.obra_social
-  );
-  const [ciudadID, setCiudadID] = useState(clienteSelected?.ciudad_id);
-  const [ciudadDesc, setCiudadDesc] = useState(clienteSelected?.Ciudad);
-  const [clienteID, setClienteID] = useState(clienteSelected?.cliente_id);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      nombre: clienteSelected?.Nombre || "",
+      apellido: clienteSelected?.Apellido || "",
+      DNI: clienteSelected?.DNI || "",
+      obraSocialID: clienteSelected?.obra_social_id || "",
+      ciudadID: clienteSelected?.ciudad_id || "",
+    },
+  });
+
+  useEffect(() => {
+    reset({
+      nombre: clienteSelected?.Nombre || "",
+      apellido: clienteSelected?.Apellido || "",
+      DNI: clienteSelected?.DNI || "",
+      obraSocialID: clienteSelected?.obra_social_id || "",
+      ciudadID: clienteSelected?.ciudad_id || "",
+    });
+  }, [clienteSelected, reset]);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  const handleEditCliente = () => {
+  const onSubmit = (data) => {
     try {
       dispatch(
         editClienteAPI({
-          cliente_id: parseInt(clienteID),
-          nombre: nombre,
-          apellido: apellido,
-          dni: DNI,
-          // Correo: correo,
-          obra_social_id: obraSocialID == 0 ? null : obraSocialID,
-          obra_social: obraSocialDesc,
-          ciudad_id: ciudadID == 0 ? null : ciudadID,
-          Ciudad: ciudadDesc,
+          cliente_id: parseInt(clienteSelected.cliente_id),
+          nombre: data.nombre,
+          apellido: data.apellido,
+          dni: data.DNI,
+          obra_social_id:
+            data.obraSocialID === "" ? null : parseInt(data.obraSocialID),
+          obra_social:
+            ObrasSociales.find(
+              (o) => o.obra_social_id === Number(data.obraSocialID)
+            )?.obra_social || "",
+          ciudad_id: data.ciudadID === "" ? null : parseInt(data.ciudadID),
+          Ciudad:
+            Ciudades.find((c) => c.ciudad_id === Number(data.ciudadID))
+              ?.ciudad || "",
         })
       );
-
       handleClose();
     } catch (error) {
       console.error("Error al editar clienteSelected:", error);
     }
-  };
-
-  useEffect(() => {
-    setNombre(clienteSelected && clienteSelected.Nombre);
-    setApellido(clienteSelected && clienteSelected.Apellido);
-    setDNI(clienteSelected && clienteSelected.DNI);
-    // setCorreo(clienteSelected && clienteSelected.Correo);
-    setObraSocialID(clienteSelected && clienteSelected.obra_social_id);
-    setCiudadID(clienteSelected && clienteSelected.ciudad_id);
-    setClienteID(clienteSelected && clienteSelected.cliente_id);
-  }, [clienteSelected]);
-
-  const handleChangeObraSocial = (e) => {
-    setObraSocialID(e.target.value);
-    const selectedObraSocialDesc =
-      e.target.selectedOptions[0].getAttribute("data-obra-social");
-    setObraSocialDesc(selectedObraSocialDesc);
-  };
-  const handleChangeCiudad = (e) => {
-    setCiudadID(e.target.value);
-    const selectedCiudadDesc = e.target.selectedOptions[0].getAttribute(
-      "data-cliente-ciudad"
-    );
-    setCiudadDesc(selectedCiudadDesc);
   };
 
   return (
@@ -86,98 +79,115 @@ const EditClienteForm = ({ clienteSelected, ObrasSociales, Ciudades }) => {
           <Modal.Title>Editar Cliente</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="form-row">
-            <div className="form-group col-md-12">
-              <label htmlFor="nombre">Nombre:</label>
-              <input
-                type="text"
-                id="nombre"
-                className="form-control"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-              />
-            </div>
-            <div className="form-group col-md-12">
-              <label htmlFor="apellido">Apellido:</label>
-              <input
-                type="text"
-                id="apellido"
-                className="form-control"
-                value={apellido}
-                onChange={(e) => setApellido(e.target.value)}
-              />
-            </div>
-            <div className="form-group col-md-12">
-              <label htmlFor="DNI">DNI:</label>
-              <input
-                type="text"
-                id="DNI"
-                className="form-control"
-                value={DNI}
-                onChange={(e) => setDNI(e.target.value)}
-              />
-            </div>
-            {/* <div className="form-group col-md-12">
-              <label htmlFor="correo">Correo:</label>
-              <input
-                type="email"
-                id="correo"
-                className="form-control"
-                value={correo}
-                onChange={(e) => setCorreo(e.target.value)}
-              />
-            </div> */}
-            <div className="form-group col-md-12">
-              <label htmlFor="obraSocialID">Obra Social:</label>
-              <select
-                value={obraSocialID}
-                className="form-select"
-                onChange={handleChangeObraSocial}
-              >
-                <option value="">Seleccionar obra social</option>
-                {ObrasSociales &&
-                  ObrasSociales?.map((obraSocial) => (
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="form-row">
+              <div className="form-group col-md-12">
+                <label htmlFor="nombre">Nombre:</label>
+                <input
+                  type="text"
+                  id="nombre"
+                  className="form-control"
+                  {...register("nombre", {
+                    required: "Este campo es obligatorio",
+                  })}
+                />
+                {errors.nombre && (
+                  <p className="text-danger">{errors.nombre.message}</p>
+                )}
+              </div>
+              <div className="form-group col-md-12">
+                <label htmlFor="apellido">Apellido:</label>
+                <input
+                  type="text"
+                  id="apellido"
+                  className="form-control"
+                  {...register("apellido", {
+                    required: "Este campo es obligatorio",
+                  })}
+                />
+                {errors.apellido && (
+                  <p className="text-danger">{errors.apellido.message}</p>
+                )}
+              </div>
+              <div className="form-group col-md-12">
+                <label htmlFor="DNI">DNI:</label>
+                <input
+                  type="text"
+                  id="DNI"
+                  className="form-control"
+                  {...register("DNI", {
+                    required: "Este campo es obligatorio",
+                  })}
+                />
+                {errors.DNI && (
+                  <p className="text-danger">{errors.DNI.message}</p>
+                )}
+              </div>
+              {/* <div className="form-group col-md-12">
+                <label htmlFor="correo">Correo:</label>
+                <input
+                  type="email"
+                  id="correo"
+                  className="form-control"
+                  {...register("correo")}
+                />
+                {errors.correo && <p className="text-danger">{errors.correo.message}</p>}
+              </div> */}
+              <div className="form-group col-md-12">
+                <label htmlFor="obraSocialID">Obra Social:</label>
+                <select
+                  id="obraSocialID"
+                  className="form-select"
+                  {...register("obraSocialID", {
+                    required: "Este campo es obligatorio",
+                  })}
+                >
+                  <option value="">Seleccionar obra social</option>
+                  {ObrasSociales?.map((obraSocial) => (
                     <option
                       key={obraSocial.obra_social_id}
                       value={obraSocial.obra_social_id}
-                      data-obra-social={obraSocial.obra_social}
                     >
                       {obraSocial.obra_social}
                     </option>
                   ))}
-              </select>
-            </div>
-            <div className="form-group col-md-12">
-              <label htmlFor="ciudadID">Ciudad:</label>
-              <select
-                value={ciudadID}
-                className="form-select"
-                onChange={handleChangeCiudad}
-              >
-                <option value="">Seleccionar ciudad</option>
-                {Ciudades &&
-                  Ciudades?.map((ciudad) => (
-                    <option
-                      key={ciudad.ciudad_id}
-                      value={ciudad.ciudad_id}
-                      data-cliente-ciudad={ciudad.ciudad}
-                    >
+                </select>
+                {errors.obraSocialID && (
+                  <p className="text-danger">{errors.obraSocialID.message}</p>
+                )}
+              </div>
+              <div className="form-group col-md-12">
+                <label htmlFor="ciudadID">Ciudad:</label>
+                <select
+                  id="ciudadID"
+                  className="form-select"
+                  {...register("ciudadID", {
+                    required: "Este campo es obligatorio",
+                  })}
+                >
+                  <option value="">Seleccionar ciudad</option>
+                  {Ciudades?.map((ciudad) => (
+                    <option key={ciudad.ciudad_id} value={ciudad.ciudad_id}>
                       {ciudad.ciudad}
                     </option>
                   ))}
-              </select>
+                </select>
+                {errors.ciudadID && (
+                  <p className="text-danger">{errors.ciudadID.message}</p>
+                )}
+              </div>
             </div>
-          </div>
+            <Modal.Footer>
+              <Button className="buttonConfirm" type="submit">
+                <FaSave className="iconConfirm" />
+                Guardar Cambios
+              </Button>
+              <Button variant="secondary" onClick={handleClose}>
+                Cancelar
+              </Button>
+            </Modal.Footer>
+          </form>
         </Modal.Body>
-        <Modal.Footer>
-          <Button className="buttonConfirm" onClick={handleEditCliente}>
-            <FaSave className="iconConfirm" />
-            Guardar Cambios
-          </Button>
-          <Button variant="secondary" onClick={handleClose}>
-            Cancelar
-          </Button>
-        </Modal.Footer>
       </Modal>
     </>
   );

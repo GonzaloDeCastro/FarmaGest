@@ -1,32 +1,43 @@
-/* eslint-disable eqeqeq */
 import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { FaSave, FaEdit } from "react-icons/fa";
-import { editUsuarioAPI } from "../../redux/usuariosSlice";
 import { useDispatch } from "react-redux";
+import { useForm } from "react-hook-form";
+import { editUsuarioAPI } from "../../redux/usuariosSlice";
 
 const EditUsuarioFormModal = ({ usuarioSelected, Roles }) => {
   const dispatch = useDispatch();
-  const [show, setShow] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      nombre: usuarioSelected?.Nombre || "",
+      apellido: usuarioSelected?.Apellido || "",
+      correo: usuarioSelected?.Correo || "",
+      roleID: usuarioSelected?.rol_id || "",
+    },
+  });
 
-  const [nombre, setNombre] = useState(usuarioSelected?.Nombre);
-  const [apellido, setApellido] = useState(usuarioSelected?.Apellido);
-  const [correo, setCorreo] = useState(usuarioSelected?.Correo);
-  const [roleID, setRoleID] = useState(usuarioSelected?.rol_id);
-  const [roleDesc, setRoleDesc] = useState(usuarioSelected?.Rol);
-  const [userID, setUserID] = useState(usuarioSelected?.usuario_id);
+  const [show, setShow] = useState(false);
+  const [roleDesc, setRoleDesc] = useState(usuarioSelected?.Rol || "");
+  const [userID, setUserID] = useState(usuarioSelected?.usuario_id || "");
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const handleEditUsuario = () => {
+
+  const onSubmit = (data) => {
     try {
       dispatch(
         editUsuarioAPI({
           usuario_id: parseInt(userID),
-          nombre: nombre,
-          apellido: apellido,
-          correo: correo,
-          rol_id: roleID == 0 ? null : roleID,
+          nombre: data.nombre,
+          apellido: data.apellido,
+          correo: data.correo,
+          rol_id: data.roleID === "" ? null : parseInt(data.roleID),
           Rol: roleDesc,
         })
       );
@@ -34,21 +45,23 @@ const EditUsuarioFormModal = ({ usuarioSelected, Roles }) => {
     } catch {}
   };
 
-  const handleChange = (e) => {
-    setRoleID(e.target.value);
-    const selectedCompaniaDesc =
+  const handleChangeRole = (e) => {
+    const selectedRoleDesc =
       e.target.selectedOptions[0].getAttribute("data-user-role");
-    setRoleDesc(selectedCompaniaDesc);
+    setRoleDesc(selectedRoleDesc);
+    setValue("roleID", e.target.value);
   };
 
   useEffect(() => {
-    setNombre(usuarioSelected && usuarioSelected.Nombre);
-    setApellido(usuarioSelected && usuarioSelected.Apellido);
-    setCorreo(usuarioSelected && usuarioSelected.Correo);
-    setRoleID(usuarioSelected && usuarioSelected.rol_id);
-    setRoleDesc(usuarioSelected && usuarioSelected.Rol);
-    setUserID(usuarioSelected && usuarioSelected.usuario_id);
-  }, [dispatch, usuarioSelected]);
+    if (usuarioSelected) {
+      setValue("nombre", usuarioSelected.Nombre);
+      setValue("apellido", usuarioSelected.Apellido);
+      setValue("correo", usuarioSelected.Correo);
+      setValue("roleID", usuarioSelected.rol_id);
+      setRoleDesc(usuarioSelected.Rol);
+      setUserID(usuarioSelected.usuario_id);
+    }
+  }, [usuarioSelected, setValue]);
 
   return (
     <>
@@ -64,69 +77,97 @@ const EditUsuarioFormModal = ({ usuarioSelected, Roles }) => {
           <Modal.Title>Edit Usuario</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="form-row">
-            <div className="form-group col-md-12">
-              <label htmlFor="nombre">Nombre:</label>
-              <input
-                type="text"
-                usuario_id="nombre"
-                className="form-control"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-              />
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="form-row">
+              <div className="form-group col-md-12">
+                <label htmlFor="nombre">Nombre:</label>
+                <input
+                  type="text"
+                  id="nombre"
+                  className="form-control"
+                  {...register("nombre", { required: true })}
+                />
+                {errors.nombre && (
+                  <p style={{ color: "#b70f0a", fontWeight: "bold" }}>
+                    Nombre requerido
+                  </p>
+                )}
+              </div>
+              <div className="form-group col-md-12">
+                <label htmlFor="apellido">Apellido:</label>
+                <input
+                  type="text"
+                  id="apellido"
+                  className="form-control"
+                  {...register("apellido", { required: true })}
+                />
+                {errors.apellido && (
+                  <p style={{ color: "#b70f0a", fontWeight: "bold" }}>
+                    Apellido requerido
+                  </p>
+                )}
+              </div>
+              <div className="form-group col-md-12">
+                <label htmlFor="correo">Correo:</label>
+                <input
+                  type="email"
+                  id="correo"
+                  className="form-control"
+                  {...register("correo", {
+                    required: true,
+                    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  })}
+                />
+                {errors.correo?.type === "required" && (
+                  <p style={{ color: "#b70f0a", fontWeight: "bold" }}>
+                    Correo requerido
+                  </p>
+                )}
+                {errors.correo?.type === "pattern" && (
+                  <p style={{ color: "#b70f0a", fontWeight: "bold" }}>
+                    Correo inválido
+                  </p>
+                )}
+              </div>
             </div>
             <div className="form-group col-md-12">
-              <label htmlFor="apellido">Apellido:</label>
-              <input
-                type="text"
-                usuario_id="apellido"
-                className="form-control"
-                value={apellido}
-                onChange={(e) => setApellido(e.target.value)}
-              />
-            </div>
-            <div className="form-group col-md-12">
-              <label htmlFor="correo">Correo:</label>
-              <input
-                type="email"
-                usuario_id="correo"
-                className="form-control"
-                value={correo}
-                onChange={(e) => setCorreo(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="form-group col-md-12">
-            <label htmlFor="roleID">Roles:</label>
-            <select
-              value={roleID}
-              className="form-select"
-              onChange={handleChange}
-            >
-              <option value="" className="default-option">
-                Seleccionar rol
-              </option>
-              {Roles?.map((rol) => (
-                <option
-                  key={rol.rol_id}
-                  value={rol.rol_id}
-                  data-user-role={rol.rol}
-                >
-                  {rol.rol.charAt(0).toUpperCase() + rol.rol.slice(1)}
+              <label htmlFor="roleID">Roles:</label>
+              <select
+                id="roleID"
+                className="form-select"
+                {...register("roleID", { required: true })}
+                onChange={handleChangeRole}
+              >
+                <option value="" className="default-option">
+                  Seleccionar rol
                 </option>
-              ))}
-            </select>
-          </div>
+                {Roles?.map((rol) => (
+                  <option
+                    key={rol.rol_id}
+                    value={rol.rol_id}
+                    data-user-role={rol.rol}
+                  >
+                    {rol.rol.charAt(0).toUpperCase() + rol.rol.slice(1)}
+                  </option>
+                ))}
+              </select>
+              {errors.roleID && (
+                <p style={{ color: "#b70f0a", fontWeight: "bold" }}>
+                  Rol requerido
+                </p>
+              )}
+            </div>
+            <Modal.Footer>
+              <Button type="submit" className="buttonConfirm">
+                <FaSave className="iconConfirm" />
+                Editar
+              </Button>
+              <Button variant="secondary" onClick={handleClose}>
+                Cancelar
+              </Button>
+            </Modal.Footer>
+          </form>
         </Modal.Body>
-        <Modal.Footer>
-          <Button className="buttonConfirm" onClick={handleEditUsuario}>
-            <FaSave className="iconConfirm" />
-            Editar
-          </Button>
-          <Button variant="secondary" onClick={handleClose}>
-            Cancelar
-          </Button>
-        </Modal.Footer>
       </Modal>
     </>
   );

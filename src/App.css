@@ -108,7 +108,9 @@ header {
 
   width: 100%;
 }
-
+.errorsHandler {
+  color: #ff9271;
+}
 .iconUser {
   color: #abd34e;
   width: 50px;

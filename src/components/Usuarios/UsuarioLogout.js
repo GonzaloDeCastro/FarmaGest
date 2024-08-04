@@ -4,121 +4,93 @@ import { FaUserCircle, FaCheck } from "react-icons/fa";
 import { MdOutlineExitToApp } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { IoIosClose } from "react-icons/io";
-
+import { useDispatch } from "react-redux";
+import Swal from "sweetalert2";
+import { useForm } from "react-hook-form";
 import {
   logoutUsuario,
   updatePasswordDataAPI,
 } from "../../redux/usuariosSlice";
-import { useDispatch } from "react-redux";
-import Swal from "sweetalert2";
 
 const UsuarioLogout = () => {
   const [show, setShow] = useState(false);
+  const [showfieldsPassword, setShowfieldsPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+  const [signInvalidPassword, setSignInvalidPassword] = useState(false);
+  const [signDifferentPassword, setSignDifferentPassword] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    reset,
+  } = useForm();
+  const logged = JSON.parse(sessionStorage.getItem("logged"));
+
   const handleClose = () => {
     setShow(false);
     setShowfieldsPassword(false);
+    reset();
   };
   const handleShow = () => setShow(true);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [showfieldsPassword, setShowfieldsPassword] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [password, setPassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
-  const [passwordError, setPasswordError] = useState(true);
-  const [signInvalidPassword, setSignInvalidPassword] = useState("none");
-  const [signDifferentPassword, setSignDifferentPassword] = useState("none");
-  const [disableButton, setDisableButton] = useState(true);
-  const logged = JSON.parse(sessionStorage.getItem("logged"));
 
   const handleLogout = () => {
     sessionStorage.removeItem("logged");
     dispatch(logoutUsuario());
-
     navigate(`/login`);
   };
-  const handleCurrentPassword = (e) => {
-    setCurrentPassword(e.target.value);
-  };
 
-  const handleChangePassword = (e) => {
-    const { value } = e.target;
-    setPassword(value);
-
-    // Expresiones regulares para validar la contraseña
-    const minLength = 12;
-    const hasNumber = /\d/;
-    const hasUpperCase = /[A-Z]/;
-
-    // Verificar si la contraseña cumple con los criterios
-    const isValidPassword =
-      value.length >= minLength &&
-      hasNumber.test(value) &&
-      hasUpperCase.test(value);
-
-    if (!isValidPassword) {
-      setPasswordError(true);
-    } else {
-      setPasswordError(false);
-    }
-  };
-
-  const checkFields = () => {
-    if (
-      password.trim() !== "" &&
-      currentPassword.trim() !== "" &&
-      repeatPassword.trim() !== ""
-    ) {
-      setDisableButton(false);
-    } else {
-      setDisableButton(true);
-    }
-  };
-
-  useEffect(() => {
-    checkFields();
-  }, [password, repeatPassword, currentPassword]);
-  const handleShowFields = () => {
-    setShowfieldsPassword(!showfieldsPassword);
-    setCurrentPassword("");
-    setPassword("");
-    setRepeatPassword("");
-    setSignInvalidPassword("none");
-    setSignDifferentPassword("none");
-  };
-
-  console.log("logged.sesion[0] ", logged.sesion[0].correo);
-  const handleUpdatePassword = async () => {
-    if (passwordError == false && password == repeatPassword) {
+  const handleUpdatePassword = async (data) => {
+    const { currentPassword, password, repeatPassword } = data;
+    if (passwordError === false && password === repeatPassword) {
       try {
-        let correo = logged.sesion[0].correo;
+        const correo = logged.sesion[0].correo;
         dispatch(updatePasswordDataAPI({ correo, currentPassword, password }));
         // Clean form
-        setCurrentPassword("");
-        setPassword("");
-        setRepeatPassword("");
+        reset();
         handleClose();
       } catch (error) {
         console.error("Error:", error);
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "Error update password. Please, try again",
+          text: "Error updating password. Please, try again",
         });
       }
     } else {
-      if (passwordError == true) {
-        setSignInvalidPassword("block");
+      if (passwordError) {
+        setSignInvalidPassword(true);
       } else {
-        setSignInvalidPassword("none");
-        if (password != repeatPassword) {
-          setSignDifferentPassword("block");
+        setSignInvalidPassword(false);
+        if (password !== repeatPassword) {
+          setSignDifferentPassword(true);
         } else {
-          setSignDifferentPassword("none");
+          setSignDifferentPassword(false);
         }
       }
     }
   };
+
+  const validatePassword = (value) => {
+    const minLength = 12;
+    const hasNumber = /\d/;
+    const hasUpperCase = /[A-Z]/;
+    const isValidPassword =
+      value.length >= minLength &&
+      hasNumber.test(value) &&
+      hasUpperCase.test(value);
+    setPasswordError(!isValidPassword);
+    return isValidPassword;
+  };
+
+  const watchPassword = watch("password");
+
+  useEffect(() => {
+    setSignInvalidPassword(passwordError);
+    setSignDifferentPassword(watchPassword !== watch("repeatPassword"));
+  }, [passwordError, watchPassword, watch]);
 
   return (
     <>
@@ -159,12 +131,7 @@ const UsuarioLogout = () => {
                 {logged?.sesion[0]?.correo}
               </div>
             </div>
-            <div
-              style={{
-                textAlign: "center",
-                width: "40%",
-              }}
-            >
+            <div style={{ textAlign: "center", width: "40%" }}>
               <FaUserCircle
                 style={{ width: "100px", height: "100px", color: "#60635f" }}
               />
@@ -181,90 +148,102 @@ const UsuarioLogout = () => {
             padding: "0px",
           }}
         >
-          <div className="itemProfile" onClick={handleShowFields}>
-            Change Password
+          <div
+            className="itemProfile"
+            onClick={() => setShowfieldsPassword(!showfieldsPassword)}
+          >
+            Cambiar Password
           </div>
           {showfieldsPassword && (
-            <>
-              <div className="form-group" style={{ width: "90%" }}>
-                <label htmlFor="userName">Current Password:</label>
-                <input
-                  maxLength="50"
-                  type="password"
-                  id="password"
-                  className="form-control"
-                  value={currentPassword}
-                  onChange={handleCurrentPassword}
-                />
-              </div>
+            <form
+              onSubmit={handleSubmit(handleUpdatePassword)}
+              autoComplete="off"
+              style={{ width: "90%" }}
+            >
+              <label htmlFor="currentPassword">Password Actual:</label>
+              <input
+                maxLength="50"
+                type="password"
+                id="currentPassword"
+                className="form-control"
+                {...register("currentPassword", { required: true })}
+                autoComplete="new-password"
+              />
+              {errors.currentPassword && <p>Este campo es requerido</p>}
 
-              <div className="form-group" style={{ width: "90%" }}>
-                <label htmlFor="userName">New Password:</label>
-                <input
-                  maxLength="50"
-                  type="password"
-                  id="password"
-                  className="form-control"
-                  value={password}
-                  onChange={handleChangePassword}
-                />
-              </div>
+              <label htmlFor="password">Nuevo Password:</label>
+              <input
+                maxLength="50"
+                type="password"
+                id="password"
+                className="form-control"
+                {...register("password", {
+                  required: true,
+                  validate: validatePassword,
+                })}
+                autoComplete="new-password"
+              />
+              {errors.password && <p>Este campo es requerido</p>}
 
-              <div className="form-group" style={{ width: "90%" }}>
-                <label htmlFor="userName">Repeat Password:</label>
-                <input
-                  maxLength="50"
-                  type="password"
-                  id="repeatPassword"
-                  className="form-control"
-                  value={repeatPassword}
-                  onChange={(e) => setRepeatPassword(e.target.value)}
-                />
+              <label htmlFor="repeatPassword">Repetir Password:</label>
+              <input
+                maxLength="50"
+                type="password"
+                id="repeatPassword"
+                className="form-control"
+                {...register("repeatPassword", {
+                  required: true,
+                  validate: (value) => value === watchPassword,
+                })}
+                autoComplete="new-password"
+              />
+              {errors.repeatPassword && <p>Las contraseñas no coinciden</p>}
 
-                <p
-                  style={{
-                    display: `${signInvalidPassword}`,
-                    marginTop: "5px",
-                    color: "#b70f0a",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Password must be at least 12 characters long, contain at least
-                  one number, and have at least one uppercase and one lowercase
-                  letter
+              {signInvalidPassword && (
+                <p style={{ color: "#b70f0a", fontWeight: "bold" }}>
+                  La contraseña debe tener al menos 12 caracteres, contener al
+                  menos un número y tener al menos una letra mayúscula
                 </p>
-                <p
-                  style={{
-                    display: `${signDifferentPassword}`,
-                    marginTop: "5px",
-                    color: "#b70f0a",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Passwords are not the same
+              )}
+              {signDifferentPassword && (
+                <p style={{ color: "#b70f0a", fontWeight: "bold" }}>
+                  Las contraseñas no coinciden
                 </p>
+              )}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  width: "100%",
+                  marginTop: "20px",
+                }}
+              >
+                <Button
+                  type="submit"
+                  disabled={
+                    passwordError || watchPassword !== watch("repeatPassword")
+                  }
+                  style={{ marginRight: "20px" }}
+                >
+                  Confirmar
+                  <FaCheck
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      marginLeft: "10px",
+                    }}
+                  />
+                </Button>
+                <Button variant="danger" onClick={handleClose}>
+                  Cerrar
+                  <IoIosClose style={{ width: "30px", height: "30px" }} />
+                </Button>
               </div>
-            </>
+            </form>
           )}
         </Modal.Body>
         <Modal.Footer>
-          {showfieldsPassword ? (
-            <Button
-              style={{ padding: "10px" }}
-              disabled={disableButton}
-              onClick={() => handleUpdatePassword()}
-            >
-              Confirm{" "}
-              <FaCheck
-                style={{
-                  width: "20px",
-                  height: "20px",
-
-                  marginLeft: "10px",
-                }}
-              />
-            </Button>
-          ) : (
+          {!showfieldsPassword && (
             <Button onClick={handleLogout}>
               Salir
               <MdOutlineExitToApp
@@ -272,11 +251,6 @@ const UsuarioLogout = () => {
               />
             </Button>
           )}
-
-          <Button variant="danger" onClick={handleClose}>
-            Cerrar
-            <IoIosClose style={{ width: "30px", height: "30px" }} />
-          </Button>
         </Modal.Footer>
       </Modal>
     </>

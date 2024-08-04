@@ -3,29 +3,47 @@ import { Button, Modal } from "react-bootstrap";
 import { FaSave, FaEdit } from "react-icons/fa";
 import { editProveedorAPI } from "../../redux/proveedoresSlice";
 import { useDispatch } from "react-redux";
+import { useForm } from "react-hook-form";
 
 const EditProveedorForm = ({ proveedorSelected }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
 
-  const [razonSocial, setRazonSocial] = useState(
-    proveedorSelected?.razon_social
-  );
-  const [telefono, setTelefono] = useState(proveedorSelected?.Telefono);
-  const [direccion, setDireccion] = useState(proveedorSelected?.Direccion);
-  const [email, setEmail] = useState(proveedorSelected?.Email);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      razon_social: proveedorSelected?.razon_social,
+      telefono: proveedorSelected?.Telefono,
+      direccion: proveedorSelected?.Direccion,
+      email: proveedorSelected?.Email,
+    },
+  });
 
-  const handleEditProveedor = () => {
+  const handleClose = () => {
+    setShow(false);
+    reset();
+  };
+
+  const handleShow = () => {
+    reset({
+      razon_social: proveedorSelected?.razon_social,
+      telefono: proveedorSelected?.Telefono,
+      direccion: proveedorSelected?.Direccion,
+      email: proveedorSelected?.Email,
+    });
+    setShow(true);
+  };
+
+  const handleEditProveedor = (data) => {
     try {
       dispatch(
         editProveedorAPI({
-          proveedor_id: proveedorSelected && proveedorSelected?.proveedor_id,
-          razon_social: razonSocial,
-          telefono: telefono,
-          direccion: direccion,
-          email: email,
+          proveedor_id: proveedorSelected?.proveedor_id,
+          ...data,
         })
       );
       handleClose();
@@ -48,59 +66,80 @@ const EditProveedorForm = ({ proveedorSelected }) => {
           <Modal.Title>Editar Proveedor</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="form-row">
-            <div className="form-group col-md-12">
-              <label htmlFor="razonSocial">Razón Social:</label>
-              <input
-                type="text"
-                id="razonSocial"
-                className="form-control"
-                value={razonSocial}
-                onChange={(e) => setRazonSocial(e.target.value)}
-              />
+          <form onSubmit={handleSubmit(handleEditProveedor)}>
+            <div className="form-row">
+              <div className="form-group col-md-12">
+                <label htmlFor="razonSocial">Razón Social:</label>
+                <input
+                  type="text"
+                  id="razonSocial"
+                  className="form-control"
+                  {...register("razon_social", {
+                    required: "Este campo es requerido",
+                  })}
+                />
+                {errors.razon_social && (
+                  <p style={{ color: "red" }}>{errors.razon_social.message}</p>
+                )}
+              </div>
+              <div className="form-group col-md-12">
+                <label htmlFor="direccion">Dirección:</label>
+                <input
+                  type="text"
+                  id="direccion"
+                  className="form-control"
+                  {...register("direccion", {
+                    required: "Este campo es requerido",
+                  })}
+                />
+                {errors.direccion && (
+                  <p style={{ color: "red" }}>{errors.direccion.message}</p>
+                )}
+              </div>
+              <div className="form-group col-md-12">
+                <label htmlFor="telefono">Teléfono:</label>
+                <input
+                  type="text"
+                  id="telefono"
+                  className="form-control"
+                  {...register("telefono", {
+                    required: "Este campo es requerido",
+                  })}
+                />
+                {errors.telefono && (
+                  <p style={{ color: "red" }}>{errors.telefono.message}</p>
+                )}
+              </div>
+              <div className="form-group col-md-12">
+                <label htmlFor="email">Email:</label>
+                <input
+                  type="email"
+                  id="email"
+                  className="form-control"
+                  {...register("email", {
+                    required: "Este campo es requerido",
+                    pattern: {
+                      value: /^[^@\s]+@[^@\s]+\.[^@\s]+$/,
+                      message: "Email inválido",
+                    },
+                  })}
+                />
+                {errors.email && (
+                  <p style={{ color: "red" }}>{errors.email.message}</p>
+                )}
+              </div>
             </div>
-            <div className="form-group col-md-12">
-              <label htmlFor="direccion">Dirección:</label>
-              <input
-                type="text"
-                id="direccion"
-                className="form-control"
-                value={direccion}
-                onChange={(e) => setDireccion(e.target.value)}
-              />
-            </div>
-            <div className="form-group col-md-12">
-              <label htmlFor="telefono">Teléfono:</label>
-              <input
-                type="text"
-                id="telefono"
-                className="form-control"
-                value={telefono}
-                onChange={(e) => setTelefono(e.target.value)}
-              />
-            </div>
-
-            <div className="form-group col-md-12">
-              <label htmlFor="email">Email:</label>
-              <input
-                type="email"
-                usuario_id="email"
-                className="form-control"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-          </div>
+            <Modal.Footer>
+              <Button type="submit" className="buttonConfirm">
+                <FaSave className="iconConfirm" />
+                Confirmar
+              </Button>
+              <Button variant="secondary" onClick={handleClose}>
+                Cancelar
+              </Button>
+            </Modal.Footer>
+          </form>
         </Modal.Body>
-        <Modal.Footer>
-          <Button className="buttonConfirm" onClick={handleEditProveedor}>
-            <FaSave className="iconConfirm" />
-            Confirmar
-          </Button>
-          <Button variant="secondary" onClick={handleClose}>
-            Cancelar
-          </Button>
-        </Modal.Footer>
       </Modal>
     </>
   );

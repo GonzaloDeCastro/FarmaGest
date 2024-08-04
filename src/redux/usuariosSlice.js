@@ -225,7 +225,6 @@ export const getUsuarioLoginAPI = (correo, password) => {
       });
 
       if (response.status === 200) {
-        console.log("llega aca al loguear?", response);
         dispatch(getUsuarioLogin(response.data));
       }
     } catch (error) {
