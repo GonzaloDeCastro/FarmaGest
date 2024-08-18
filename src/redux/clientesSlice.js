@@ -67,11 +67,11 @@ export const {
 // Funciones API para interactuar con el backend
 
 export const getClientesAPI = (
-  page = 1,
-  pageSize = 5,
-  search = "",
-  obraSocialID = 0,
-  ciudadID = 0
+  page,
+  pageSize,
+  search,
+  obraSocialID,
+  ciudadID
 ) => {
   return async (dispatch) => {
     try {
