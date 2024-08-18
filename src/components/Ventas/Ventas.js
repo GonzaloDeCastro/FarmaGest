@@ -10,10 +10,10 @@ const Ventas = () => {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const pageSize = 10;
+  const pageSize = 8;
 
   const ventas = useSelector((state) => state.ventas.initialState || []);
-  console.log("ventas ", ventas);
+
   useEffect(() => {
     dispatch(getVentasAPI(page, pageSize, search));
   }, [dispatch, page, search]);
@@ -86,7 +86,7 @@ const Ventas = () => {
                 <td>{venta.numero_factura}</td>
                 <td>{`${venta.cliente_nombre} ${venta.cliente_apellido}`}</td>
                 <td>{`${venta.usuario_nombre} ${venta.usuario_apellido}`}</td>
-                <td>{venta.total}</td>
+                <td>${venta.total}</td>
                 <td>
                   {/* <EditVentaForm venta={venta} /> */}
                   <FaRegTrashAlt
@@ -110,6 +110,8 @@ const Ventas = () => {
           <button
             onClick={() => handlePageChange(page + 1)}
             className="buttonPage"
+            style={{ marginLeft: "10px" }}
+            disabled={ventas && ventas.length < pageSize}
           >
             Siguiente
           </button>
