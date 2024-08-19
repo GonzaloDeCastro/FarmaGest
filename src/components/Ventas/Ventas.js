@@ -12,7 +12,7 @@ const Ventas = () => {
   const [search, setSearch] = useState("");
   const pageSize = 8;
 
-  const ventas = useSelector((state) => state.ventas.initialState || []);
+  const ventas = useSelector((state) => state.venta.initialState || []);
 
   useEffect(() => {
     dispatch(getVentasAPI(page, pageSize, search));

@@ -5,9 +5,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 //import { addVentaAPI } from "../../redux/ventasSlice"; // Asegúrate de tener esta acción definida en tu Redux
 import { getClientesAPI } from "../../redux/clientesSlice";
+import { getItemsAPI } from "../../redux/itemsSlice";
 import Select from "react-select";
 import AgregarItems from "./AgregarItems";
-
+import { FaRegTrashAlt } from "react-icons/fa";
 const VentaFormModal = () => {
   const {
     register,
@@ -28,16 +29,17 @@ const VentaFormModal = () => {
   const onSubmit = (data) => {
     // Aquí podrías formatear los datos si es necesario antes de enviarlos
     // dispatch(addVentaAPI(data));
-    handleClose();
+    // handleClose();
   };
   const clientes = useSelector(
     (state) => state && state.cliente && state.cliente
   );
-
+  const items = useSelector((state) => state && state?.item?.initialState);
   useEffect(() => {
     dispatch(getClientesAPI());
+    dispatch(getItemsAPI());
   }, [dispatch]);
-
+  console.log("items ", items);
   let optionsClientes =
     clientes &&
     clientes?.initialState?.map((cliente) => ({
@@ -103,9 +105,18 @@ const VentaFormModal = () => {
               className="mb-3"
               style={{ display: "flex", justifyContent: "space-between" }}
             >
-              <Form.Label>Detalles de los Productos</Form.Label>
+              <table className="headerTable">
+                <thead>
+                  <tr>
+                    {/* Aquí mapeamos las claves ajustadas, incluyendo las combinaciones de nombres */}
+                    <th>Detalle Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
               <AgregarItems />
-              {/* Aquí podrías tener un componente separado para manejar múltiples productos */}
             </Form.Group>
 
             <Button type="submit" className="buttonConfirm">

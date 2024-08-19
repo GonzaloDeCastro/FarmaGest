@@ -2,84 +2,91 @@ import React, { useEffect, useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 import { FaPlusCircle, FaSave } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { useForm } from "react-hook-form";
-//import { addVentaAPI } from "../../redux/ventasSlice"; // Asegúrate de tener esta acción definida en tu Redux
+import { useForm, Controller } from "react-hook-form";
+import { addItemAPI } from "../../redux/itemsSlice";
 import { getProductosAPI } from "../../redux/productosSlice";
 import Select from "react-select";
 
 const AgregarItems = () => {
   const {
-    register,
+    control,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      producto: null,
+      cantidad: 1,
+      precio: 0,
+      total: 0,
+    },
+  });
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
-  const [producto, setProducto] = useState(0);
-  const [precio, setPrecio] = useState(0);
-  const [cantidad, setCantidad] = useState(1);
+  const productos = useSelector((state) => state.producto?.initialState || []);
+
+  useEffect(() => {
+    dispatch(getProductosAPI());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      if (name === "producto" || name === "cantidad") {
+        updateTotal(value.cantidad, value.precio);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
   const handleClose = () => {
     setShow(false);
-    setProducto(0);
-    setPrecio(0);
-    setCantidad(0);
     reset();
   };
 
   const handleShow = () => setShow(true);
 
   const onSubmit = (data) => {
-    // Aquí podrías formatear los datos si es necesario antes de enviarlos
-    // dispatch(addVentaAPI(data));
-    handleClose();
+    console.log("data ", data);
+    dispatch(addItemAPI(data));
   };
 
-  const productos = useSelector((state) => state && state?.producto);
-
-  useEffect(() => {
-    dispatch(getProductosAPI());
-  }, [dispatch]);
-
-  let optionsProductos =
-    productos &&
-    productos?.initialState?.map((producto) => ({
-      value: producto.producto_id,
-      label: `${producto.Codigo} - ${producto.Nombre}`,
-    }));
-
-  const handleProducto = (event) => {
-    setProducto(event.target.value);
-
-    /*  const selectedEventReasonDesc =
-      event.target.selectedOptions[0].getAttribute("data-event-reason-desc");
-    setEventReasonDesc(selectedEventReasonDesc); */
+  const updateTotal = (cantidad, precio) => {
+    setValue("total", cantidad * precio);
   };
 
-  useEffect(() => {
-    if (producto) {
-      const selectedProduct =
-        productos &&
-        productos?.initialState &&
-        productos?.initialState?.find(
-          (product) => product.producto_id === producto
-        ).Precio;
-      if (cantidad < 2 || isNaN(cantidad)) {
-        setPrecio(parseInt(selectedProduct * 1));
-      } else {
-        setPrecio(parseInt(selectedProduct * cantidad));
-      }
+  const handleProductoChange = (producto) => {
+    const selectedProducto = productos.find((p) => p.producto_id === producto);
+    if (selectedProducto) {
+      setValue("precio", selectedProducto.Precio);
+      updateTotal(watch("cantidad"), selectedProducto.Precio);
     }
-  }, [producto, cantidad, productos]);
+  };
+
+  const optionsProductos = productos.map((producto) => ({
+    value: producto.producto_id,
+    label: `${producto.Codigo} - ${producto.Nombre}`,
+  }));
 
   return (
     <>
-      <Button onClick={handleShow} className="mb-2">
+      <div
+        onClick={handleShow}
+        className="buttonConfirm"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          padding: "5px",
+          borderRadius: "0px 10px 10px 0px",
+          cursor: "pointer",
+        }}
+      >
         <FaPlusCircle
           style={{ width: "30px", height: "30px", marginRight: "5px" }}
         />
-        Agregar Productos
-      </Button>
+        <div style={{ whiteSpace: "nowrap" }}>Agregar Items</div>
+      </div>
 
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>
@@ -88,66 +95,45 @@ const AgregarItems = () => {
         <Modal.Body>
           <Form onSubmit={handleSubmit(onSubmit)}>
             <Form.Group className="mb-3">
-              <div
-                className="form-group col-md-6"
-                style={{ width: "100%", fontSize: "15px" }}
-              >
-                <label style={{ display: "block" }} htmlFor="code">
-                  Producto:
-                </label>
-
-                {show && (
+              <label>Producto:</label>
+              <Controller
+                name="producto"
+                control={control}
+                render={({ field }) => (
                   <Select
-                    value={
-                      (optionsProductos &&
-                        optionsProductos?.find(
-                          (option) => option.value === producto
-                        )) ||
-                      null
-                    }
-                    onChange={(option) =>
-                      handleProducto({
-                        target: { value: option ? option.value : 0 },
-                      })
-                    }
+                    {...field}
                     options={optionsProductos}
-                    placeholder="Selection Event Reason"
+                    onChange={(val) => {
+                      field.onChange(val ? val.value : null);
+                      handleProductoChange(val ? val.value : null);
+                    }}
+                    value={optionsProductos.find(
+                      (option) => option.value === field.value
+                    )}
                     classNamePrefix="react-select"
                   />
                 )}
-              </div>
-              <div style={{ display: "flex" }}>
-                <div className="form-group col-md-6">
-                  <label style={{ display: "block" }} htmlFor="code">
-                    Cantidad:
-                  </label>
-                  <input
-                    maxLength="50"
-                    type="number"
-                    id="cantidad"
-                    className="form-control"
-                    value={cantidad}
-                    onChange={(e) =>
-                      setCantidad(
-                        parseInt(
-                          e.target.value < 0
-                            ? e.target.value * -1
-                            : e.target.value
-                        )
-                      )
-                    }
-                  />
-                </div>
-                <div
-                  className="form-group col-md-6"
-                  style={{ marginLeft: "10%" }}
-                >
-                  <label style={{ display: "block" }} htmlFor="code">
-                    Precio:
-                  </label>
-                  {`$${precio}`}
-                </div>
-              </div>
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <label>Cantidad:</label>
+              <input
+                type="number"
+                {...control.register("cantidad", { valueAsNumber: true })}
+                className="form-control"
+                onChange={(e) => setValue("cantidad", parseInt(e.target.value))}
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <label>Precio Unitario:</label>
+              <p>{`$${watch("precio")}`}</p>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <label>Total:</label>
+              <p>{`$${watch("total")}`}</p>
             </Form.Group>
 
             <Button type="submit" variant="primary">
