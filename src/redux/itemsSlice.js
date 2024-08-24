@@ -5,6 +5,7 @@ const itemDataSlice = createSlice({
   initialState: {},
   reducers: {
     getItems: (state, action) => {
+      console.log("action.payload ", action.payload);
       return {
         ...state,
         initialState: action.payload,
@@ -21,6 +22,7 @@ const itemDataSlice = createSlice({
 export const { getItems, addItem } = itemDataSlice.actions;
 
 export const getItemsAPI = () => {
+  console.log("aca entra al get");
   return async (dispatch) => {
     try {
       dispatch(getItems());
@@ -30,6 +32,7 @@ export const getItemsAPI = () => {
   };
 };
 export const addItemAPI = (itemData) => {
+  console.log("llega algo? ", itemData);
   return async (dispatch) => {
     try {
       dispatch(addItem(itemData));

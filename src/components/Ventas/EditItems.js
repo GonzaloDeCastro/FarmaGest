@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
-import { FaPlusCircle, FaSave } from "react-icons/fa";
+import { FaPlusCircle, FaSave, FaEdit } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm, Controller } from "react-hook-form";
 import { addItemAPI } from "../../redux/itemsSlice";
 import { getProductosAPI } from "../../redux/productosSlice";
 import Select from "react-select";
 
-const AgregarItems = ({ onAgregarItem }) => {
+const EditarItem = ({ onAgregarItem }) => {
   const {
     control,
     handleSubmit,
@@ -80,22 +80,7 @@ const AgregarItems = ({ onAgregarItem }) => {
 
   return (
     <>
-      <div
-        onClick={handleShow}
-        className="buttonConfirm"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          padding: "5px",
-          borderRadius: "0px 10px 10px 0px",
-          cursor: "pointer",
-        }}
-      >
-        <FaPlusCircle
-          style={{ width: "30px", height: "30px", marginRight: "5px" }}
-        />
-        <div style={{ whiteSpace: "nowrap" }}>Agregar Items</div>
-      </div>
+      <FaEdit className="iconABM" onClick={handleShow} />
 
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>
@@ -155,4 +140,4 @@ const AgregarItems = ({ onAgregarItem }) => {
   );
 };
 
-export default AgregarItems;
+export default EditarItem;

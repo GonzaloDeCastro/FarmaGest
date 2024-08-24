@@ -9,6 +9,7 @@ import { getItemsAPI } from "../../redux/itemsSlice";
 import Select from "react-select";
 import AgregarItems from "./AgregarItems";
 import { FaRegTrashAlt } from "react-icons/fa";
+import EditarItem from "./EditItems";
 const VentaFormModal = () => {
   const {
     register,
@@ -19,6 +20,8 @@ const VentaFormModal = () => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
   const [cliente, setCliente] = useState(0);
+  const [itemsAgregados, setItemsAgregados] = useState([]);
+
   const handleClose = () => {
     setShow(false);
     reset();
@@ -38,8 +41,8 @@ const VentaFormModal = () => {
   useEffect(() => {
     dispatch(getClientesAPI());
     dispatch(getItemsAPI());
-  }, [dispatch]);
-  console.log("items ", items);
+  }, [dispatch, items, show]);
+
   let optionsClientes =
     clientes &&
     clientes?.initialState?.map((cliente) => ({
@@ -54,6 +57,13 @@ const VentaFormModal = () => {
       event.target.selectedOptions[0].getAttribute("data-event-reason-desc");
     setEventReasonDesc(selectedEventReasonDesc); */
   };
+
+  // En VentaFormModal
+  const handleAgregarItem = (item) => {
+    setItemsAgregados((prevItems) => [...prevItems, item]);
+  };
+  console.log("items ", items);
+  console.log("itemsAgregados ", itemsAgregados);
 
   return (
     <>
@@ -112,11 +122,27 @@ const VentaFormModal = () => {
                     <th>Detalle Producto</th>
                     <th>Cantidad</th>
                     <th>Precio</th>
+                    <AgregarItems onAgregarItem={handleAgregarItem} />
                   </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody>
+                  {" "}
+                  {itemsAgregados.map((item, index) => (
+                    <tr key={index}>
+                      <td>{item.producto}</td>
+                      <td>{item.cantidad}</td>
+                      <td>{item.precio}</td>
+                      <td style={{ flexWrap: "nowrap" }}>
+                        <EditarItem clienteSelected={cliente} />
+                        <FaRegTrashAlt
+                          className="iconABM"
+                          /* onClick={() => handleDelete(cliente)} */
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
               </table>
-              <AgregarItems />
             </Form.Group>
 
             <Button type="submit" className="buttonConfirm">
