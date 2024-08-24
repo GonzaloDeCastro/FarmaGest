@@ -5,11 +5,9 @@ import proveedorDataSlice from "../redux/proveedoresSlice";
 import clienteDataSlice from "../redux/clientesSlice";
 import obraSocialDataSlice from "../redux/obrasSocialesSlice";
 import ventaDataSlice from "../redux/ventasSlice";
-import itemDataSlice from "../redux/itemsSlice";
 
 export default configureStore({
   reducer: {
-    item: itemDataSlice,
     venta: ventaDataSlice,
     producto: productoDataSlice,
     usuario: usuarioDataSlice,

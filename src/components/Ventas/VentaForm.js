@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 //import { addVentaAPI } from "../../redux/ventasSlice"; // Asegúrate de tener esta acción definida en tu Redux
 import { getClientesAPI } from "../../redux/clientesSlice";
-import { getItemsAPI } from "../../redux/itemsSlice";
+
 import Select from "react-select";
 import AgregarItems from "./AgregarItems";
 import { FaRegTrashAlt } from "react-icons/fa";
@@ -40,7 +40,6 @@ const VentaFormModal = () => {
   const items = useSelector((state) => state && state?.item?.initialState);
   useEffect(() => {
     dispatch(getClientesAPI());
-    dispatch(getItemsAPI());
   }, [dispatch, items, show]);
 
   let optionsClientes =

@@ -3,7 +3,7 @@ import { Button, Modal, Form } from "react-bootstrap";
 import { FaPlusCircle, FaSave, FaEdit } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm, Controller } from "react-hook-form";
-import { addItemAPI } from "../../redux/itemsSlice";
+
 import { getProductosAPI } from "../../redux/productosSlice";
 import Select from "react-select";
 
@@ -48,15 +48,6 @@ const EditarItem = ({ onAgregarItem }) => {
   const handleShow = () => setShow(true);
 
   const onSubmit = (data) => {
-    console.log("data ", data);
-    dispatch(
-      addItemAPI({
-        producto: data.producto,
-        cantidad: data.cantidad,
-        precio: data.precio,
-        total: data.total,
-      })
-    );
     onAgregarItem(data); // Llama a la función de callback para actualizar el estado en VentaFormModal
     handleClose();
   };
