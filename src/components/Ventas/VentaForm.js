@@ -2,44 +2,37 @@ import React, { useEffect, useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 import { FaPlusCircle, FaSave } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { useForm } from "react-hook-form";
-//import { addVentaAPI } from "../../redux/ventasSlice"; // Asegúrate de tener esta acción definida en tu Redux
+import { addVentaAPI, getUltimaVentaAPI } from "../../redux/ventasSlice";
 import { getClientesAPI } from "../../redux/clientesSlice";
-
 import Select from "react-select";
 import AgregarItems from "./AgregarItems";
 import { FaRegTrashAlt } from "react-icons/fa";
 import EditarItem from "./EditItems";
-const VentaFormModal = () => {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm();
+import Swal from "sweetalert2";
+const VentaFormModal = ({ usuarioId }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
   const [cliente, setCliente] = useState(0);
   const [itemsAgregados, setItemsAgregados] = useState([]);
+  const [total, setTotal] = useState(0);
 
   const handleClose = () => {
     setShow(false);
-    reset();
   };
 
   const handleShow = () => setShow(true);
 
-  const onSubmit = (data) => {
-    // Aquí podrías formatear los datos si es necesario antes de enviarlos
-    // dispatch(addVentaAPI(data));
-    // handleClose();
-  };
   const clientes = useSelector(
     (state) => state && state.cliente && state.cliente
   );
+  const ultimaVenta = useSelector(
+    (state) => state && state.venta && state.venta.ultimaVentaState
+  );
+
   const items = useSelector((state) => state && state?.item?.initialState);
   useEffect(() => {
     dispatch(getClientesAPI());
+    dispatch(getUltimaVentaAPI());
   }, [dispatch, items, show]);
 
   let optionsClientes =
@@ -61,8 +54,44 @@ const VentaFormModal = () => {
   const handleAgregarItem = (item) => {
     setItemsAgregados((prevItems) => [...prevItems, item]);
   };
-  console.log("items ", items);
-  console.log("itemsAgregados ", itemsAgregados);
+
+  const handleDelete = (item) => {
+    Swal.fire({
+      title: "Remover item",
+      html: `Estas seguro de remover el item <b>${item.nombre}</b>?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, borrar!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setItemsAgregados((itemsAgregados) =>
+          itemsAgregados.filter(
+            (producto) => producto.productoId !== item.productoId
+          )
+        );
+      }
+    });
+  };
+
+  useEffect(() => {
+    let total = 0;
+    itemsAgregados.forEach((item) => {
+      total += parseInt(item.total);
+    });
+    setTotal(total);
+  }, [itemsAgregados]);
+
+  const handleCrearFactura = () => {
+    addVentaAPI({
+      cliente_id: cliente,
+      itemsAgregados,
+      total,
+      usuario_id: usuarioId,
+      numer_factura: ultimaVenta && ultimaVenta?.venta_id + 1,
+    });
+  };
 
   return (
     <>
@@ -75,10 +104,12 @@ const VentaFormModal = () => {
 
       <Modal show={show} onHide={handleClose} centered size="xl">
         <Modal.Header closeButton>
-          <Modal.Title>Agregar Nueva Factura</Modal.Title>
+          <Modal.Title>
+            Nueva Factura N°00000000{ultimaVenta && ultimaVenta?.venta_id + 1}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleSubmit(onSubmit)}>
+          <Form>
             <Form.Group className="mb-3">
               <div
                 className="form-group col-md-6"
@@ -125,17 +156,16 @@ const VentaFormModal = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {" "}
                   {itemsAgregados.map((item, index) => (
                     <tr key={index}>
-                      <td>{item.producto}</td>
+                      <td>{item.nombre}</td>
                       <td>{item.cantidad}</td>
                       <td>{item.precio}</td>
                       <td style={{ flexWrap: "nowrap" }}>
-                        <EditarItem clienteSelected={cliente} />
+                        {/*        <EditarItem clienteSelected={cliente} /> */}
                         <FaRegTrashAlt
                           className="iconABM"
-                          /* onClick={() => handleDelete(cliente)} */
+                          onClick={() => handleDelete(item)}
                         />
                       </td>
                     </tr>
@@ -143,10 +173,20 @@ const VentaFormModal = () => {
                 </tbody>
               </table>
             </Form.Group>
-
-            <Button type="submit" className="buttonConfirm">
-              Crear Factura
-            </Button>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Button className="buttonConfirm" onClick={handleCrearFactura}>
+                Crear Factura
+              </Button>
+              <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+                {`Total: $${total}`}
+              </div>
+            </div>
           </Form>
         </Modal.Body>
       </Modal>

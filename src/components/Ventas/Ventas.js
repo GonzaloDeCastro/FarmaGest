@@ -11,7 +11,8 @@ const Ventas = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const pageSize = 8;
-
+  const logged = JSON.parse(sessionStorage.getItem("logged"));
+  const sesion = logged.sesion;
   const ventas = useSelector((state) => state.venta.initialState || []);
 
   useEffect(() => {
@@ -62,7 +63,7 @@ const Ventas = () => {
           placeholder="Buscar ventas..."
         />
         <div style={{ display: "flex" }}>
-          <VentaFormModal />
+          <VentaFormModal usuarioId={sesion.usuario_id} />
         </div>
       </div>
 

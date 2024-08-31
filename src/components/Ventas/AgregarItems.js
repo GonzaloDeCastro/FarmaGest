@@ -17,7 +17,7 @@ const AgregarItems = ({ onAgregarItem }) => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      producto: null,
+      productoId: null,
       cantidad: 1,
       precio: 0,
       total: 0,
@@ -33,7 +33,7 @@ const AgregarItems = ({ onAgregarItem }) => {
 
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
-      if (name === "producto" || name === "cantidad") {
+      if (name === "productoId" || name === "cantidad") {
         updateTotal(value.cantidad, value.precio);
       }
     });
@@ -48,7 +48,11 @@ const AgregarItems = ({ onAgregarItem }) => {
   const handleShow = () => setShow(true);
 
   const onSubmit = (data) => {
-    onAgregarItem(data); // Llama a la función de callback para actualizar el estado en VentaFormModal
+    let productoNombre = productos.find(
+      (p) => p.producto_id === data.productoId
+    ).Nombre;
+    let dataComplete = { ...data, nombre: productoNombre };
+    onAgregarItem(dataComplete); // Llama a la función de callback para actualizar el estado en VentaFormModal
     handleClose();
   };
 
@@ -56,8 +60,10 @@ const AgregarItems = ({ onAgregarItem }) => {
     setValue("total", cantidad * precio);
   };
 
-  const handleProductoChange = (producto) => {
-    const selectedProducto = productos.find((p) => p.producto_id === producto);
+  const handleProductoChange = (productoId) => {
+    const selectedProducto = productos.find(
+      (p) => p.producto_id === productoId
+    );
     if (selectedProducto) {
       setValue("precio", selectedProducto.Precio);
       updateTotal(watch("cantidad"), selectedProducto.Precio);
@@ -97,7 +103,7 @@ const AgregarItems = ({ onAgregarItem }) => {
             <Form.Group className="mb-3">
               <label>Producto:</label>
               <Controller
-                name="producto"
+                name="productoId"
                 control={control}
                 render={({ field }) => (
                   <Select
