@@ -84,13 +84,16 @@ const VentaFormModal = ({ usuarioId }) => {
   }, [itemsAgregados]);
 
   const handleCrearFactura = () => {
-    addVentaAPI({
-      cliente_id: cliente,
-      itemsAgregados,
-      total,
-      usuario_id: usuarioId,
-      numer_factura: ultimaVenta && ultimaVenta?.venta_id + 1,
-    });
+    dispatch(
+      addVentaAPI({
+        cliente_id: cliente,
+        itemsAgregados,
+        total,
+        usuario_id: usuarioId,
+        numero_factura: ultimaVenta && ultimaVenta?.venta_id + 1,
+      })
+    );
+    handleClose();
   };
 
   return (

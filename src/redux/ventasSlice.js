@@ -79,21 +79,17 @@ export const deleteVentaAPI = (ventaId) => async (dispatch) => {
 };
 
 export const addVentaAPI = (ventaData) => {
-  console.log("ventaData ", ventaData);
-  /* return async (dispatch) => {
+  return async (dispatch) => {
     try {
-      const response = await axios.post(`${API}/usuarios`, ventaData);
-
+      const response = await axios.post(`${API}/ventas`, ventaData);
       if (response.status === 201) {
-        const newUsuario = {
-          usuario_id: response.data.usuario_id,
-          Nombre: ventaData.nombre,
-          Apellido: ventaData.apellido,
-          Correo: ventaData.correo,
-          Rol: ventaData.Rol,
-          rol_id: ventaData.rol_id,
-        };
-        dispatch(addVenta(newUsuario));
+        //dispatch(addVenta(ventaData));
+        const response = await axios.get(`${API}/ventas`, {
+          params: { page: 1, pageSize: 8, search: "" },
+        });
+        if (response.status === 200) {
+          dispatch(getVentas(response.data));
+        }
         Swal.fire({
           icon: "success",
           title: "Factura creada",
@@ -115,7 +111,7 @@ export const addVentaAPI = (ventaData) => {
         });
       }
     }
-  }; */
+  };
 };
 
 export default ventasSlice.reducer;

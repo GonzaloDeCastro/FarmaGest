@@ -99,24 +99,23 @@ const Ventas = () => {
             ))}
           </tbody>
         </table>
-
-        <div>
-          <button
-            onClick={() => handlePageChange(page - 1)}
-            disabled={page === 1}
-            className="buttonPage"
-          >
-            Anterior
-          </button>
-          <button
-            onClick={() => handlePageChange(page + 1)}
-            className="buttonPage"
-            style={{ marginLeft: "10px" }}
-            disabled={ventas && ventas.length < pageSize}
-          >
-            Siguiente
-          </button>
-        </div>
+      </div>
+      <div>
+        <button
+          onClick={() => handlePageChange(page - 1)}
+          disabled={page === 1}
+          className="buttonPage"
+        >
+          Anterior
+        </button>
+        <button
+          onClick={() => handlePageChange(page + 1)}
+          className="buttonPage"
+          style={{ marginLeft: "10px" }}
+          disabled={ventas && ventas.length < pageSize}
+        >
+          Siguiente
+        </button>
       </div>
     </div>
   );
