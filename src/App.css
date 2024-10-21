@@ -230,6 +230,14 @@ nav.bigActive span {
   color: #1353c9;
 }
 
+.iconABMDisabled,
+.iconResetPassworDisabled {
+  width: 32px;
+  height: 32px;
+  cursor: not-allowed;
+  color: #636363;
+}
+
 .containerSelected {
   padding: 20px 40px 0px 40px;
   color: #0f1014;

@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { Tooltip } from "react-tooltip";
 import { useDispatch, useSelector } from "react-redux";
-import { getVentasAPI, deleteVentaAPI } from "../../redux/ventasSlice";
-import { FaRegTrashAlt } from "react-icons/fa";
+import { getVentasAPI, verFacturaVentaAPI } from "../../redux/ventasSlice";
+import { FaFileInvoice } from "react-icons/fa";
+import { MdReceiptLong } from "react-icons/md";
+
 import Swal from "sweetalert2";
 import VentaFormModal from "./VentaForm";
+import FacturaDetalle from "./FacturaDetalle";
 //import EditVentaForm from "./EditVentaForm"; // Asumimos que tienes este componente para editar
 
 const Ventas = () => {
@@ -19,17 +23,17 @@ const Ventas = () => {
     dispatch(getVentasAPI(page, pageSize, search));
   }, [dispatch, page, search]);
 
-  const handleDelete = (venta) => {
+  const handleVerFactura = (venta) => {
     Swal.fire({
       title: "Advertencia!",
-      text: `¿Está seguro que desea eliminar la venta con ID ${venta.venta_id}?`,
+      text: `¿Está seguro que desea eliminar la venta N° ${venta.venta_id}?`,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "No, cancelar",
+      confirmButtonText: "Confirmar",
+      cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(deleteVentaAPI(venta.venta_id));
+        dispatch(verFacturaVentaAPI(venta.venta_id));
       }
     });
   };
@@ -90,10 +94,15 @@ const Ventas = () => {
                 <td>${venta.total}</td>
                 <td>
                   {/* <EditVentaForm venta={venta} /> */}
-                  <FaRegTrashAlt
-                    className="iconABM"
-                    onClick={() => handleDelete(venta)}
-                  />
+                  <div style={{ display: "flex" }}>
+                    <FacturaDetalle ventaId={venta.venta_id} />
+                    <MdReceiptLong
+                      data-tooltip-id="my-tooltip-NC"
+                      data-tooltip-content="Nota de Crédito"
+                      className="iconABMDisabled"
+                    />
+                    <Tooltip id="my-tooltip-NC"> Nota de crédito</Tooltip>
+                  </div>
                 </td>
               </tr>
             ))}

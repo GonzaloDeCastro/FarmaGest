@@ -9,6 +9,7 @@ const ventasSlice = createSlice({
   name: "ventas",
   initialState: {},
   ultimaVentaState: {},
+  facturaState: {},
   reducers: {
     getVentas: (state, action) => {
       return {
@@ -28,18 +29,16 @@ const ventasSlice = createSlice({
         initialState: [action.payload, ...state.initialState],
       };
     },
-    deleteVenta: (state, action) => {
+    verFacturaVenta: (state, action) => {
       return {
         ...state,
-        initialState: state.initialState?.filter(
-          (venta) => venta?.venta_id !== action?.payload
-        ),
+        facturaState: action.payload,
       };
     },
   },
 });
 
-export const { getVentas, getUltimaVenta, addVenta, deleteVenta } =
+export const { getVentas, getUltimaVenta, addVenta, verFacturaVenta } =
   ventasSlice.actions;
 
 export const getVentasAPI = (page, pageSize, search) => async (dispatch) => {
@@ -65,16 +64,14 @@ export const getUltimaVentaAPI = () => async (dispatch) => {
     console.error("Error al obtener ventas:", error);
   }
 };
-export const deleteVentaAPI = (ventaId) => async (dispatch) => {
+export const verFacturaVentaAPI = (ventaId) => async (dispatch) => {
   try {
-    const response = await axios.delete(`${API}/ventas/venta-id/${ventaId}`);
+    const response = await axios.get(`${API}/ventas/venta-id/${ventaId}`);
     if (response.status === 200) {
-      dispatch(deleteVenta(ventaId));
-      Swal.fire("Eliminado!", "La venta ha sido eliminada.", "success");
+      dispatch(verFacturaVenta(response.data));
     }
   } catch (error) {
-    console.error("Error al eliminar venta:", error);
-    Swal.fire("Error", "Hubo un problema al eliminar la venta.", "error");
+    console.error("Error al obtener factura:", error);
   }
 };
 
