@@ -219,6 +219,17 @@ nav.bigActive span {
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.5);
 }
 
+.iconResetPassword {
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.iconABM:hover,
+.iconResetPassword:hover {
+  color: #1353c9;
+}
+
 .containerSelected {
   padding: 20px 40px 0px 40px;
   color: #0f1014;

@@ -7,10 +7,10 @@ import {
   getRolesAPI,
 } from "../../redux/usuariosSlice";
 import { FaRegTrashCan } from "react-icons/fa6";
-
 import Swal from "sweetalert2";
 import UsuarioForm from "./UsuarioForm";
 import EditUsuarioFormModal from "./EditUsuarioForm";
+import ResetPassword from "./ResetPassword";
 
 const Usuarios = () => {
   const dispatch = useDispatch();
@@ -169,6 +169,7 @@ const Usuarios = () => {
                       usuarioSelected={dato}
                       Roles={Roles}
                     />
+                    <ResetPassword userSelected={dato} />
                     <FaRegTrashCan
                       className="iconABM"
                       onClick={() => handleDelete(dato)}

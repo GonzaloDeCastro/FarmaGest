@@ -19,7 +19,7 @@ const FormLogin = () => {
   const onSubmit = (data) => {
     dispatch(getUsuarioLoginAPI(data.correo, data.password));
   };
-  console.log("UsuarioLogin ", UsuarioLogin);
+
   useEffect(() => {
     if (UsuarioLogin && UsuarioLogin.correo !== undefined) {
       sessionStorage.setItem(

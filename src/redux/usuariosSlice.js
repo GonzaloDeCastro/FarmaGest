@@ -247,7 +247,6 @@ export const getUsuarioLoginAPI = (correo, password) => {
 
 export const updatePasswordDataAPI = (dataUser) => {
   const { correo, currentPassword } = dataUser;
-
   return async (dispatch) => {
     try {
       const response = await axios.get(`${API}/usuarios/login`, {
@@ -256,10 +255,8 @@ export const updatePasswordDataAPI = (dataUser) => {
           contrasena: currentPassword && currentPassword,
         },
       });
-      console.log("response ", response);
       if (response?.data.correo !== undefined) {
         const action = response?.data;
-        console.log("llega ?");
         if (action !== 1) {
           const response2 = await axios.put(
             `${API}/usuarios/pwd/${correo}`,
@@ -302,6 +299,32 @@ export const updatePasswordDataAPI = (dataUser) => {
         });
       }
     }
+  };
+};
+
+export const resetPasswordDataAPI = (dataUser) => {
+  const { correo } = dataUser;
+  console.log("dataUser ", dataUser);
+  return async (dispatch) => {
+    try {
+      const response2 = await axios.put(
+        `${API}/usuarios/pwd/${correo}`,
+        dataUser
+      );
+      if (response2?.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Password Updated",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Password cannot be updated",
+        });
+      }
+    } catch (error) {}
   };
 };
 
