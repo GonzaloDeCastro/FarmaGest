@@ -1,0 +1,23 @@
+.table {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.table th,
+.table td {
+  border: 1px solid #dddddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.table th:last-child,
+.table td:last-child {
+  width: 70px;
+  white-space: nowrap; /* Evitar que el contenido se ajuste automáticamente */
+}
+.table tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+.table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}

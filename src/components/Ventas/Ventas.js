@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Tooltip } from "react-tooltip";
 import { useDispatch, useSelector } from "react-redux";
 import { getVentasAPI, verFacturaVentaAPI } from "../../redux/ventasSlice";
-import { FaFileInvoice } from "react-icons/fa";
 import { MdReceiptLong } from "react-icons/md";
 
 import Swal from "sweetalert2";
