@@ -44,7 +44,7 @@ const FormLogin = () => {
       </div>
 
       <form className="formulario" onSubmit={handleSubmit(onSubmit)}>
-        <label htmlFor="correo">Usuario / Correo</label>
+        <label htmlFor="correo">Correo</label>
         <input type="text" {...register("correo", { required: true })} />
         {errors.correo && (
           <p className="errorsHandler">Este campo correo es requerido</p>

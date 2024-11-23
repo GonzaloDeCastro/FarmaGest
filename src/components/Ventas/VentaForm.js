@@ -137,7 +137,7 @@ const VentaFormModal = ({ usuarioId }) => {
                       })
                     }
                     options={optionsClientes}
-                    placeholder="Selection Event Reason"
+                    placeholder="Selectcionar Cliente"
                     classNamePrefix="react-select"
                   />
                 )}

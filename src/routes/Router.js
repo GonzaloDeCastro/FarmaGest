@@ -8,6 +8,7 @@ import Proveedores from "../components/Proveedores/Proveedores";
 import Clientes from "../components/Clientes/Clientes";
 import ObrasSociales from "../components/ObrasSociales/ObrasSociales";
 import Pedidos from "../components/Pedidos/Pedidos";
+import Reportes from "../components/Reportes/Reportes";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
 import PrivateRouteVentas from "./PrivateVentas";
@@ -83,6 +84,14 @@ const AppRouter = () => {
               element={
                 <Layout title={"usuarios"}>
                   <Usuarios />
+                </Layout>
+              }
+            />
+            <Route
+              path="/reportes"
+              element={
+                <Layout title={"reportes"}>
+                  <Reportes />
                 </Layout>
               }
             />

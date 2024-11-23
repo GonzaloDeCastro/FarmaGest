@@ -48,6 +48,7 @@ export const getVentasAPI = (page, pageSize, search) => async (dispatch) => {
     });
     if (response.status === 200) {
       dispatch(getVentas(response.data));
+      console.log("response.data ", response.data);
     }
   } catch (error) {
     console.error("Error al obtener ventas:", error);

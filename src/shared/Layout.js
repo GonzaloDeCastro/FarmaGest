@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { FaHandshake } from "react-icons/fa6";
 import { LiaAddressCardSolid } from "react-icons/lia";
 import { AiFillProduct } from "react-icons/ai";
+import { IoBarChart } from "react-icons/io5";
 import { RiShoppingBag4Fill } from "react-icons/ri";
 import { HiUsers } from "react-icons/hi";
 import { FaBell, FaShoppingCart } from "react-icons/fa";
@@ -68,7 +69,9 @@ const Layout = ({ children, title }) => {
       </header>
       <div className="bodyContainer">
         <nav className={!isOpen ? "smallActive" : "smallInactive"}>
-          {permisos.includes("gestion_pedidos") && (
+          {permisos.includes(
+            "gestion_pedidos" && logged.sesion.rol !== "admin"
+          ) && (
             <Link to="/pedidos">
               <RiShoppingBag4Fill className="iconMenu" />
             </Link>
@@ -103,15 +106,21 @@ const Layout = ({ children, title }) => {
               <HiUsers className="iconMenu" />
             </Link>
           )}
+          {permisos.includes("gestion_usuarios") && (
+            <Link to="/reportes">
+              <IoBarChart className="iconMenu" />
+            </Link>
+          )}
         </nav>
 
         <nav className={isOpen ? "bigActive" : "bigInactive"}>
-          {permisos.includes("gestion_pedidos") && (
-            <Link className="itemMenu" to="/pedidos">
-              <RiShoppingBag4Fill className="iconMenu" />
-              <span>Pedidos</span>
-            </Link>
-          )}
+          {permisos.includes("gestion_pedidos") &&
+            logged.sesion.rol !== "admin" && (
+              <Link className="itemMenu" to="/pedidos">
+                <RiShoppingBag4Fill className="iconMenu" />
+                <span>Pedidos</span>
+              </Link>
+            )}
           {permisos.includes("gestion_proveedores") && (
             <Link className="itemMenu" to="/proveedores">
               <ImUserTie className="iconMenu" />
@@ -146,6 +155,12 @@ const Layout = ({ children, title }) => {
             <Link className="itemMenu" to="/usuarios">
               <HiUsers className="iconMenu" />
               <span>Usuarios</span>
+            </Link>
+          )}
+          {permisos.includes("gestion_usuarios") && (
+            <Link className="itemMenu" to="/reportes">
+              <IoBarChart className="iconMenu" />
+              <span>Reportes</span>
             </Link>
           )}
         </nav>

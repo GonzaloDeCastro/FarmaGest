@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Tooltip } from "react-tooltip";
 import { useDispatch, useSelector } from "react-redux";
-import { getVentasAPI, verFacturaVentaAPI } from "../../redux/ventasSlice";
+import { getVentasAPI } from "../../redux/ventasSlice";
 import { MdReceiptLong } from "react-icons/md";
-
-import Swal from "sweetalert2";
 import VentaFormModal from "./VentaForm";
 import FacturaDetalle from "./FacturaDetalle";
-//import EditVentaForm from "./EditVentaForm"; // Asumimos que tienes este componente para editar
 
 const Ventas = () => {
   const dispatch = useDispatch();
@@ -21,21 +18,6 @@ const Ventas = () => {
   useEffect(() => {
     dispatch(getVentasAPI(page, pageSize, search));
   }, [dispatch, page, search]);
-
-  const handleVerFactura = (venta) => {
-    Swal.fire({
-      title: "Advertencia!",
-      text: `¿Está seguro que desea eliminar la venta N° ${venta.venta_id}?`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Confirmar",
-      cancelButtonText: "Cancelar",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(verFacturaVentaAPI(venta.venta_id));
-      }
-    });
-  };
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);

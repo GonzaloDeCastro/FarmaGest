@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./Ventas.module.css";
-import { Button, Modal, Table } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 import { FaFileInvoice, FaPrint } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { verFacturaVentaAPI } from "../../redux/ventasSlice";
@@ -23,7 +23,7 @@ const FacturaDetalle = ({ ventaId }) => {
 
   const handleDownloadPDF = () => {
     const input = facturaRef.current;
-    console.log("input", input);
+
     html2canvas(input).then((canvas) => {
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF();
@@ -71,25 +71,21 @@ const FacturaDetalle = ({ ventaId }) => {
         </Modal.Header>
         <Modal.Body className={styles.modalBody}>
           <div ref={facturaRef}>
-            <p>
+            <p className={styles.encabezadoFactura}>
               <strong>Factura N°:</strong> {facturaDetalle.venta_id}
             </p>
-            <p>
+            <p className={styles.encabezadoFactura}>
               <strong>Fecha y hora:</strong>{" "}
               {new Date(facturaDetalle.fecha_hora).toLocaleString()}
             </p>
-            <p>
+            <p className={styles.encabezadoFactura}>
               <strong>Cliente:</strong> {facturaDetalle.cliente_nombre}{" "}
               {facturaDetalle.cliente_apellido}
             </p>
-            <p>
+            <p className={styles.encabezadoFactura}>
               <strong>Vendedor:</strong> {facturaDetalle.usuario_nombre}{" "}
               {facturaDetalle.usuario_apellido}
             </p>
-            <p>
-              <strong>Total:</strong> ${facturaDetalle.total}
-            </p>
-            <h5>Items</h5>
             <table className={styles.table}>
               <thead>
                 <tr>
@@ -109,7 +105,23 @@ const FacturaDetalle = ({ ventaId }) => {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table>{" "}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                fontSize: "1.2rem",
+                fontWeight: "bold",
+                color: "#333",
+                backgroundColor: "#f9f9f9",
+                padding: "10px 15px",
+                borderRadius: "5px",
+                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              Total:${facturaDetalle?.total}
+            </div>
           </div>
         </Modal.Body>
         <Modal.Footer>
