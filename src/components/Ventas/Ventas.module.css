@@ -25,3 +25,14 @@
 .encabezadoFactura {
   margin: 5px;
 }
+
+.formSelectDate {
+  height: 35px;
+  width: 180px;
+  font-size: 18px;
+  border-radius: 5px;
+  border-color: #ccc;
+  font-family: Arial, FontAwesome;
+  padding-left: 10px;
+  margin-right: 40px;
+}

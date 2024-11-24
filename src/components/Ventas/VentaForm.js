@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import styles from "./Ventas.module.css";
 import { Button, Modal, Form } from "react-bootstrap";
 import { FaPlusCircle, FaSave } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,6 +16,15 @@ const VentaFormModal = ({ usuarioId }) => {
   const [cliente, setCliente] = useState(0);
   const [itemsAgregados, setItemsAgregados] = useState([]);
   const [total, setTotal] = useState(0);
+  const today = new Date();
+
+  const formattedToday = `${today.getFullYear()}-${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}T${String(
+    today.getHours()
+  ).padStart(2, "0")}:${String(today.getMinutes()).padStart(2, "0")}`;
+
+  const [dateSelectedFrom, setDateSelectedFrom] = useState(formattedToday);
 
   const handleClose = () => {
     setShow(false);
@@ -91,9 +101,13 @@ const VentaFormModal = ({ usuarioId }) => {
         total,
         usuario_id: usuarioId,
         numero_factura: ultimaVenta && ultimaVenta?.venta_id + 1,
+        fecha_hora: dateSelectedFrom,
       })
     );
     handleClose();
+  };
+  const handleSelectDateFrom = (e) => {
+    setDateSelectedFrom(e.target.value);
   };
 
   return (
@@ -113,7 +127,22 @@ const VentaFormModal = ({ usuarioId }) => {
         </Modal.Header>
         <Modal.Body>
           <Form>
-            <Form.Group className="mb-3">
+            <Form.Group
+              className="mb-3"
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              <div className={styles.containerDate}>
+                <label style={{ display: "block" }} htmlFor="code">
+                  Fecha:
+                </label>
+                <input
+                  type="datetime-local"
+                  className={styles.formSelectDate}
+                  style={{ border: "none" }}
+                  onChange={handleSelectDateFrom}
+                  value={dateSelectedFrom}
+                />
+              </div>
               <div
                 className="form-group col-md-6"
                 style={{ width: "30%", fontSize: "15px" }}

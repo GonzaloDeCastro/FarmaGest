@@ -164,7 +164,8 @@ const Reportes = () => {
               onChange={handleSelectDateTo}
               value={dateSelectedTo}
             />
-          </div>
+          </div>{" "}
+          {/* 
           <div className={styles.containerDate}>
             Entidad{" "}
             <select
@@ -224,7 +225,7 @@ const Reportes = () => {
                   classNamePrefix="react-select"
                 />
               </div>
-            )}
+            )} */}
           <button
             className={styles.buttonAplicar}
             onClick={handleAplicar}
@@ -299,23 +300,24 @@ const Reportes = () => {
           </div>
         </div>
       ) : (
-        <table className="headerTable">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reportes.map((reporte, index) => (
-              <tr key={index}>
-                <td>{formatDate(reporte.fecha)}</td>
-
-                <td>${reporte.monto_total}</td>
+        <div className={styles.tableContainer}>
+          <table className={styles.headerTable}>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Total</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {reportes.map((reporte, index) => (
+                <tr key={index}>
+                  <td>{formatDate(reporte.fecha)}</td>
+                  <td>${reporte.monto_total}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

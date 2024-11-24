@@ -88,6 +88,51 @@
   transition: background-color 0.3s, border-color 0.3s, color 0.3s;
 }
 
+/*Tabla */
+.tableContainer {
+  max-height: 450px; /* Limita la altura máxima del contenedor */
+  overflow-y: auto; /* Habilita el desplazamiento vertical si es necesario */
+  border: 1px solid #ccc; /* Opcional: Agrega un borde al contenedor */
+  border-radius: 5px; /* Opcional: Bordes redondeados */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Opcional: Sombra para diseño */
+}
+
+.headerTable {
+  width: 100%; /* Asegura que la tabla ocupe todo el ancho del contenedor */
+  border-collapse: collapse; /* Combina los bordes de las celdas */
+}
+
+.headerTable th,
+.headerTable td {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid #ddd; /* Línea divisoria entre filas */
+}
+
+.headerTable th {
+  background-color: #f4f4f4; /* Color de fondo para el encabezado */
+  font-weight: bold;
+}
+
+.headerTable tr:hover {
+  background-color: #f9f9f9; /* Color de fondo al pasar el cursor */
+}
+
+.NoData {
+  text-align: center;
+  padding: 16px;
+  color: #555;
+}
+
+/* Estilos para filas impares */
+.headerTable tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+.headerTable tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+  color: #333;
+}
+
 /* Graficos */
 .container {
   padding: 20px;
