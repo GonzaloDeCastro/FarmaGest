@@ -33,6 +33,7 @@
   display: flex;
   align-items: center;
   background-color: #abd34e;
+  border: none;
   height: 38px;
   padding: 0px 10px 0px 10px;
   color: #000;
@@ -45,4 +46,8 @@
 
 .buttonAplicar:hover {
   background-color: #d5ff71;
+}
+.buttonAplicar:disabled {
+  background-color: #a9a9a9;
+  cursor: not-allowed;
 }

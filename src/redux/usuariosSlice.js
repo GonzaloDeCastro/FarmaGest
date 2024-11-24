@@ -74,12 +74,7 @@ export const {
 
 // Funciones API para interactuar con el backend
 
-export const getUsuariosAPI = (
-  page = 1,
-  pageSize = 5,
-  search = "",
-  rolID = 0
-) => {
+export const getUsuariosAPI = (page, pageSize, search, rolID) => {
   return async (dispatch) => {
     try {
       const response = await axios.get(`${API}/usuarios`, {

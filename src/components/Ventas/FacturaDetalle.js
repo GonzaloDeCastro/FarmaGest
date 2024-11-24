@@ -14,7 +14,9 @@ const FacturaDetalle = ({ ventaId }) => {
   const facturaDetalle = useSelector((state) => state.venta.facturaState || {});
 
   useEffect(() => {
-    dispatch(verFacturaVentaAPI(ventaId));
+    if (show) {
+      dispatch(verFacturaVentaAPI(ventaId));
+    }
   }, [dispatch, ventaId, show]);
 
   const handleClose = () => setShow(false);

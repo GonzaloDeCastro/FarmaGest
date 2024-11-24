@@ -1,39 +1,42 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getVentasAPI } from "../../redux/ventasSlice";
 import styles from "./Reportes.module.css";
-import { MdCheckCircleOutline } from "react-icons/md";
-
 import { Select } from "react-select-virtualized";
 import { getClientesAPI } from "../../redux/clientesSlice";
-
+import { getProductosAPI } from "../../redux/productosSlice";
+import { getUsuariosAPI } from "../../redux/usuariosSlice";
+import { getReportesAPI } from "../../redux/reportesSlice";
 const Reportes = () => {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
   const pageSize = 8;
   const logged = JSON.parse(sessionStorage.getItem("logged"));
   const sesion = logged.sesion;
-  const ventas = useSelector((state) => state.venta.initialState || []);
+  const reportes = useSelector((state) => state.reporte.initialState || []);
+  const [clienteProductoVendedor, setClienteProductoVendedor] = useState("");
   const [dateSelectedFrom, setDateSelectedFrom] = useState(
     "" /* getCurrentDateFormatted() */
   );
   const [dateSelectedTo, setDateSelectedTo] = useState(
     "" /* getCurrentDateFormatted() */
   );
-  const [cliente, setCliente] = useState(0);
+
   const [entitySelected, setSelectEntity] = useState("");
+  const [optionEntities, setSelectOptionEntities] = useState("");
   useEffect(() => {
-    dispatch(getVentasAPI(page, pageSize, search));
-  }, [dispatch, page, search]);
+    dispatch(getReportesAPI(page, pageSize, ""));
+  }, [dispatch, page]);
 
   const clientes = useSelector(
-    (state) => state && state.cliente && state.cliente
+    (state) => (state && state.cliente && state.cliente) || []
   );
-  useEffect(() => {
-    dispatch(getClientesAPI());
-  }, [dispatch]);
+  const productos = useSelector(
+    (state) => (state && state.producto && state.producto) || []
+  );
 
+  const usuarios = useSelector(
+    (state) => (state && state?.usuario && state?.usuario) || []
+  );
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };
@@ -48,9 +51,6 @@ const Reportes = () => {
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
 
-  const handleCliente = (event) => {
-    setCliente(event.target.value);
-  };
   const handleSelectDateFrom = (e) => {
     setDateSelectedFrom(e.target.value);
   };
@@ -61,14 +61,70 @@ const Reportes = () => {
 
   const handleChangeEntity = (e) => {
     setSelectEntity(e.target.value);
+    if (e.target.value === "Cliente") {
+      dispatch(getClientesAPI());
+      setClienteProductoVendedor("");
+    }
+    if (e.target.value === "Producto") {
+      dispatch(getProductosAPI());
+      setClienteProductoVendedor("");
+    }
+    if (e.target.value === "Vendedor") {
+      dispatch(getUsuariosAPI());
+      setClienteProductoVendedor("");
+    }
   };
+  const handleClienteProductoVendedor = (event) => {
+    setClienteProductoVendedor(event.target.value);
+  };
+  useEffect(() => {
+    if (entitySelected === "Cliente") {
+      let optionsClientes =
+        clientes &&
+        clientes?.initialState?.map((cliente) => ({
+          value: cliente.cliente_id,
+          label: `${cliente.Apellido} ${cliente.Nombre}`,
+        }));
+      setSelectOptionEntities(optionsClientes);
+    }
+    if (entitySelected === "Producto") {
+      let optionsProductos =
+        productos &&
+        productos?.initialState?.map((producto) => ({
+          value: producto.producto_id,
+          label: `${producto.Nombre}`,
+        }));
+      setSelectOptionEntities(optionsProductos);
+    }
 
-  let optionsClientes =
-    clientes &&
-    clientes?.initialState?.map((cliente) => ({
-      value: cliente.cliente_id,
-      label: `${cliente.Apellido} ${cliente.Nombre}`,
-    }));
+    if (entitySelected === "Vendedor") {
+      let optionsVendedores =
+        usuarios &&
+        usuarios?.initialState
+          ?.filter((usuario) => usuario.rol_id === 2 || usuario.rol_id === 1)
+          ?.map((usuario) => ({
+            value: usuario.usuario_id,
+            label: `${usuario.Apellido} ${usuario.Nombre}`,
+          }));
+      setSelectOptionEntities(optionsVendedores);
+    }
+  }, [entitySelected, clientes, productos, usuarios]);
+
+  const handleAplicar = () => {
+    console.log("dateSelectedFrom", dateSelectedFrom);
+    console.log("dateSelectedTo", dateSelectedTo);
+    console.log("entity ", entitySelected);
+    console.log("clienteProductoVendedor ", clienteProductoVendedor);
+    //esto lo sigo mañana
+    dispatch(
+      getReportesAPI(
+        dateSelectedFrom,
+        dateSelectedTo,
+        entitySelected,
+        clienteProductoVendedor
+      )
+    );
+  };
   return (
     <div className="containerSelected">
       <div className={styles.header}>
@@ -114,8 +170,8 @@ const Reportes = () => {
             </option>
           </select>
         </div>
-        {optionsClientes &&
-          optionsClientes.length > 0 &&
+        {optionEntities &&
+          optionEntities.length > 0 &&
           (entitySelected === "Cliente" ||
             entitySelected === "Vendedor" ||
             entitySelected === "Producto") && (
@@ -128,18 +184,19 @@ const Reportes = () => {
             >
               <Select
                 value={
-                  (optionsClientes &&
-                    optionsClientes?.find(
-                      (option) => option.value === cliente
+                  (optionEntities &&
+                    optionEntities?.find(
+                      (option) => option.value === clienteProductoVendedor
                     )) ||
                   null
                 }
                 onChange={(option) =>
-                  handleCliente({
+                  handleClienteProductoVendedor({
                     target: { value: option ? option.value : 0 },
                   })
                 }
-                options={optionsClientes && optionsClientes}
+                //crear un options que sea optionsEntities
+                options={optionEntities && optionEntities}
                 placeholder={
                   entitySelected === "Cliente"
                     ? "Selectcionar Cliente"
@@ -151,7 +208,13 @@ const Reportes = () => {
               />
             </div>
           )}
-        <div className={styles.buttonAplicar}>Aplicar</div>
+        <button
+          className={styles.buttonAplicar}
+          onClick={handleAplicar}
+          disabled={dateSelectedFrom == ""}
+        >
+          Aplicar
+        </button>
       </div>
 
       <div className="containerTableAndPagesSelected">
@@ -164,20 +227,16 @@ const Reportes = () => {
               <th>Cliente</th>
               <th>Usuario</th>
               <th>Total</th>
-              <th>Opciones</th>
             </tr>
           </thead>
           <tbody>
-            {ventas.map((venta) => (
+            {reportes.map((venta) => (
               <tr key={venta.venta_id}>
                 <td>{formatDate(venta.fecha_hora)}</td>
                 <td>{venta.numero_factura}</td>
                 <td>{`${venta.cliente_nombre} ${venta.cliente_apellido}`}</td>
                 <td>{`${venta.usuario_nombre} ${venta.usuario_apellido}`}</td>
                 <td>${venta.total}</td>
-                <td>
-                  <div style={{ display: "flex" }}></div>
-                </td>
               </tr>
             ))}
           </tbody>
@@ -195,7 +254,7 @@ const Reportes = () => {
           onClick={() => handlePageChange(page + 1)}
           className="buttonPage"
           style={{ marginLeft: "10px" }}
-          disabled={ventas && ventas.length < pageSize}
+          disabled={reportes && reportes.length < pageSize}
         >
           Siguiente
         </button>
