@@ -19,17 +19,30 @@ const reportesSlice = createSlice({
 
 export const { getVentas } = reportesSlice.actions;
 
-export const getReportesAPI = (page, pageSize, search) => async (dispatch) => {
-  try {
-    const response = await axios.get(`${API}/ventas`, {
-      params: { page, pageSize, search },
-    });
-    if (response.status === 200) {
-      dispatch(getVentas(response.data));
+export const getReportesAPI =
+  (dateSelectedFrom, dateSelectedTo, entitySelected, clienteProductoVendedor) =>
+  async (dispatch) => {
+    console.log(
+      dateSelectedFrom,
+      dateSelectedTo,
+      entitySelected,
+      clienteProductoVendedor
+    );
+    try {
+      const response = await axios.get(`${API}/reportes`, {
+        params: {
+          dateSelectedFrom: dateSelectedFrom,
+          dateSelectedTo: dateSelectedTo,
+          entitySelected: entitySelected,
+          clienteProductoVendedor: clienteProductoVendedor,
+        },
+      });
+      if (response.status === 200) {
+        dispatch(getVentas(response.data));
+      }
+    } catch (error) {
+      console.error("Error al obtener ventas:", error);
     }
-  } catch (error) {
-    console.error("Error al obtener ventas:", error);
-  }
-};
+  };
 
 export default reportesSlice.reducer;

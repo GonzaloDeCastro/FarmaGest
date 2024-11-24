@@ -1,3 +1,7 @@
+.containerHeader {
+  display: flex;
+  justify-content: space-between;
+}
 .header {
   display: flex;
   justify-content: flex-start;
@@ -50,4 +54,136 @@
 .buttonAplicar:disabled {
   background-color: #a9a9a9;
   cursor: not-allowed;
+}
+.buttonTablaGraficos {
+  display: flex;
+  align-items: center;
+  background-color: #000;
+  border: none;
+  height: 38px;
+  padding: 0px 5px 0px 5px;
+  color: #abd34e;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.5);
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+.buttonTablaGraficos:hover {
+  background-color: #1d1d1d;
+}
+.buttonTablaGraficosInactivo {
+  display: flex;
+  align-items: center;
+  background-color: #696969;
+  border: none;
+  height: 38px;
+  padding: 0px 5px 0px 5px;
+  color: #cacaca;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.5);
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+/* Graficos */
+.container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  text-align: center;
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.chartContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 10px;
+  height: 300px;
+  position: relative;
+  border-left: 2px solid #ccc;
+  border-bottom: 2px solid #ccc;
+  padding: 10px 0;
+}
+
+.yAxis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  margin-right: 10px;
+  position: relative;
+}
+
+.yAxisLine {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.yAxisLabel {
+  margin-right: 5px;
+  font-size: 12px;
+  color: #666;
+}
+
+.yGuideLine {
+  flex: 1;
+  height: 1px;
+  background-color: #ddd;
+}
+
+.bars {
+  display: flex;
+  gap: 10px;
+  height: 100%;
+  width: 100%;
+}
+
+.barWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.bar {
+  width: 40px;
+  background-color: #4caf50;
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.bar:hover {
+  transform: scaleY(1.1);
+  background-color: #388e3c;
+}
+
+.barLabel {
+  position: absolute;
+  top: -20px;
+  font-size: 12px;
+  color: #333;
+  font-weight: bold;
+}
+
+.label {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #666;
+  text-align: center;
 }
