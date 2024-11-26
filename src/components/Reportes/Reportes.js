@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { SiMicrosoftexcel } from "react-icons/si";
+
+import * as XLSX from "xlsx";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "./Reportes.module.css";
 import { Select } from "react-select-virtualized";
@@ -8,6 +11,7 @@ import { getUsuariosAPI } from "../../redux/usuariosSlice";
 import { getReportesAPI } from "../../redux/reportesSlice";
 import { FaTableList } from "react-icons/fa6";
 import { BiBarChartAlt2 } from "react-icons/bi";
+import Swal from "sweetalert2";
 
 const Reportes = () => {
   const dispatch = useDispatch();
@@ -17,12 +21,12 @@ const Reportes = () => {
   const [clienteProductoVendedor, setClienteProductoVendedor] = useState("");
   const [grafico, setGrafico] = useState(false);
   const today = new Date();
-  const lastWeek = new Date();
-  lastWeek.setDate(today.getDate() - 7);
+  const lastTenDays = new Date();
+  lastTenDays.setDate(today.getDate() - 10);
 
-  const year = lastWeek.getFullYear();
-  const month = String(lastWeek.getMonth() + 1).padStart(2, "0"); // Mes empieza en 0
-  const day = String(lastWeek.getDate()).padStart(2, "0"); // Día del mes
+  const year = lastTenDays.getFullYear();
+  const month = String(lastTenDays.getMonth() + 1).padStart(2, "0"); // Mes empieza en 0
+  const day = String(lastTenDays.getDate()).padStart(2, "0"); // Día del mes
 
   const lastWeekFormatted = `${year}-${month}-${day}`;
   const [dateSelectedFrom, setDateSelectedFrom] = useState(lastWeekFormatted);
@@ -124,14 +128,19 @@ const Reportes = () => {
 
   const data = reportes
     .map((item) => ({
-      fecha: new Date(item.fecha).toISOString().split("T")[0], // YYYY-MM-DD
+      fecha: new Date(item.fecha).toISOString().split("T")[0],
+      cantidad_ventas: parseFloat(item.cantidad_ventas),
       monto: parseFloat(item.monto_total),
     }))
     .sort((a, b) => new Date(a.fecha) - new Date(b.fecha)); // Ordenar por fecha de menor a mayor
 
   // Encontrar el valor máximo para escalar las barras
   const maxMonto = Math.max(...data.map((item) => item.monto));
-
+  const maxCantidadVentas = Math.max(
+    ...data.map((item) => item.cantidad_ventas)
+  );
+  console.log("maxCantidadVentas ", maxCantidadVentas);
+  console.log("maxMonto ", maxMonto);
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -141,6 +150,39 @@ const Reportes = () => {
     const minutes = date.getMinutes().toString().padStart(2, "0");
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
+
+  const exportToExcel = (data, fileName) => {
+    // Crear una hoja de trabajo (workbook)
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, `Reportes`);
+
+    // Generar el archivo y disparar la descarga
+    XLSX.writeFile(workbook, `${fileName}-${dateSelectedFrom.toString()}.xlsx`);
+  };
+
+  const handleExportExcel = (data, fileName) => {
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¿Quieres exportar los datos a un archivo Excel?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, exportar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        exportToExcel(data, fileName);
+        Swal.fire({
+          title: "Exportación completada",
+          text: `El archivo "${fileName}-${dateSelectedFrom.toString()}.xlsx" ha sido descargado.`,
+          icon: "success",
+        });
+      }
+    });
+  };
+  console.log("reportes ", reportes);
+  const [contador, setContador] = useState(0);
+
   return (
     <div className="containerSelected">
       <div className={styles.containerHeader}>
@@ -153,6 +195,7 @@ const Reportes = () => {
               style={{ border: "none" }}
               onChange={handleSelectDateFrom}
               value={dateSelectedFrom}
+              max={dateSelectedTo}
             />
           </div>
           <div className={styles.containerDate}>
@@ -163,6 +206,7 @@ const Reportes = () => {
               style={{ border: "none" }}
               onChange={handleSelectDateTo}
               value={dateSelectedTo}
+              min={dateSelectedFrom}
             />
           </div>{" "}
           {/* 
@@ -236,12 +280,22 @@ const Reportes = () => {
         </div>
         <div style={{ display: "flex" }}>
           <div
+            className={styles.buttonAplicar}
+            onClick={() => handleExportExcel(data, "Reportes")}
+          >
+            <SiMicrosoftexcel
+              style={{ width: "30px", height: "30px", marginRight: "5px" }}
+            />{" "}
+            Exportar
+          </div>
+          <div
             className={
               grafico === false
                 ? styles.buttonTablaGraficos
                 : styles.buttonTablaGraficosInactivo
             }
             onClick={() => setGrafico(false)}
+            style={{ marginLeft: "5px" }}
           >
             <FaTableList
               style={{ width: "30px", height: "30px", marginRight: "5px" }}
@@ -261,13 +315,26 @@ const Reportes = () => {
             <BiBarChartAlt2
               style={{ width: "30px", height: "30px", marginRight: "5px" }}
             />
-            Grafico
+            Gráfico
           </div>
         </div>
       </div>
       {grafico ? (
         <div className={styles.container}>
-          <h3 className={styles.title}>Montos por Fecha</h3>
+          <h3 className={styles.title} style={{ display: "flex" }}>
+            <div
+              className={styles.botonMontoTotal}
+              onClick={() => setContador(0)}
+            >
+              {"Montos por Fecha"}
+            </div>
+            <div
+              className={styles.botonCantidad}
+              onClick={() => setContador(1)}
+            >
+              {"Cantidad de Ventas por Fecha"}
+            </div>
+          </h3>
           <div className={styles.chartContainer}>
             {/* Renderizar líneas guía en el eje Y */}
             <div className={styles.yAxis}>
@@ -283,16 +350,32 @@ const Reportes = () => {
             <div className={styles.bars}>
               {data.map((item, index) => (
                 <div key={index} className={styles.barWrapper}>
-                  <div
-                    className={styles.bar}
-                    style={{
-                      height: `${(item.monto / maxMonto) * 100}%`,
-                    }}
-                  >
-                    <span className={styles.barLabel}>
-                      {item.monto.toLocaleString()}
-                    </span>
-                  </div>
+                  {contador % 2 === 0 ? (
+                    <div
+                      className={styles.bar}
+                      style={{
+                        height: `${(item.monto / maxMonto) * 100}%`,
+                      }}
+                    >
+                      <span className={styles.barLabel}>
+                        ${item.monto.toLocaleString()}
+                      </span>
+                    </div>
+                  ) : (
+                    <div
+                      className={styles.barCantidad}
+                      style={{
+                        height: `${
+                          (item.cantidad_ventas / maxCantidadVentas) * 100
+                        }%`,
+                      }}
+                    >
+                      <span className={styles.barLabel}>
+                        {item.cantidad_ventas.toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+
                   <div className={styles.label}>{item.fecha}</div>
                 </div>
               ))}
@@ -305,13 +388,15 @@ const Reportes = () => {
             <thead>
               <tr>
                 <th>Fecha</th>
-                <th>Total</th>
+                <th>Cantidad de Ventas</th>
+                <th>Monto Total</th>
               </tr>
             </thead>
             <tbody>
               {reportes.map((reporte, index) => (
                 <tr key={index}>
                   <td>{formatDate(reporte.fecha)}</td>
+                  <td>{reporte.cantidad_ventas}</td>
                   <td>${reporte.monto_total}</td>
                 </tr>
               ))}

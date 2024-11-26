@@ -55,6 +55,7 @@
   background-color: #a9a9a9;
   cursor: not-allowed;
 }
+
 .buttonTablaGraficos {
   display: flex;
   align-items: center;
@@ -96,26 +97,32 @@
   border-radius: 5px; /* Opcional: Bordes redondeados */
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Opcional: Sombra para diseño */
 }
-
 .headerTable {
-  width: 100%; /* Asegura que la tabla ocupe todo el ancho del contenedor */
-  border-collapse: collapse; /* Combina los bordes de las celdas */
+  width: 100%;
+  border-collapse: collapse;
 }
 
 .headerTable th,
 .headerTable td {
-  text-align: left;
+  border: 1px solid #dddddd;
   padding: 8px;
-  border-bottom: 1px solid #ddd; /* Línea divisoria entre filas */
+  text-align: left;
 }
 
 .headerTable th {
-  background-color: #f4f4f4; /* Color de fondo para el encabezado */
-  font-weight: bold;
+  background-color: #f2f2f2;
 }
 
-.headerTable tr:hover {
-  background-color: #f9f9f9; /* Color de fondo al pasar el cursor */
+.headerTable th:last-child,
+.headerTable td:last-child {
+  width: 70px;
+  white-space: nowrap; /* Evitar que el contenido se ajuste automáticamente */
+}
+
+.headerTable .spinner-border {
+  margin-top: 10%;
+  width: 100px;
+  height: 100px;
 }
 
 .NoData {
@@ -155,7 +162,7 @@
   align-items: flex-end;
   justify-content: flex-start;
   gap: 10px;
-  height: 300px;
+  height: 350px;
   position: relative;
   border-left: 2px solid #ccc;
   border-bottom: 2px solid #ccc;
@@ -216,6 +223,45 @@
 .bar:hover {
   transform: scaleY(1.1);
   background-color: #388e3c;
+}
+
+.botonMontoTotal {
+  background-color: #4caf50;
+  padding: 10px;
+  border-radius: 5px 0 0 5px;
+  color: white;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.botonMontoTotal:hover {
+  background-color: #388e3c;
+  cursor: pointer;
+}
+
+.botonCantidad {
+  background-color: #af4c4c;
+  padding: 10px;
+  border-radius: 0 5px 5px 0;
+  color: white;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.botonCantidad:hover {
+  background-color: #f64e42;
+  cursor: pointer;
+}
+
+.barCantidad {
+  width: 40px;
+  background-color: #af4c4c;
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.barCantidad:hover {
+  transform: scaleY(1.1);
+  background-color: #f64e42;
 }
 
 .barLabel {
