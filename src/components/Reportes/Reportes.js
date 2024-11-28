@@ -139,8 +139,7 @@ const Reportes = () => {
   const maxCantidadVentas = Math.max(
     ...data.map((item) => item.cantidad_ventas)
   );
-  console.log("maxCantidadVentas ", maxCantidadVentas);
-  console.log("maxMonto ", maxMonto);
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -158,13 +157,14 @@ const Reportes = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, `Reportes`);
 
     // Generar el archivo y disparar la descarga
-    XLSX.writeFile(workbook, `${fileName}-${dateSelectedFrom.toString()}.xlsx`);
+    XLSX.writeFile(workbook, `${fileName}-${data[0].fecha.toString()}.xlsx`);
   };
 
   const handleExportExcel = (data, fileName) => {
+    console.log("data ", data);
     Swal.fire({
       title: "¿Estás seguro?",
-      text: "¿Quieres exportar los datos a un archivo Excel?",
+      html: `¿Quieres exportar los datos con fecha ${data[0].fecha} a un archivo  en Excel?`,
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Sí, exportar",
@@ -174,7 +174,7 @@ const Reportes = () => {
         exportToExcel(data, fileName);
         Swal.fire({
           title: "Exportación completada",
-          text: `El archivo "${fileName}-${dateSelectedFrom.toString()}.xlsx" ha sido descargado.`,
+          text: `El archivo "${fileName}-${data[0].fecha}.xlsx" ha sido descargado.`,
           icon: "success",
         });
       }
@@ -279,15 +279,16 @@ const Reportes = () => {
           </button>
         </div>
         <div style={{ display: "flex" }}>
-          <div
+          <button
             className={styles.buttonAplicar}
             onClick={() => handleExportExcel(data, "Reportes")}
+            disabled={reportes.length === 0}
           >
             <SiMicrosoftexcel
               style={{ width: "30px", height: "30px", marginRight: "5px" }}
             />{" "}
             Exportar
-          </div>
+          </button>
           <div
             className={
               grafico === false
