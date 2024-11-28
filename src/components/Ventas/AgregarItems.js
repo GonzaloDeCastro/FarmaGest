@@ -130,6 +130,9 @@ const AgregarItems = ({ onAgregarItem }) => {
                 className="form-control"
                 onChange={(e) => setValue("cantidad", parseInt(e.target.value))}
               />
+              {errors.cantidad && (
+                <p className="error">{errors.cantidad.message}</p>
+              )}
             </Form.Group>
 
             <Form.Group className="mb-3">
@@ -142,7 +145,11 @@ const AgregarItems = ({ onAgregarItem }) => {
               <p>{`$${watch("total")}`}</p>
             </Form.Group>
 
-            <Button type="submit" variant="primary">
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={errors.length > 0}
+            >
               Agregar Item
             </Button>
           </Form>

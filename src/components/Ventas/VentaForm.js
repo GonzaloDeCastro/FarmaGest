@@ -90,6 +90,7 @@ const VentaFormModal = ({ usuarioId }) => {
     itemsAgregados.forEach((item) => {
       total += parseInt(item.total);
     });
+
     setTotal(total);
   }, [itemsAgregados]);
 
@@ -212,11 +213,15 @@ const VentaFormModal = ({ usuarioId }) => {
                 alignItems: "center",
               }}
             >
-              <Button className="buttonConfirm" onClick={handleCrearFactura}>
+              <Button
+                className="buttonConfirm"
+                onClick={handleCrearFactura}
+                disabled={itemsAgregados.length === 0}
+              >
                 Crear Factura
               </Button>
               <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-                {`Total: $${total}`}
+                {`Total: $${total} `}
               </div>
             </div>
           </Form>

@@ -370,3 +370,8 @@ nav.bigActive span {
   background-color: #d5ff71;
   color: #000;
 }
+
+.buttonConfirm:disabled {
+  background-color: #636363;
+  cursor: not-allowed;
+}

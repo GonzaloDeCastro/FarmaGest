@@ -163,8 +163,8 @@ const Reportes = () => {
   const handleExportExcel = (data, fileName) => {
     console.log("data ", data);
     Swal.fire({
-      title: "¿Estás seguro?",
-      html: `¿Quieres exportar los datos con fecha ${data[0].fecha} a un archivo  en Excel?`,
+      title: "Exportar a Excel",
+      html: `¿Quieres exportar los datos con fecha <b>${data[0].fecha}</b> a un archivo  en Excel?`,
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Sí, exportar",
