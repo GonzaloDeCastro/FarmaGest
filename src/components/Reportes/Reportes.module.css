@@ -91,11 +91,13 @@
 
 /*Tabla */
 .tableContainer {
+  min-height: 450px;
   max-height: 450px; /* Limita la altura máxima del contenedor */
   overflow-y: auto; /* Habilita el desplazamiento vertical si es necesario */
   border: 1px solid #ccc; /* Opcional: Agrega un borde al contenedor */
   border-radius: 5px; /* Opcional: Bordes redondeados */
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Opcional: Sombra para diseño */
+  background-color: rgb(230, 230, 230);
 }
 .headerTable {
   width: 100%;

@@ -11,7 +11,7 @@ const PrivateRouteUsuarios = ({ redirect = "/" }) => {
     Swal.fire({
       icon: "warning",
       title: "Permiso denegado",
-      text: "Su rol no le permite acceder a la pantalla de Usuarios",
+      text: "Necesita rol administrdaor para acceder a este módulo",
     });
     return <Navigate to={redirect} replace />;
   }

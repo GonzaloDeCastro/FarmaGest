@@ -11,6 +11,7 @@ import { RiShoppingBag4Fill } from "react-icons/ri";
 import { HiUsers } from "react-icons/hi";
 import { FaBell, FaShoppingCart } from "react-icons/fa";
 import { ImUserTie } from "react-icons/im";
+import { AiOutlineFileSearch } from "react-icons/ai";
 import UsuarioLogout from "../components/Usuarios/UsuarioLogout";
 
 const Layout = ({ children, title }) => {
@@ -61,8 +62,6 @@ const Layout = ({ children, title }) => {
             </div>
           </div>
           <div>
-            <FaBell className="iconUser" />
-
             <UsuarioLogout />
           </div>
         </div>
@@ -109,6 +108,11 @@ const Layout = ({ children, title }) => {
           {permisos.includes("gestion_usuarios") && (
             <Link to="/reportes">
               <IoBarChart className="iconMenu" />
+            </Link>
+          )}
+          {permisos.includes("gestion_usuarios") && (
+            <Link to="/auditoria">
+              <AiOutlineFileSearch className="iconMenu" />
             </Link>
           )}
         </nav>
@@ -161,6 +165,12 @@ const Layout = ({ children, title }) => {
             <Link className="itemMenu" to="/reportes">
               <IoBarChart className="iconMenu" />
               <span>Reportes</span>
+            </Link>
+          )}
+          {permisos.includes("gestion_usuarios") && (
+            <Link className="itemMenu" to="/auditoria">
+              <AiOutlineFileSearch className="iconMenu" />
+              <span>Auditoría</span>
             </Link>
           )}
         </nav>

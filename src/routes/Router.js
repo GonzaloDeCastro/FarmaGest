@@ -17,6 +17,7 @@ import PrivateRoutePedidos from "./PrivatePedidos";
 import PrivateRouteClientes from "./PrivateClientes";
 import PrivateRouteUsuarios from "./PrivateUsuarios";
 import PrivateRouteObrasSociales from "./PrivateObrasSociales";
+import Auditoria from "../components/Auditoria/Auditoria";
 
 const AppRouter = () => {
   const logged = JSON.parse(sessionStorage.getItem("logged"));
@@ -92,6 +93,14 @@ const AppRouter = () => {
               element={
                 <Layout title={"reportes"}>
                   <Reportes />
+                </Layout>
+              }
+            />
+            <Route
+              path="/auditoria"
+              element={
+                <Layout title={"auditoria"}>
+                  <Auditoria />
                 </Layout>
               }
             />
