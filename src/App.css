@@ -64,6 +64,14 @@ body {
 .formulario button:hover {
   background-color: #d8fa89;
 }
+.forgetPassword {
+  font-size: 13px;
+  margin-top: -20px;
+}
+.forgetPassword:hover {
+  color: #d8fa89;
+  cursor: pointer;
+}
 
 .buildPage {
   display: flex;
@@ -109,6 +117,7 @@ header {
   width: 100%;
 }
 .errorsHandler {
+  margin-top: -20px;
   color: #ff9271;
 }
 .iconUser {

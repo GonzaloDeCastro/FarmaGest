@@ -37,6 +37,14 @@ const FormLogin = () => {
     }
   }, [UsuarioLogin, navigate]);
 
+  const buttonOlvidoPassword = () => {
+    Swal.fire({
+      title: "Recuperación de contraseña",
+      text: `Envie un correo al administrador gonzalo@example.com`,
+      icon: "info",
+    });
+  };
+
   return (
     <div className="login">
       <div className="logo-container">
@@ -49,13 +57,18 @@ const FormLogin = () => {
         {errors.correo && (
           <p className="errorsHandler">Este campo correo es requerido</p>
         )}
-
         <label htmlFor="password">Contraseña</label>
         <input type="password" {...register("password", { required: true })} />
         {errors.password && (
           <p className="errorsHandler">El campo contraseña es requerido</p>
         )}
-
+        <label
+          className="forgetPassword"
+          style={{ fontSize: "13px", marginTop: "-20px" }}
+          onClick={buttonOlvidoPassword}
+        >
+          Olvidó sus contraseña?
+        </label>
         <button type="submit">Iniciar sesión</button>
       </form>
     </div>

@@ -161,7 +161,6 @@ const Reportes = () => {
   };
 
   const handleExportExcel = (data, fileName) => {
-    console.log("data ", data);
     Swal.fire({
       title: "Exportar a Excel",
       html: `¿Quieres exportar los datos con fecha <b>${data[0].fecha}</b> a un archivo  en Excel?`,
@@ -180,7 +179,7 @@ const Reportes = () => {
       }
     });
   };
-  console.log("reportes ", reportes);
+
   const [contador, setContador] = useState(0);
 
   return (
