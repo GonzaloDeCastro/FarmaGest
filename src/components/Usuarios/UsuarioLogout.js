@@ -89,7 +89,22 @@ const UsuarioLogout = () => {
 
   useEffect(() => {
     setSignInvalidPassword(passwordError);
-    setSignDifferentPassword(watchPassword !== watch("repeatPassword"));
+
+    // Obtiene los valores de password y repeatPassword utilizando la función watch de react-hook-form
+    const password = watch("password");
+    const repeatPassword = watch("repeatPassword");
+
+    // Verifica si ambos campos tienen la misma longitud y luego si son iguales
+    if (
+      password &&
+      repeatPassword &&
+      password.length === repeatPassword.length
+    ) {
+      setSignDifferentPassword(password !== repeatPassword);
+    } else {
+      // Puede optar por no hacer nada o establecer específicamente setSignDifferentPassword a false si no se cumple la condición de longitud
+      setSignDifferentPassword(false);
+    }
   }, [passwordError, watchPassword, watch]);
 
   return (
@@ -230,7 +245,7 @@ const UsuarioLogout = () => {
                 <Button
                   type="submit"
                   disabled={
-                    passwordError || watchPassword !== watch("repeatPassword")
+                    passwordError || watchPassword != watch("repeatPassword")
                   }
                   style={{ marginLeft: "10px" }}
                 >
