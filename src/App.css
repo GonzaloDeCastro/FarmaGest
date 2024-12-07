@@ -9,6 +9,28 @@ body {
   background-color: #0f1014;
   color: #0f1014;
 }
+.modal-header {
+  background-color: #abd34e; /* Color de fondo gris claro */
+  border-bottom: 1px solid #dee2e6; /* Línea inferior sutil */
+  color: #fff;
+}
+.modal-title {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 1.25rem;
+  color: #000;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo gris con transparencia */
+  z-index: 1040; /* Debe estar por debajo del modal */
+}
 
 .login {
   display: flex;

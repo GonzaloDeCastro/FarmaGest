@@ -280,3 +280,11 @@
   color: #666;
   text-align: center;
 }
+
+.noData {
+  text-align: center !important; /* Centra el texto horizontalmente */
+  padding: 20px; /* Añade algo de padding para mejorar la estética */
+  font-size: 16px; /* Ajusta el tamaño de la fuente */
+  color: #666; /* Color del texto */
+  background-color: #f9f9f9; /* Color de fondo para la celda sin datos */
+}

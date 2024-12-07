@@ -393,13 +393,21 @@ const Reportes = () => {
               </tr>
             </thead>
             <tbody>
-              {reportes.map((reporte, index) => (
-                <tr key={index}>
-                  <td>{formatDate(reporte.fecha)}</td>
-                  <td>{reporte.cantidad_ventas}</td>
-                  <td>${reporte.monto_total}</td>
+              {reportes && reportes.length > 0 ? (
+                reportes.map((reporte, index) => (
+                  <tr key={index}>
+                    <td>{formatDate(reporte.fecha)}</td>
+                    <td>{reporte.cantidad_ventas}</td>
+                    <td>${reporte.monto_total}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className={styles.noData}>
+                    No hay ventas en este rango de fecha
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

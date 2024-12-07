@@ -93,7 +93,7 @@ const AgregarItems = ({ onAgregarItem }) => {
         />
         <div style={{ whiteSpace: "nowrap" }}>Agregar Items</div>
       </div>
-
+      {show && <div className="modal-overlay"></div>}
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>
           <Modal.Title>Agregar Nuevo Producto</Modal.Title>

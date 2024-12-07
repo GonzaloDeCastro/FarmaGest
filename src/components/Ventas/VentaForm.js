@@ -106,6 +106,9 @@ const VentaFormModal = ({ usuarioId }) => {
       })
     );
     handleClose();
+    setCliente(0);
+    setItemsAgregados([]);
+    setDateSelectedFrom(formattedToday);
   };
   const handleSelectDateFrom = (e) => {
     setDateSelectedFrom(e.target.value);

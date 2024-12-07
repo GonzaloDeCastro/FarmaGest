@@ -116,6 +116,7 @@ const UsuarioLogout = () => {
                 justifyContent: "space-around",
                 width: "60%",
                 fontSize: "1.3rem",
+                color: "#000",
               }}
             >
               <div>
@@ -133,7 +134,7 @@ const UsuarioLogout = () => {
             </div>
             <div style={{ textAlign: "center", width: "40%" }}>
               <FaUserCircle
-                style={{ width: "100px", height: "100px", color: "#60635f" }}
+                style={{ width: "120px", height: "120px", color: "#000" }}
               />
             </div>
           </div>
@@ -218,12 +219,20 @@ const UsuarioLogout = () => {
                   marginTop: "20px",
                 }}
               >
+                {" "}
+                <Button
+                  variant="danger"
+                  onClick={() => setShowfieldsPassword(!showfieldsPassword)}
+                >
+                  Volver
+                  <IoIosClose style={{ width: "30px", height: "30px" }} />
+                </Button>
                 <Button
                   type="submit"
                   disabled={
                     passwordError || watchPassword !== watch("repeatPassword")
                   }
-                  style={{ marginRight: "20px" }}
+                  style={{ marginLeft: "10px" }}
                 >
                   Confirmar
                   <FaCheck
@@ -234,22 +243,25 @@ const UsuarioLogout = () => {
                     }}
                   />
                 </Button>
-                <Button variant="danger" onClick={handleClose}>
-                  Cerrar
-                  <IoIosClose style={{ width: "30px", height: "30px" }} />
-                </Button>
               </div>
             </form>
           )}
         </Modal.Body>
         <Modal.Footer>
           {!showfieldsPassword && (
-            <Button onClick={handleLogout}>
-              Salir
-              <MdOutlineExitToApp
-                style={{ width: "30px", height: "30px", marginLeft: "10px" }}
-              />
-            </Button>
+            <>
+              {" "}
+              <Button variant="danger" onClick={handleClose}>
+                Cerrar
+                <IoIosClose style={{ width: "30px", height: "30px" }} />
+              </Button>
+              <Button onClick={handleLogout}>
+                Logout
+                <MdOutlineExitToApp
+                  style={{ width: "30px", height: "30px", marginLeft: "10px" }}
+                />
+              </Button>
+            </>
           )}
         </Modal.Footer>
       </Modal>
