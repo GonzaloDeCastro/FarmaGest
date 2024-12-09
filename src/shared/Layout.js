@@ -68,13 +68,13 @@ const Layout = ({ children, title }) => {
       </header>
       <div className="bodyContainer">
         <nav className={!isOpen ? "smallActive" : "smallInactive"}>
-          {permisos.includes(
+          {/*    {permisos.includes(
             "gestion_pedidos" && logged.sesion.rol !== "admin"
           ) && (
             <Link to="/pedidos">
               <RiShoppingBag4Fill className="iconMenu" />
             </Link>
-          )}
+          )} */}
           {permisos.includes("gestion_proveedores") && (
             <Link to="/proveedores">
               <ImUserTie className="iconMenu" />
@@ -118,13 +118,13 @@ const Layout = ({ children, title }) => {
         </nav>
 
         <nav className={isOpen ? "bigActive" : "bigInactive"}>
-          {permisos.includes("gestion_pedidos") &&
+          {/*      {permisos.includes("gestion_pedidos") &&
             logged.sesion.rol !== "admin" && (
               <Link className="itemMenu" to="/pedidos">
                 <RiShoppingBag4Fill className="iconMenu" />
                 <span>Pedidos</span>
               </Link>
-            )}
+            )} */}
           {permisos.includes("gestion_proveedores") && (
             <Link className="itemMenu" to="/proveedores">
               <ImUserTie className="iconMenu" />

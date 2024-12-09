@@ -25,9 +25,6 @@ const ClienteFormModal = ({ Ciudades, ObrasSociales }) => {
     },
   });
 
-  const watchObraSocialID = watch("obraSocialID");
-  const watchCiudadID = watch("ciudadID");
-
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
