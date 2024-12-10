@@ -37,10 +37,10 @@ const ResetPassword = ({ userID, userSelected, permissions_code }) => {
   useEffect(() => {
     if (!isValidPassword) {
       setPasswordError(
-        "Password must be at least 12 characters long, contain at least one number, and have at least one uppercase and one lowercase letter"
+        "La contraseña debe tener al menos 12 caracteres, contener al menos un número y tener al menos una letra mayúscula y una minúscula."
       );
     } else if (password !== repeatPassword) {
-      setPasswordError("Passwords are not the same");
+      setPasswordError("Passwords diferentes");
     } else {
       setPasswordError("");
     }
