@@ -67,7 +67,7 @@ const FormLogin = () => {
           style={{ fontSize: "13px", marginTop: "-20px" }}
           onClick={buttonOlvidoPassword}
         >
-          Olvidó sus contraseña?
+          Olvidó su contraseña?
         </label>
         <button type="submit">Iniciar sesión</button>
       </form>
