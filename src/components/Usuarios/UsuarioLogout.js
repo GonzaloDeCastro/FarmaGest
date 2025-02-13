@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import {
   logoutUsuario,
   updatePasswordDataAPI,
+  logoutUsuarioAPI,
 } from "../../redux/usuariosSlice";
 
 const UsuarioLogout = () => {
@@ -39,6 +40,7 @@ const UsuarioLogout = () => {
   const handleLogout = () => {
     sessionStorage.removeItem("logged");
     dispatch(logoutUsuario());
+    // dispatch(logoutUsuarioAPI(logged.sesion.sesion_id));
     navigate(`/login`);
   };
 

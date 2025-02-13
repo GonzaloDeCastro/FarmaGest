@@ -330,4 +330,12 @@ export const resetPasswordDataAPI = (dataUser) => {
   };
 };
 
+export const logoutUsuarioAPI = (sesion_id) => {
+  return async (dispatch) => {
+    try {
+      await axios.put(`${API}/usuarios/logout/${sesion_id}`);
+    } catch (error) {}
+  };
+};
+
 export default usuarioDataSlice.reducer;
