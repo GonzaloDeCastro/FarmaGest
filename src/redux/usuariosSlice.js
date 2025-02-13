@@ -209,13 +209,20 @@ export const editUsuarioAPI = (usuarioData) => {
   };
 };
 
-export const getUsuarioLoginAPI = (correo, password) => {
+export const getUsuarioLoginAPI = (
+  correo,
+  password,
+  ip_address,
+  user_agent
+) => {
   return async (dispatch) => {
     try {
       const response = await axios.get(`${API}/usuarios/login`, {
         params: {
           correo: correo && correo,
           contrasena: password && password,
+          ip_address: ip_address && ip_address,
+          user_agent: user_agent && user_agent,
         },
       });
 

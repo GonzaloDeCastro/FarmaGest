@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import { getUsuarioLoginAPI } from "../../redux/usuariosSlice";
+import axios from "axios";
+import Bowser from "bowser";
 
 const FormLogin = () => {
   const {
@@ -16,8 +18,14 @@ const FormLogin = () => {
   const dispatch = useDispatch();
   const UsuarioLogin = useSelector((state) => state.usuario.loginState);
 
-  const onSubmit = (data) => {
-    dispatch(getUsuarioLoginAPI(data.correo, data.password));
+  const onSubmit = async (data) => {
+    const response = await axios.get("https://api.ipify.org?format=json");
+    const ip_address = response.data.ip;
+    const browser = Bowser.parse(navigator.userAgent);
+    const user_agent = browser.browser.name + " " + browser.browser.version;
+    dispatch(
+      getUsuarioLoginAPI(data.correo, data.password, ip_address, user_agent)
+    );
   };
 
   useEffect(() => {
@@ -26,7 +34,7 @@ const FormLogin = () => {
         "logged",
         JSON.stringify({ sesion: UsuarioLogin })
       );
-      console.log("aca llega?");
+
       navigate("/");
     } else if (UsuarioLogin && UsuarioLogin.length === 0) {
       Swal.fire({
