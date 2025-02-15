@@ -286,7 +286,6 @@ export const updatePasswordDataAPI = (dataUser) => {
         });
       }
     } catch (error) {
-      console.log("error ", error);
       if (error.response.status === 401) {
         Swal.fire({
           icon: "warning",
@@ -306,7 +305,7 @@ export const updatePasswordDataAPI = (dataUser) => {
 
 export const resetPasswordDataAPI = (dataUser) => {
   const { correo } = dataUser;
-  console.log("dataUser ", dataUser);
+
   return async (dispatch) => {
     try {
       const response2 = await axios.put(
@@ -333,8 +332,13 @@ export const resetPasswordDataAPI = (dataUser) => {
 export const logoutUsuarioAPI = (sesion_id) => {
   return async (dispatch) => {
     try {
-      await axios.put(`${API}/usuarios/logout/${sesion_id}`);
-    } catch (error) {}
+      const response = await axios.put(`${API}/usuarios/logout/${sesion_id}`);
+      if (response && response?.status === 200) {
+        dispatch(logoutUsuario());
+      }
+    } catch (error) {
+      console.log("error ", error);
+    }
   };
 };
 

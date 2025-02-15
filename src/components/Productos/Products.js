@@ -16,7 +16,8 @@ const Products = () => {
   const [search, setSearch] = useState("");
 
   const pageSize = 8;
-
+  const logged = JSON.parse(sessionStorage.getItem("logged"));
+  const usuarioId = logged?.sesion?.usuario_id;
   useEffect(() => {
     dispatch(getProductosAPI(page, pageSize, search));
     dispatch(getCategoriasAPI());
@@ -31,6 +32,7 @@ const Products = () => {
     (Products && Products.initialState && Products.initialState[0]) || {}
   );
   const handleDelete = (dato) => {
+    const datoWithUserId = { ...dato, usuario_id: usuarioId };
     Swal.fire({
       title: "Advertencia!",
       text: `¿Esta seguro que desea eliminar el producto ${dato.Producto}? `,
@@ -40,7 +42,7 @@ const Products = () => {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        const action = deleteProductoAPI(dato);
+        const action = deleteProductoAPI(datoWithUserId);
         dispatch(action);
       }
     });
@@ -67,7 +69,7 @@ const Products = () => {
           />
         </div>
         <div style={{ display: "flex" }}>
-          <ProductForm Categorias={Categorias} />
+          <ProductForm Categorias={Categorias} usuarioId={usuarioId} />
         </div>
       </div>
       <div className="containerTableAndPagesSelected">
@@ -113,6 +115,7 @@ const Products = () => {
                     <EditProductFormModal
                       productSelected={dato}
                       Categorias={Categorias}
+                      usuarioId={usuarioId}
                     />
                     <FaRegTrashCan
                       className="iconABM"

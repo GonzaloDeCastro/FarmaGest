@@ -8,7 +8,6 @@ import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
 import { useForm } from "react-hook-form";
 import {
-  logoutUsuario,
   updatePasswordDataAPI,
   logoutUsuarioAPI,
 } from "../../redux/usuariosSlice";
@@ -37,10 +36,9 @@ const UsuarioLogout = () => {
   };
   const handleShow = () => setShow(true);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await dispatch(logoutUsuarioAPI(logged.sesion.sesion_id));
     sessionStorage.removeItem("logged");
-    dispatch(logoutUsuario());
-    // dispatch(logoutUsuarioAPI(logged.sesion.sesion_id));
     navigate(`/login`);
   };
 

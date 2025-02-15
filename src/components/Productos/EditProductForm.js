@@ -5,7 +5,7 @@ import { editProductoAPI } from "../../redux/productosSlice";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 
-const EditProductFormModal = ({ productSelected, Categorias }) => {
+const EditProductFormModal = ({ productSelected, Categorias, usuarioId }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
 
@@ -26,8 +26,6 @@ const EditProductFormModal = ({ productSelected, Categorias }) => {
     },
   });
 
-  const watchCategoriaID = watch("categoriaID");
-
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
@@ -42,6 +40,7 @@ const EditProductFormModal = ({ productSelected, Categorias }) => {
           categoria_id: data.categoriaID === "" ? null : data.categoriaID,
           precio: data.precio,
           stock: data.cantidad,
+          usuario_id: usuarioId,
           Categoria:
             Categorias.find((c) => c.categoria_id === Number(data.categoriaID))
               ?.nombre || "",

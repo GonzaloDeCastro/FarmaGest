@@ -5,7 +5,7 @@ import { addProductoAPI } from "../../redux/productosSlice";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 
-const ProductFormModal = ({ Categorias }) => {
+const ProductFormModal = ({ Categorias, usuarioId }) => {
   const dispatch = useDispatch();
   const {
     register,
@@ -35,6 +35,7 @@ const ProductFormModal = ({ Categorias }) => {
           precio: data.precio,
           stock: data.cantidad,
           Categoria: data.categoriaDesc,
+          usuario_id: usuarioId,
         })
       );
       handleClose();

@@ -95,6 +95,7 @@ export const getCategoriasAPI = () => {
 };
 
 export const addProductoAPI = (productoData) => {
+  console.log("first", productoData);
   return async (dispatch) => {
     try {
       const response = await axios.post(`${API}/productos`, productoData);
@@ -132,8 +133,9 @@ export const addProductoAPI = (productoData) => {
 export const deleteProductoAPI = (productoData) => {
   return async (dispatch) => {
     try {
-      const response = await axios.delete(
-        `${API}/productos/${productoData.producto_id}`
+      const response = await axios.put(
+        `${API}/productos/delete/${productoData.producto_id}`,
+        productoData
       );
 
       if (response.status === 200) {
