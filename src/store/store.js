@@ -6,6 +6,7 @@ import clienteDataSlice from "../redux/clientesSlice";
 import obraSocialDataSlice from "../redux/obrasSocialesSlice";
 import ventaDataSlice from "../redux/ventasSlice";
 import reporteDataSlice from "../redux/reportesSlice";
+import auditoriaProductosDataSlice from "../redux/auditoriaProductosSlice";
 
 export default configureStore({
   reducer: {
@@ -16,5 +17,6 @@ export default configureStore({
     cliente: clienteDataSlice,
     obrasocial: obraSocialDataSlice,
     reporte: reporteDataSlice,
+    auditoriaProductos: auditoriaProductosDataSlice,
   },
 });

@@ -95,7 +95,6 @@ export const getCategoriasAPI = () => {
 };
 
 export const addProductoAPI = (productoData) => {
-  console.log("first", productoData);
   return async (dispatch) => {
     try {
       const response = await axios.post(`${API}/productos`, productoData);

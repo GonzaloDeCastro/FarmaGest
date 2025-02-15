@@ -35,7 +35,7 @@ const Products = () => {
     const datoWithUserId = { ...dato, usuario_id: usuarioId };
     Swal.fire({
       title: "Advertencia!",
-      text: `¿Esta seguro que desea eliminar el producto ${dato.Producto}? `,
+      html: `¿Esta seguro que desea eliminar el producto <b>${dato.Nombre}</b> ? `,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes",

@@ -1,14 +1,7 @@
 import React from "react";
-import { IoMdConstruct } from "react-icons/io";
+import AuditoriaProductos from "./TablaAuditoriaProductos";
 
 const Auditoria = () => {
-  return (
-    <div className="buildPage">
-      <div>
-        <IoMdConstruct className="iconBuild" />
-      </div>
-      Página Auditoria en construcción
-    </div>
-  );
+  return <AuditoriaProductos />;
 };
 export default Auditoria;
