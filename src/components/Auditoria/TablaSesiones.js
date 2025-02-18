@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getSesionesAPI } from "../../redux/sesionesSlice";
+import { formatDate } from "../../functions/formatDate";
+import { formatString } from "../../functions/formatText";
 
 const Sesiones = () => {
   const dispatch = useDispatch();
@@ -9,7 +11,7 @@ const Sesiones = () => {
   const [search, setSearch] = useState("");
   const [showBy, setShowBy] = useState(1);
 
-  const pageSize = 6;
+  const pageSize = 8;
 
   const sesiones = useSelector(
     (state) => state && state.sesiones && state.sesiones
@@ -49,18 +51,7 @@ const Sesiones = () => {
           <thead>
             <tr>
               {keys.map((column) => {
-                if (
-                  column === "cliente_id" ||
-                  column === "obra_social_id" ||
-                  column === "ciudad_id"
-                ) {
-                  return null;
-                }
-                return (
-                  <th key={column}>
-                    {column == "obra_social" ? "Obra Social" : column}
-                  </th>
-                );
+                return <th key={column}>{formatString(column)}</th>;
               })}
             </tr>
           </thead>
@@ -76,12 +67,16 @@ const Sesiones = () => {
             ) : (
               sesiones &&
               sesiones.sesionState &&
-              sesiones.sesionState.map((cliente) => (
-                <tr key={cliente.cliente_id}>
+              sesiones.sesionState.map((sesion, index) => (
+                <tr key={index}>
                   {keys.map((column) => {
                     return (
-                      <td key={`${cliente.cliente_id}-${column}`}>
-                        {cliente[column]}
+                      <td key={`${sesion.sesion_id}-${column}`}>
+                        {column == "hora_logueo" ||
+                        column == "hora_logout" ||
+                        column == "ultima_actividad"
+                          ? formatDate(sesion[column])
+                          : sesion[column]}
                       </td>
                     );
                   })}
