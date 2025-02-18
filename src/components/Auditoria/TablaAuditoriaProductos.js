@@ -2,14 +2,16 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAuditoriaProductosAPI } from "../../redux/auditoriaProductosSlice";
+import { formatDate } from "../../functions/formatDate";
+import { useNavigate } from "react-router-dom";
 
 const AuditoriaProductos = () => {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-
+  const [showBy, setShowBy] = useState(0);
   const pageSize = 8;
-
+  const navigate = useNavigate();
   const auditoriaProductos = useSelector(
     (state) => state && state.auditoriaProductos && state.auditoriaProductos
   );
@@ -32,6 +34,11 @@ const AuditoriaProductos = () => {
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };
+  useEffect(() => {
+    if (showBy == 1) {
+      navigate(`/home-supervisor`);
+    }
+  }, [showBy]);
 
   return (
     <div className="containerSelected">
@@ -51,13 +58,6 @@ const AuditoriaProductos = () => {
           <thead>
             <tr>
               {keys.map((column) => {
-                if (
-                  column === "cliente_id" ||
-                  column === "obra_social_id" ||
-                  column === "ciudad_id"
-                ) {
-                  return null;
-                }
                 return (
                   <th key={column}>
                     {column == "obra_social" ? "Obra Social" : column}
@@ -78,19 +78,14 @@ const AuditoriaProductos = () => {
             ) : (
               auditoriaProductos &&
               auditoriaProductos.initialState &&
-              auditoriaProductos.initialState.map((cliente) => (
-                <tr key={cliente.cliente_id}>
+              auditoriaProductos.initialState.map((auditoria, index) => (
+                <tr key={index}>
                   {keys.map((column) => {
-                    if (
-                      column === "cliente_id" ||
-                      column === "obra_social_id" ||
-                      column === "ciudad_id"
-                    ) {
-                      return null;
-                    }
                     return (
-                      <td key={`${cliente.cliente_id}-${column}`}>
-                        {cliente[column]}
+                      <td key={`${auditoria.id}-${column}`}>
+                        {column == "Fecha"
+                          ? formatDate(auditoria[column])
+                          : auditoria[column]}
                       </td>
                     );
                   })}

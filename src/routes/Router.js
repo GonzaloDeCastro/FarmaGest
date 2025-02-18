@@ -18,6 +18,7 @@ import PrivateRouteClientes from "./PrivateClientes";
 import PrivateRouteUsuarios from "./PrivateUsuarios";
 import PrivateRouteObrasSociales from "./PrivateObrasSociales";
 import Auditoria from "../components/Auditoria/Auditoria";
+import Sesiones from "../components/Auditoria/TablaSesiones";
 
 const AppRouter = () => {
   const logged = JSON.parse(sessionStorage.getItem("logged"));
@@ -101,6 +102,14 @@ const AppRouter = () => {
               element={
                 <Layout title={"auditoria"}>
                   <Auditoria />
+                </Layout>
+              }
+            />
+            <Route
+              path="/sesiones"
+              element={
+                <Layout title={"sesiones"}>
+                  <Sesiones />
                 </Layout>
               }
             />

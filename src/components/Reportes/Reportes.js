@@ -4,7 +4,6 @@ import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "./Reportes.module.css";
-import { Select } from "react-select-virtualized";
 import { getClientesAPI } from "../../redux/clientesSlice";
 import { getProductosAPI } from "../../redux/productosSlice";
 import { getUsuariosAPI } from "../../redux/usuariosSlice";
@@ -12,11 +11,11 @@ import { getReportesAPI } from "../../redux/reportesSlice";
 import { FaTableList } from "react-icons/fa6";
 import { BiBarChartAlt2 } from "react-icons/bi";
 import Swal from "sweetalert2";
+import { formatDate } from "../../functions/formatDate";
 
 const Reportes = () => {
   const dispatch = useDispatch();
-  const logged = JSON.parse(sessionStorage.getItem("logged"));
-  const sesion = logged.sesion;
+
   const reportes = useSelector((state) => state.reporte.initialState || []);
   const [clienteProductoVendedor, setClienteProductoVendedor] = useState("");
   const [grafico, setGrafico] = useState(false);
@@ -139,16 +138,6 @@ const Reportes = () => {
   const maxCantidadVentas = Math.max(
     ...data.map((item) => item.cantidad_ventas)
   );
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
-  };
 
   const exportToExcel = (data, fileName) => {
     // Crear una hoja de trabajo (workbook)
