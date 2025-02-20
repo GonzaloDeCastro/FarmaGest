@@ -29,9 +29,8 @@ export const getSesionesAPI = (page, pageSize, search) => {
           search,
         },
       });
-      console.log("response sesiones", response);
+
       if (response.status === 200) {
-        console.log("response sesiones data", response.data);
         dispatch(getSesiones(response.data));
       }
     } catch (error) {

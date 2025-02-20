@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAuditoriaProductosAPI } from "../../redux/auditoriaProductosSlice";
 import { formatDate } from "../../functions/formatDate";
 import { useNavigate } from "react-router-dom";
+import styles from "./Auditoria.module.css";
 
 const AuditoriaProductos = () => {
   const dispatch = useDispatch();
@@ -36,10 +37,10 @@ const AuditoriaProductos = () => {
   };
   useEffect(() => {
     if (showBy == 1) {
-      navigate(`/home-supervisor`);
+      navigate(`/sesiones`);
     }
   }, [showBy]);
-
+  console.log("showBy auditoria", showBy);
   return (
     <div className="containerSelected">
       <div className="headerSelected">
@@ -52,9 +53,17 @@ const AuditoriaProductos = () => {
             placeholder="&#xF002; Buscar..."
           />
         </div>
+        <select
+          onChange={(e) => setShowBy(e.target.value)}
+          className="buttonSelect"
+          defaultValue={showBy}
+        >
+          <option value={0}>Auditoria</option>
+          <option value={1}>Sesiones</option>
+        </select>
       </div>
       <div className="containerTableAndPagesSelected">
-        <table className="headerTable">
+        <table className={styles.headerTable}>
           <thead>
             <tr>
               {keys.map((column) => {

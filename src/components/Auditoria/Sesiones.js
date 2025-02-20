@@ -1,30 +1,29 @@
 /* eslint-disable eqeqeq */
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAuditoriaProductosAPI } from "../../redux/auditoriaProductosSlice";
+import { getSesionesAPI } from "../../redux/sesionesSlice";
 import { formatDate } from "../../functions/formatDate";
+import { formatString } from "../../functions/formatText";
 import { useNavigate } from "react-router-dom";
-
-const AuditoriaProductos = () => {
+import styles from "./Auditoria.module.css";
+const Sesiones = () => {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [showBy, setShowBy] = useState(0);
-  const pageSize = 8;
+  const [showBy, setShowBy] = useState(1);
   const navigate = useNavigate();
-  const auditoriaProductos = useSelector(
-    (state) => state && state.auditoriaProductos && state.auditoriaProductos
+  const pageSize = 8;
+
+  const sesiones = useSelector(
+    (state) => state && state.sesiones && state.sesiones
   );
 
   useEffect(() => {
-    dispatch(getAuditoriaProductosAPI(page, pageSize, search));
+    dispatch(getSesionesAPI(page, pageSize, search));
   }, [dispatch, page, pageSize, search]);
 
   const keys = Object.keys(
-    (auditoriaProductos &&
-      auditoriaProductos.initialState &&
-      auditoriaProductos.initialState[0]) ||
-      {}
+    (sesiones && sesiones.sesionState && sesiones.sesionState[0]) || {}
   );
 
   const handleSearchChange = (e) => {
@@ -34,12 +33,13 @@ const AuditoriaProductos = () => {
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };
+
   useEffect(() => {
-    if (showBy == 1) {
-      navigate(`/home-supervisor`);
+    if (showBy == 0) {
+      navigate(`/auditoria`);
     }
   }, [showBy]);
-
+  console.log("showBy sesiones ", showBy);
   return (
     <div className="containerSelected">
       <div className="headerSelected">
@@ -50,42 +50,48 @@ const AuditoriaProductos = () => {
             value={search}
             onChange={handleSearchChange}
             placeholder="&#xF002; Buscar..."
-          />
-        </div>
+          />{" "}
+        </div>{" "}
+        <select
+          onChange={(e) => setShowBy(e.target.value)}
+          className="buttonSelect"
+          defaultValue={showBy}
+        >
+          <option value={0}>Auditoria</option>
+          <option value={1}>Sesiones</option>
+        </select>
       </div>
       <div className="containerTableAndPagesSelected">
-        <table className="headerTable">
+        <table className={styles.headerTable}>
           <thead>
             <tr>
               {keys.map((column) => {
-                return (
-                  <th key={column}>
-                    {column == "obra_social" ? "Obra Social" : column}
-                  </th>
-                );
+                return <th key={column}>{formatString(column)}</th>;
               })}
             </tr>
           </thead>
           <tbody>
-            {auditoriaProductos &&
-            auditoriaProductos.initialState &&
-            auditoriaProductos.initialState.length === 0 ? (
+            {sesiones &&
+            sesiones.sesionState &&
+            sesiones.sesionState.length === 0 ? (
               <tr>
                 <td colSpan={keys.length + 1} className="NoData">
                   Sin datos
                 </td>
               </tr>
             ) : (
-              auditoriaProductos &&
-              auditoriaProductos.initialState &&
-              auditoriaProductos.initialState.map((auditoria, index) => (
+              sesiones &&
+              sesiones.sesionState &&
+              sesiones.sesionState.map((sesion, index) => (
                 <tr key={index}>
                   {keys.map((column) => {
                     return (
-                      <td key={`${auditoria.id}-${column}`}>
-                        {column == "Fecha"
-                          ? formatDate(auditoria[column])
-                          : auditoria[column]}
+                      <td key={`${sesion.sesion_id}-${column}`}>
+                        {column == "hora_logueo" ||
+                        column == "hora_logout" ||
+                        column == "ultima_actividad"
+                          ? formatDate(sesion[column])
+                          : sesion[column]}
                       </td>
                     );
                   })}
@@ -107,9 +113,9 @@ const AuditoriaProductos = () => {
           onClick={() => handlePageChange(page + 1)}
           style={{ marginLeft: "10px" }}
           disabled={
-            auditoriaProductos &&
-            auditoriaProductos.initialState &&
-            auditoriaProductos.initialState.length < pageSize
+            sesiones &&
+            sesiones.sesionState &&
+            sesiones.sesionState.length < pageSize
           }
           className="buttonPage"
         >
@@ -120,4 +126,4 @@ const AuditoriaProductos = () => {
   );
 };
 
-export default AuditoriaProductos;
+export default Sesiones;

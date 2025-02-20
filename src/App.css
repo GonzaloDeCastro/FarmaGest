@@ -384,6 +384,25 @@ nav.bigActive span {
 .buttonNewItem:hover {
   background-color: #d5ff71;
 }
+
+.buttonSelect {
+  display: flex;
+  align-items: center;
+  background-color: #abd34e;
+  padding: 13px 10px 13px 10px;
+  color: #000;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  font-size: 1.1rem;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.5);
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+.buttonSelect option {
+  background-color: #dbe9bb; /* Color de fondo deseado para las opciones */
+}
 .iconConfirm {
   width: 25px;
   height: 25px;
