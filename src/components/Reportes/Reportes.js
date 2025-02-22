@@ -28,7 +28,7 @@ const Reportes = () => {
   const day = String(lastTenDays.getDate()).padStart(2, "0"); // Día del mes
 
   const lastWeekFormatted = `${year}-${month}-${day}`;
-  const [dateSelectedFrom, setDateSelectedFrom] = useState(lastWeekFormatted);
+  const [dateSelectedFrom, setDateSelectedFrom] = useState("");
   const [dateSelectedTo, setDateSelectedTo] = useState("");
 
   const [entitySelected, setSelectEntity] = useState("");
@@ -176,7 +176,7 @@ const Reportes = () => {
       <div className={styles.containerHeader}>
         <div className={styles.header}>
           <div className={styles.containerDate}>
-            Fecha Inicio{" "}
+            Fecha Desde{" "}
             <input
               type="date"
               className={styles.formSelectDate}
@@ -187,7 +187,7 @@ const Reportes = () => {
             />
           </div>
           <div className={styles.containerDate}>
-            Fecha Fin{" "}
+            Fecha Hasta{" "}
             <input
               type="date"
               className={styles.formSelectDate}
@@ -261,7 +261,7 @@ const Reportes = () => {
           <button
             className={styles.buttonAplicar}
             onClick={handleAplicar}
-            disabled={dateSelectedFrom == ""}
+            /* disabled={dateSelectedFrom == ""} */
           >
             Aplicar
           </button>

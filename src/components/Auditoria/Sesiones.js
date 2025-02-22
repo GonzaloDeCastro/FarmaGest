@@ -86,11 +86,18 @@ const Sesiones = () => {
                 <tr key={index}>
                   {keys.map((column) => {
                     return (
-                      <td key={`${sesion.sesion_id}-${column}`}>
+                      <td
+                        key={`${sesion.sesion_id}-${column}`}
+                        style={{
+                          textAlign: sesion[column] == null && "center",
+                        }}
+                      >
                         {column == "hora_logueo" ||
                         column == "hora_logout" ||
                         column == "ultima_actividad"
-                          ? formatDate(sesion[column])
+                          ? sesion[column] == null
+                            ? "-"
+                            : formatDate(sesion[column])
                           : sesion[column]}
                       </td>
                     );
