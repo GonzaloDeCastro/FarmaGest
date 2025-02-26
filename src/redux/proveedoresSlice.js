@@ -46,7 +46,12 @@ export const { getProveedores, addProveedor, deleteProveedor, editProveedor } =
 
 // Funciones API para interactuar con el backend
 
-export const getProveedoresAPI = (page = 1, pageSize = 5, search = "") => {
+export const getProveedoresAPI = (
+  page = 1,
+  pageSize = 5,
+  search = "",
+  sesion
+) => {
   return async (dispatch) => {
     try {
       const response = await axios.get(`${API}/proveedores`, {
@@ -54,6 +59,7 @@ export const getProveedoresAPI = (page = 1, pageSize = 5, search = "") => {
           page,
           pageSize,
           search,
+          sesion,
         },
       });
       if (response.status === 200) {

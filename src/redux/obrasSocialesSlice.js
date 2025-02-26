@@ -50,7 +50,12 @@ export const {
 
 // Funciones API para interactuar con el backend
 
-export const getObrasSocialesAPI = (page = 1, pageSize = 5, search = "") => {
+export const getObrasSocialesAPI = (
+  page = 1,
+  pageSize = 5,
+  search = "",
+  sesion
+) => {
   return async (dispatch) => {
     try {
       const response = await axios.get(`${API}/obras-sociales`, {
@@ -58,6 +63,7 @@ export const getObrasSocialesAPI = (page = 1, pageSize = 5, search = "") => {
           page,
           pageSize,
           search,
+          sesion,
         },
       });
       if (response.status === 200) {

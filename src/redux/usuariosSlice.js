@@ -74,7 +74,7 @@ export const {
 
 // Funciones API para interactuar con el backend
 
-export const getUsuariosAPI = (page, pageSize, search, rolID) => {
+export const getUsuariosAPI = (page, pageSize, search, rolID, sesion) => {
   return async (dispatch) => {
     try {
       const response = await axios.get(`${API}/usuarios`, {
@@ -83,6 +83,7 @@ export const getUsuariosAPI = (page, pageSize, search, rolID) => {
           pageSize,
           search,
           rolID,
+          sesion,
         },
       });
 
@@ -218,6 +219,10 @@ export const getUsuarioLoginAPI = (
   return async (dispatch) => {
     try {
       const response = await axios.get(`${API}/usuarios/login`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
         params: {
           correo: correo && correo,
           contrasena: password && password,

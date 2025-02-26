@@ -18,8 +18,10 @@ const Products = () => {
   const pageSize = 8;
   const logged = JSON.parse(sessionStorage.getItem("logged"));
   const usuarioId = logged?.sesion?.usuario_id;
+  const sesion = logged?.sesion?.sesion_id;
+
   useEffect(() => {
-    dispatch(getProductosAPI(page, pageSize, search));
+    dispatch(getProductosAPI(page, pageSize, search, sesion));
     dispatch(getCategoriasAPI());
   }, [page, pageSize, search, dispatch]);
 

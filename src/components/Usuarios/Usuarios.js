@@ -19,7 +19,8 @@ const Usuarios = () => {
   const [search, setSearch] = useState("");
   const [roleID, setRoleID] = useState(0);
   const pageSize = 8;
-
+  const logged = JSON.parse(sessionStorage.getItem("logged"));
+  const sesion = logged?.sesion?.sesion_id;
   const Usuarios = useSelector(
     (state) => state && state?.usuario && state?.usuario
   );
@@ -27,7 +28,7 @@ const Usuarios = () => {
   const Roles = useSelector((state) => state && state?.usuario?.rolesState);
 
   useEffect(() => {
-    dispatch(getUsuariosAPI(page, pageSize, search, roleID));
+    dispatch(getUsuariosAPI(page, pageSize, search, roleID, sesion));
     dispatch(getRolesAPI());
   }, [page, pageSize, search, roleID, dispatch]);
 

@@ -14,11 +14,12 @@ const ObrasSociales = () => {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-
+  const logged = JSON.parse(sessionStorage.getItem("logged"));
+  const sesion = logged?.sesion?.sesion_id;
   const pageSize = 8;
 
   useEffect(() => {
-    dispatch(getObrasSocialesAPI(page, pageSize, search));
+    dispatch(getObrasSocialesAPI(page, pageSize, search, sesion));
   }, [page, pageSize, search, dispatch]);
 
   const ObrasSociales = useSelector((state) => state && state?.obrasocial);

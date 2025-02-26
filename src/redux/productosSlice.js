@@ -59,15 +59,16 @@ export const {
 
 // Funciones API para interactuar con el backend
 
-export const getProductosAPI = (page, pageSize, search, categoriaID) => {
+export const getProductosAPI = (page, pageSize, search, sesion) => {
   return async (dispatch) => {
     try {
+      console.log("sesion ", sesion);
       const response = await axios.get(`${API}/productos`, {
         params: {
           page,
           pageSize,
           search,
-          categoriaID,
+          sesion,
         },
       });
 

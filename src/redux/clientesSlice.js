@@ -71,7 +71,8 @@ export const getClientesAPI = (
   pageSize,
   search,
   obraSocialID,
-  ciudadID
+  ciudadID,
+  sesion
 ) => {
   return async (dispatch) => {
     try {
@@ -82,6 +83,7 @@ export const getClientesAPI = (
           search,
           obraSocialID,
           ciudadID,
+          sesion,
         },
       });
 

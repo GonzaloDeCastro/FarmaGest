@@ -13,11 +13,12 @@ const Ventas = () => {
   const [search, setSearch] = useState("");
   const pageSize = 8;
   const logged = JSON.parse(sessionStorage.getItem("logged"));
-  const sesion = logged.sesion;
+  const usuarioId = logged?.sesion?.usuario_id;
+  const sesion = logged?.sesion?.sesion_id;
   const ventas = useSelector((state) => state.venta.initialState || []);
 
   useEffect(() => {
-    dispatch(getVentasAPI(page, pageSize, search));
+    dispatch(getVentasAPI(page, pageSize, search, sesion));
   }, [dispatch, page, search]);
 
   const handleSearchChange = (e) => {
@@ -39,7 +40,7 @@ const Ventas = () => {
           placeholder="Buscar ventas..."
         />
         <div style={{ display: "flex" }}>
-          <VentaFormModal usuarioId={sesion.usuario_id} />
+          <VentaFormModal usuarioId={usuarioId} />
         </div>
       </div>
 

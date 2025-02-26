@@ -19,7 +19,8 @@ const Clientes = () => {
   const [obraSocialID, setObraSocialID] = useState(0);
   const [ciudadID, setCiudadID] = useState(0);
   const pageSize = 8;
-
+  const logged = JSON.parse(sessionStorage.getItem("logged"));
+  const sesion = logged?.sesion?.sesion_id;
   const clientes = useSelector(
     (state) => state && state.cliente && state.cliente
   );
@@ -31,7 +32,9 @@ const Clientes = () => {
   );
 
   useEffect(() => {
-    dispatch(getClientesAPI(page, pageSize, search, obraSocialID, ciudadID));
+    dispatch(
+      getClientesAPI(page, pageSize, search, obraSocialID, ciudadID, sesion)
+    );
     dispatch(getObrasSocialesAPI());
     dispatch(getCiudadesAPI());
   }, [dispatch, page, pageSize, search, obraSocialID, ciudadID]);

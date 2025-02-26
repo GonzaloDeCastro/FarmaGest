@@ -6,9 +6,10 @@
 .headerTable th,
 .headerTable td {
   border: 1px solid #dddddd;
-  padding: 8px;
+  padding: 6px;
   text-align: left;
   height: 44px;
+  white-space: nowrap;
 }
 
 .headerTable th {

@@ -41,18 +41,19 @@ const ventasSlice = createSlice({
 export const { getVentas, getUltimaVenta, addVenta, verFacturaVenta } =
   ventasSlice.actions;
 
-export const getVentasAPI = (page, pageSize, search) => async (dispatch) => {
-  try {
-    const response = await axios.get(`${API}/ventas`, {
-      params: { page, pageSize, search },
-    });
-    if (response.status === 200) {
-      dispatch(getVentas(response.data));
+export const getVentasAPI =
+  (page, pageSize, search, sesion) => async (dispatch) => {
+    try {
+      const response = await axios.get(`${API}/ventas`, {
+        params: { page, pageSize, search, sesion },
+      });
+      if (response.status === 200) {
+        dispatch(getVentas(response.data));
+      }
+    } catch (error) {
+      console.error("Error al obtener ventas:", error);
     }
-  } catch (error) {
-    console.error("Error al obtener ventas:", error);
-  }
-};
+  };
 
 export const getUltimaVentaAPI = () => async (dispatch) => {
   try {
