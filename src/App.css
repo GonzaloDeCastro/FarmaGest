@@ -291,8 +291,8 @@ nav.bigActive span {
   border-radius: 10px;
 }
 .headerTable {
-  width: 100%;
-  border-collapse: collapse;
+  /*  width: 100%; */
+  /*  border-collapse: collapse; */
 }
 
 .headerTable th,
@@ -309,7 +309,7 @@ nav.bigActive span {
 
 .headerTable th:last-child,
 .headerTable td:last-child {
-  width: 70px;
+  /*   width: 70px; */
   white-space: nowrap; /* Evitar que el contenido se ajuste automáticamente */
 }
 
@@ -437,7 +437,7 @@ nav.bigActive span {
   cursor: not-allowed;
 }
 
-@media screen and (min-width: 1080px) and (min-height: 810px) {
+@media screen and (min-width: 1080px) and (min-height: 610px) {
   .headerTable th,
   .headerTable td {
     height: 65px;

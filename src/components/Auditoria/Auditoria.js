@@ -62,16 +62,12 @@ const AuditoriaProductos = () => {
           <option value={1}>Sesiones</option>
         </select>
       </div>
-      <div className="containerTableAndPagesSelected">
+      <div className={styles.containerTableAndPagesSelected}>
         <table className={styles.headerTable}>
           <thead>
             <tr>
               {keys.map((column) => {
-                return (
-                  <th key={column}>
-                    {column == "obra_social" ? "Obra Social" : column}
-                  </th>
-                );
+                return <th key={column}>{column}</th>;
               })}
             </tr>
           </thead>

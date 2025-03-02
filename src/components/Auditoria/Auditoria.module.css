@@ -1,3 +1,13 @@
+.containerTableAndPagesSelected {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  margin-bottom: 10px;
+  background-color: #d6d6d6;
+  border-radius: 10px;
+}
+
 .headerTable {
   /*   width: 100%; */
   border-collapse: collapse;
@@ -43,7 +53,7 @@
   color: #333;
 }
 
-@media screen and (min-width: 1080px) and (min-height: 810px) {
+@media screen and (min-width: 1080px) and (min-height: 610px) {
   .headerTable {
     max-width: 100%;
     overflow-x: auto;
@@ -52,6 +62,12 @@
   .headerTable td {
     height: 65px;
     padding: 8px;
+  }
+  .containerTableAndPagesSelected {
+    width: 100%;
+    max-width: 980px; /* Define un límite máximo para la tabla */
+    margin: auto; /* Centra la tabla si el contenedor es más grande */
+    overflow-x: auto; /* Activa el scroll horizontal si es necesario */
   }
 }
 

@@ -61,7 +61,7 @@ const Sesiones = () => {
           <option value={1}>Sesiones</option>
         </select>
       </div>
-      <div className="containerTableAndPagesSelected">
+      <div className={styles.containerTableAndPagesSelected}>
         <table className={styles.headerTable}>
           <thead>
             <tr>
