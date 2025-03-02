@@ -437,6 +437,14 @@ nav.bigActive span {
   cursor: not-allowed;
 }
 
+@media screen and (min-width: 1080px) and (min-height: 810px) {
+  .headerTable th,
+  .headerTable td {
+    height: 65px;
+    padding: 8px;
+  }
+}
+
 @media screen and (min-width: 1920px) and (min-height: 945px) {
   .headerTable th,
   .headerTable td {

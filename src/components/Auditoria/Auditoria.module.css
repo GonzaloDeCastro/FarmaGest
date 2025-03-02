@@ -1,5 +1,5 @@
 .headerTable {
-  width: 100%;
+  /*   width: 100%; */
   border-collapse: collapse;
 }
 
@@ -41,4 +41,24 @@
 .headerTable tbody tr:nth-child(even) {
   background-color: #f2f2f2;
   color: #333;
+}
+
+@media screen and (min-width: 1080px) and (min-height: 810px) {
+  .headerTable {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  .headerTable th,
+  .headerTable td {
+    height: 65px;
+    padding: 8px;
+  }
+}
+
+@media screen and (min-width: 1920px) and (min-height: 945px) {
+  .headerTable th,
+  .headerTable td {
+    height: 80px;
+    padding: 8px;
+  }
 }
