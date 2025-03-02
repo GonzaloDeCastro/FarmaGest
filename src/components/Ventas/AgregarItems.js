@@ -14,6 +14,7 @@ const AgregarItems = ({ onAgregarItem }) => {
     reset,
     setValue,
     watch,
+    register,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -25,6 +26,7 @@ const AgregarItems = ({ onAgregarItem }) => {
   });
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
+  const [outOfStock, setOutOfStock] = useState(0);
   const productos = useSelector((state) => state.producto?.initialState || []);
 
   useEffect(() => {
@@ -57,17 +59,23 @@ const AgregarItems = ({ onAgregarItem }) => {
   };
 
   const updateTotal = (cantidad, precio) => {
-    setValue("total", cantidad * precio);
+    if (isNaN(cantidad) || isNaN(precio)) {
+      setValue("total", 0);
+    } else {
+      setValue("total", cantidad * precio);
+    }
   };
 
   const handleProductoChange = (productoId) => {
     const selectedProducto = productos.find(
       (p) => p.producto_id === productoId
     );
+    const stock = selectedProducto && selectedProducto.Stock;
     if (selectedProducto) {
       setValue("precio", selectedProducto.Precio);
       updateTotal(watch("cantidad"), selectedProducto.Precio);
     }
+    setOutOfStock(stock);
   };
 
   const optionsProductos = productos.map((producto) => ({
@@ -104,11 +112,15 @@ const AgregarItems = ({ onAgregarItem }) => {
               <label>Producto:</label>
               <Controller
                 name="productoId"
+                id="cantidad"
                 control={control}
                 render={({ field }) => (
                   <Select
                     {...field}
                     options={optionsProductos}
+                    {...register("productoId", {
+                      required: "Debe elegir al menos 1 producto",
+                    })}
                     onChange={(val) => {
                       field.onChange(val ? val.value : null);
                       handleProductoChange(val ? val.value : null);
@@ -120,18 +132,24 @@ const AgregarItems = ({ onAgregarItem }) => {
                   />
                 )}
               />
+              {errors.productoId && (
+                <p className="text-danger">{errors.productoId.message}</p>
+              )}
             </Form.Group>
 
             <Form.Group className="mb-3">
               <label>Cantidad:</label>
               <input
                 type="number"
-                {...control.register("cantidad", { valueAsNumber: true })}
+                id="cantidad"
                 className="form-control"
+                {...register("cantidad", {
+                  required: "Debe elegir al menos 1 unidad",
+                })}
                 onChange={(e) => setValue("cantidad", parseInt(e.target.value))}
               />
               {errors.cantidad && (
-                <p className="error">{errors.cantidad.message}</p>
+                <p className="text-danger">{errors.cantidad.message}</p>
               )}
             </Form.Group>
 
@@ -144,7 +162,13 @@ const AgregarItems = ({ onAgregarItem }) => {
               <label>Total:</label>
               <p>{`$${watch("total")}`}</p>
             </Form.Group>
-
+            {outOfStock < 1 ? (
+              <p className="text-danger">
+                El producto seleccionado no tiene stock
+              </p>
+            ) : (
+              <p>Cantidad disponible: {outOfStock}</p>
+            )}
             <Button
               type="submit"
               variant="primary"

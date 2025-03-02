@@ -291,7 +291,7 @@ nav.bigActive span {
   border-radius: 10px;
 }
 .headerTable {
-  /*  width: 100%; */
+  width: 100%;
   /*  border-collapse: collapse; */
 }
 
@@ -437,7 +437,7 @@ nav.bigActive span {
   cursor: not-allowed;
 }
 
-@media screen and (min-width: 1080px) and (min-height: 610px) {
+@media screen and (min-width: 1080px) and (min-height: 650px) {
   .headerTable th,
   .headerTable td {
     height: 65px;

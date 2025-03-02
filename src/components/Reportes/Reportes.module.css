@@ -166,7 +166,7 @@
   position: relative;
   border-left: 2px solid #ccc;
   border-bottom: 2px solid #ccc;
-  padding: 10px 0;
+  padding: 20px 0;
 }
 
 .yAxis {
@@ -287,7 +287,7 @@
   background-color: #f9f9f9; /* Color de fondo para la celda sin datos */
 }
 
-@media screen and (min-width: 1080px) and (min-height: 610px) {
+@media screen and (min-width: 1080px) and (min-height: 650px) {
   .headerTable th,
   .headerTable td {
     height: 65px;
