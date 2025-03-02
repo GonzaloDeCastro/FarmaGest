@@ -26,7 +26,7 @@ const AgregarItems = ({ onAgregarItem }) => {
   });
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
-  const [outOfStock, setOutOfStock] = useState(0);
+  const [outOfStock, setOutOfStock] = useState(false);
   const productos = useSelector((state) => state.producto?.initialState || []);
 
   useEffect(() => {
@@ -43,6 +43,7 @@ const AgregarItems = ({ onAgregarItem }) => {
   }, [watch]);
 
   const handleClose = () => {
+    setOutOfStock(false);
     setShow(false);
     reset();
   };
@@ -162,12 +163,13 @@ const AgregarItems = ({ onAgregarItem }) => {
               <label>Total:</label>
               <p>{`$${watch("total")}`}</p>
             </Form.Group>
-            {outOfStock < 1 ? (
+            {outOfStock && outOfStock < 1 ? (
               <p className="text-danger">
                 El producto seleccionado no tiene stock
               </p>
             ) : (
-              <p>Cantidad disponible: {outOfStock}</p>
+              outOfStock &&
+              outOfStock && <p>Cantidad disponible: {outOfStock}</p>
             )}
             <Button
               type="submit"
