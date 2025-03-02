@@ -9,6 +9,9 @@ body {
   background-color: #0f1014;
   color: #0f1014;
 }
+.containerSection {
+  height: 100%;
+}
 .modal-header {
   background-color: #abd34e; /* Color de fondo gris claro */
   border-bottom: 1px solid #dee2e6; /* Línea inferior sutil */
@@ -270,15 +273,22 @@ nav.bigActive span {
 }
 
 .containerSelected {
-  padding: 20px 20px 0px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
   color: #0f1014;
+  height: 100%;
 }
 
 .containerTableAndPagesSelected {
   display: flex;
-  min-height: 412px;
   flex-direction: column;
   justify-content: space-between;
+  height: 100%;
+  margin-bottom: 10px;
+  background-color: #d6d6d6;
+  border-radius: 10px;
 }
 .headerTable {
   width: 100%;
@@ -288,8 +298,9 @@ nav.bigActive span {
 .headerTable th,
 .headerTable td {
   border: 1px solid #dddddd;
-  padding: 8px;
   text-align: left;
+  padding: 4px;
+  height: 45px;
 }
 
 .headerTable th {
@@ -424,4 +435,12 @@ nav.bigActive span {
 .buttonConfirm:disabled {
   background-color: #636363;
   cursor: not-allowed;
+}
+
+@media screen and (min-width: 1920px) and (min-height: 945px) {
+  .headerTable th,
+  .headerTable td {
+    height: 80px;
+    padding: 8px;
+  }
 }

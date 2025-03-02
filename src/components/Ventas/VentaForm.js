@@ -54,10 +54,6 @@ const VentaFormModal = ({ usuarioId }) => {
 
   const handleCliente = (event) => {
     setCliente(event.target.value);
-
-    /*  const selectedEventReasonDesc =
-      event.target.selectedOptions[0].getAttribute("data-event-reason-desc");
-    setEventReasonDesc(selectedEventReasonDesc); */
   };
 
   // En VentaFormModal

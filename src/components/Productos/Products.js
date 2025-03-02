@@ -57,7 +57,7 @@ const Products = () => {
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };
-
+  console.log("keys ", keys);
   return (
     <div className="containerSelected">
       <div className="headerSelected">
@@ -104,7 +104,14 @@ const Products = () => {
                         column !== "producto_id" && column !== "categoria_id"
                     ) //filtro para que no aparezca la columna producto_id
                     .map((column) => (
-                      <td key={`${dato.producto_id}-${column}`}>
+                      <td
+                        style={{
+                          color:
+                            column == "Stock" && dato[column] <= 0 && "red",
+                          fontWeight: column == "Stock" && "bold",
+                        }}
+                        key={`${dato.producto_id}-${column}`}
+                      >
                         {dato[column]}
                       </td>
                     ))}
