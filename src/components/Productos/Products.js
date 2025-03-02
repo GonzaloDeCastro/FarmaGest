@@ -97,7 +97,12 @@ const Products = () => {
               />
             ) : Products?.initialState?.length > 0 ? (
               Products?.initialState?.map((dato) => (
-                <tr key={dato.producto_id}>
+                <tr
+                  key={dato.producto_id}
+                  style={{
+                    backgroundColor: dato.Stock <= 0 && "#f8d7da",
+                  }}
+                >
                   {keys
                     ?.filter(
                       (column) =>
@@ -107,8 +112,8 @@ const Products = () => {
                       <td
                         style={{
                           color:
-                            column == "Stock" && dato[column] <= 0 && "red",
-                          fontWeight: column == "Stock" && "bold",
+                            column === "Stock" && dato[column] <= 0 && "red",
+                          fontWeight: column === "Stock" && "bold",
                         }}
                         key={`${dato.producto_id}-${column}`}
                       >
