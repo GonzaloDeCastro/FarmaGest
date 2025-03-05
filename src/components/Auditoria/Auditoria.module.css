@@ -77,4 +77,10 @@
     height: 80px;
     padding: 8px;
   }
+  .containerTableAndPagesSelected {
+    width: 100%;
+    max-width: 1800px; /* Define un límite máximo para la tabla */
+    margin: auto; /* Centra la tabla si el contenedor es más grande */
+    overflow-x: auto; /* Activa el scroll horizontal si es necesario */
+  }
 }
