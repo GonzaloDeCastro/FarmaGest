@@ -249,7 +249,7 @@ const Reportes = () => {
                   options={optionEntities && optionEntities}
                   placeholder={
                     entitySelected === "Cliente"
-                      ? "Selectcionar Cliente"
+                      ? "Seleccionar Cliente"
                       : entitySelected === "Vendedor"
                       ? "Selectcionar Vendedor"
                       : entitySelected === "Producto" && "Selectcionar Producto"

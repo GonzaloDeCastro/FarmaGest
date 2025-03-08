@@ -5,6 +5,7 @@ import { FaPlusCircle, FaSave } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { addVentaAPI, getUltimaVentaAPI } from "../../redux/ventasSlice";
 import { getClientesAPI } from "../../redux/clientesSlice";
+import { getObrasSocialesAPI } from "../../redux/obrasSocialesSlice";
 import Select from "react-select";
 import AgregarItems from "./AgregarItems";
 import { FaRegTrashAlt } from "react-icons/fa";
@@ -15,6 +16,7 @@ const VentaFormModal = ({ usuarioId }) => {
   const [show, setShow] = useState(false);
   const [cliente, setCliente] = useState(0);
   const [itemsAgregados, setItemsAgregados] = useState([]);
+  const [obraSocial, setObraSocial] = useState([]);
   const [total, setTotal] = useState(0);
   const today = new Date();
 
@@ -35,6 +37,13 @@ const VentaFormModal = ({ usuarioId }) => {
   const clientes = useSelector(
     (state) => state && state.cliente && state.cliente
   );
+  const obrasSociales = useSelector(
+    (state) =>
+      state &&
+      state.cliente &&
+      state.obrasocial &&
+      state.obrasocial.initialState
+  );
   const ultimaVenta = useSelector(
     (state) => state && state.venta && state.venta.ultimaVentaState
   );
@@ -43,6 +52,7 @@ const VentaFormModal = ({ usuarioId }) => {
   useEffect(() => {
     dispatch(getClientesAPI());
     dispatch(getUltimaVentaAPI());
+    dispatch(getObrasSocialesAPI(0, 999));
   }, [dispatch, items, show]);
 
   let optionsClientes =
@@ -53,7 +63,15 @@ const VentaFormModal = ({ usuarioId }) => {
     }));
 
   const handleCliente = (event) => {
-    setCliente(event.target.value);
+    const selectedCliente = event.target.value;
+    setCliente(selectedCliente);
+    const obraSocialID = clientes?.initialState?.find(
+      (c) => c.cliente_id == selectedCliente
+    ).obra_social_id;
+    const obraSocialEncontrada =
+      obrasSociales &&
+      obrasSociales?.find((o) => o.obra_social_id == obraSocialID);
+    setObraSocial(obraSocialEncontrada);
   };
 
   // En VentaFormModal
@@ -109,7 +127,7 @@ const VentaFormModal = ({ usuarioId }) => {
   const handleSelectDateFrom = (e) => {
     setDateSelectedFrom(e.target.value);
   };
-
+  console.log("obraSocial ", obraSocial);
   return (
     <>
       <div onClick={handleShow} className="buttonNewItem">
@@ -166,10 +184,11 @@ const VentaFormModal = ({ usuarioId }) => {
                       })
                     }
                     options={optionsClientes}
-                    placeholder="Selectcionar Cliente"
+                    placeholder="Seleccionar Cliente"
                     classNamePrefix="react-select"
                   />
                 )}
+                {}
               </div>
             </Form.Group>
 
