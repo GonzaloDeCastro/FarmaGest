@@ -8,6 +8,7 @@ import ventaDataSlice from "../redux/ventasSlice";
 import reporteDataSlice from "../redux/reportesSlice";
 import auditoriaProductosDataSlice from "../redux/auditoriaProductosSlice";
 import auditoriaClientesDataSlice from "../redux/auditoriaClientesSlice";
+import auditoriaObrasSocialesDataSlice from "../redux/auditoriaObrasSocialesSlice";
 import sesionesDataSlice from "../redux/sesionesSlice";
 
 export default configureStore({
@@ -21,6 +22,7 @@ export default configureStore({
     reporte: reporteDataSlice,
     auditoriaProductos: auditoriaProductosDataSlice,
     auditoriaClientes: auditoriaClientesDataSlice,
+    auditoriaObrasSociales: auditoriaObrasSocialesDataSlice,
     sesiones: sesionesDataSlice,
   },
 });

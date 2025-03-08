@@ -16,6 +16,7 @@ const ObrasSociales = () => {
   const [search, setSearch] = useState("");
   const logged = JSON.parse(sessionStorage.getItem("logged"));
   const sesion = logged?.sesion?.sesion_id;
+  const usuarioId = logged?.sesion?.usuario_id;
   const pageSize = 8;
 
   useEffect(() => {
@@ -32,6 +33,7 @@ const ObrasSociales = () => {
   );
 
   const handleDelete = (dato) => {
+    const datoWithUserId = { ...dato, usuario_id: usuarioId };
     Swal.fire({
       title: "Advertencia!",
       text: `¿Está seguro que desea eliminar la obra social ${dato.obra_social}?`,
@@ -41,7 +43,7 @@ const ObrasSociales = () => {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        const action = deleteObraSocialAPI(dato.obra_social_id);
+        const action = deleteObraSocialAPI(datoWithUserId);
         dispatch(action);
       }
     });
@@ -68,7 +70,7 @@ const ObrasSociales = () => {
           />
         </div>
         <div style={{ display: "flex" }}>
-          <ObraSocialForm />
+          <ObraSocialForm usuarioId={usuarioId} />
         </div>
       </div>
       <div className="containerTableAndPagesSelected">
@@ -109,7 +111,10 @@ const ObrasSociales = () => {
                       flexWrap: "nowrap",
                     }}
                   >
-                    <EditObraSocialForm obraSocialSelected={dato} />
+                    <EditObraSocialForm
+                      obraSocialSelected={dato}
+                      usuarioId={usuarioId}
+                    />
                     <FaRegTrashCan
                       className="iconABM"
                       onClick={() => handleDelete(dato)}

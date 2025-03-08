@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAuditoriaProductosAPI } from "../../redux/auditoriaProductosSlice";
 import { getAuditoriaClientesAPI } from "../../redux/auditoriaClientesSlice";
+import { getAuditoriaObrasSocialesAPI } from "../../redux/auditoriaObrasSocialesSlice";
 import { formatDate } from "../../functions/formatDate";
 import { useNavigate } from "react-router-dom";
 import styles from "./Auditoria.module.css";
@@ -23,6 +24,9 @@ const Auditoria = () => {
   // 📌 Obtener datos de Redux
   const auditoriaProductos = useSelector((state) => state.auditoriaProductos);
   const auditoriaClientes = useSelector((state) => state.auditoriaClientes);
+  const auditoriaObrasSociales = useSelector(
+    (state) => state.auditoriaObrasSociales
+  );
 
   // 📌 Efecto para cargar la auditoría
   useEffect(() => {
@@ -31,6 +35,8 @@ const Auditoria = () => {
         await dispatch(getAuditoriaProductosAPI(page, pageSize, search));
       } else if (auditoria == 1) {
         await dispatch(getAuditoriaClientesAPI(page, pageSize, search));
+      } else if (auditoria == 2) {
+        await dispatch(getAuditoriaObrasSocialesAPI(page, pageSize, search));
       }
     };
 
@@ -43,8 +49,15 @@ const Auditoria = () => {
       setEntidad(auditoriaProductos.initialState || []);
     } else if (auditoria == 1) {
       setEntidad(auditoriaClientes.initialState || []);
+    } else if (auditoria == 2) {
+      setEntidad(auditoriaObrasSociales.initialState || []);
     }
-  }, [auditoria, auditoriaProductos, auditoriaClientes]);
+  }, [
+    auditoria,
+    auditoriaProductos,
+    auditoriaClientes,
+    auditoriaObrasSociales,
+  ]);
 
   // 📌 Obtener las claves de la entidad (si existen datos)
   const keys = entidad.length > 0 ? Object.keys(entidad[0]) : [];
@@ -66,7 +79,7 @@ const Auditoria = () => {
             type="text"
             value={search}
             onChange={handleSearchChange}
-            placeholder="Buscar..."
+            placeholder=" &#xF002; Buscar..."
           />
         </div>
         <div style={{ display: "flex" }}>
@@ -78,6 +91,7 @@ const Auditoria = () => {
           >
             <option value={0}>Tabla Productos</option>
             <option value={1}>Tabla Clientes</option>
+            <option value={2}>Tabla Obras Sociales</option>
           </select>
           <select
             onChange={(e) => setShowBy(Number(e.target.value))}

@@ -108,14 +108,15 @@ export const addObraSocialAPI = (obraSocialData) => {
   };
 };
 
-export const deleteObraSocialAPI = (obraSocialId) => {
+export const deleteObraSocialAPI = (dato) => {
   return async (dispatch) => {
     try {
-      const response = await axios.delete(
-        `${API}/obras-sociales/${obraSocialId}`
+      const response = await axios.put(
+        `${API}/obras-sociales/delete/${dato.obra_social_id}`,
+        dato
       );
       if (response.status === 200) {
-        dispatch(deleteObraSocial(obraSocialId));
+        dispatch(deleteObraSocial(dato.obra_social_id));
         Swal.fire({
           icon: "success",
           title: "Obra social eliminada",

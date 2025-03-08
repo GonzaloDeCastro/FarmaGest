@@ -5,7 +5,7 @@ import { addObraSocialAPI } from "../../redux/obrasSocialesSlice";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 
-const ObraSocialForm = () => {
+const ObraSocialForm = ({ usuarioId }) => {
   const dispatch = useDispatch();
   const [show, setShow] = React.useState(false);
 
@@ -34,6 +34,7 @@ const ObraSocialForm = () => {
           plan: data.plan,
           descuento: data.descuento,
           codigo: data.codigo,
+          usuario_id: usuarioId,
         })
       );
       handleClose();

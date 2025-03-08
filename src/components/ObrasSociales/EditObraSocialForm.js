@@ -5,7 +5,7 @@ import { editObraSocialAPI } from "../../redux/obrasSocialesSlice";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 
-const EditObraSocialForm = ({ obraSocialSelected }) => {
+const EditObraSocialForm = ({ obraSocialSelected, usuarioId }) => {
   const dispatch = useDispatch();
   const [show, setShow] = React.useState(false);
 
@@ -36,6 +36,7 @@ const EditObraSocialForm = ({ obraSocialSelected }) => {
           plan: data.plan,
           descuento: data.descuento,
           codigo: data.codigo,
+          usuario_id: usuarioId,
         })
       );
       handleClose();
