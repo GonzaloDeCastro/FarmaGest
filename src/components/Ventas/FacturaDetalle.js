@@ -108,22 +108,25 @@ const FacturaDetalle = ({ ventaId }) => {
                 ))}
               </tbody>
             </table>{" "}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
-                fontSize: "1.2rem",
-                fontWeight: "bold",
-                color: "#333",
-                backgroundColor: "#f9f9f9",
-                padding: "10px 15px",
-                borderRadius: "5px",
-                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-              }}
-            >
-              Total:${facturaDetalle?.total}
-            </div>
+            <>
+              <div className={styles.contenedorTotal}>
+                Total sin descuento:
+                <span className={styles.valorSubTotal}>
+                  ${facturaDetalle?.total_sin_descuento}
+                </span>
+              </div>
+
+              <div className={styles.contenedorTotal}>
+                Descuento aplicado:
+                <span className={styles.valorDescuento}>
+                  {facturaDetalle?.descuento}%
+                </span>
+                Total:
+                <span className={styles.valorTotal}>
+                  ${facturaDetalle?.total}
+                </span>
+              </div>
+            </>
           </div>
         </Modal.Body>
         <Modal.Footer>

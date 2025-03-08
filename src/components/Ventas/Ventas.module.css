@@ -36,3 +36,69 @@
   padding-left: 10px;
   margin-right: 40px;
 }
+.contenedorTotal {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+  background-color: #f9f9f9;
+  padding: 10px 15px;
+  border-radius: 5px;
+
+  width: 100%;
+  margin-top: 10px;
+  max-width: 500px; /* Evita que se expanda demasiado */
+  overflow: hidden;
+  white-space: nowrap; /* Evita que el texto se desborde */
+}
+
+.contenedorResumen {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 8px;
+  background: #f8f9fa; /* Color suave de fondo */
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+  width: 100%;
+  max-width: 450px; /* Controlar el ancho */
+}
+
+.subTotal {
+  color: #333;
+}
+
+.valorSubTotal {
+  color: #007fff;
+  font-size: 22px;
+  font-weight: bold;
+  background-color: #baddff;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.total {
+  color: #333;
+  margin-left: 15px;
+  white-space: nowrap;
+}
+
+.valorTotal {
+  color: #28a745;
+  font-size: 22px;
+  font-weight: bold;
+  background-color: #d4edda;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.valorDescuento {
+  font-weight: bold;
+  color: #d9534f; /* Rojo para destacar descuentos */
+  margin-left: 5px;
+  margin-right: 10px;
+}

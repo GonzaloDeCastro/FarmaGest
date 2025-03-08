@@ -11,7 +11,6 @@ import { getReportesAPI } from "../../redux/reportesSlice";
 import { FaTableList } from "react-icons/fa6";
 import { BiBarChartAlt2 } from "react-icons/bi";
 import Swal from "sweetalert2";
-import { formatDate } from "../../functions/formatDate";
 
 const Reportes = () => {
   const dispatch = useDispatch();
@@ -172,7 +171,7 @@ const Reportes = () => {
   const [contador, setContador] = useState(0);
 
   return (
-    <div className="containerSelected">
+    <div className={styles.containerSelected}>
       <div className={styles.containerHeader}>
         <div className={styles.header}>
           <div className={styles.containerDate}>
@@ -385,7 +384,7 @@ const Reportes = () => {
               {reportes && reportes.length > 0 ? (
                 reportes.map((reporte, index) => (
                   <tr key={index}>
-                    <td>{formatDate(reporte.fecha)}</td>
+                    <td>{reporte.fecha.slice(0, 10)}</td>
                     <td>{reporte.cantidad_ventas}</td>
                     <td>${reporte.monto_total}</td>
                   </tr>

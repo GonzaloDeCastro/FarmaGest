@@ -53,6 +53,8 @@ const Ventas = () => {
               <th>Número Factura</th>
               <th>Cliente</th>
               <th>Usuario</th>
+              <th>Total sin descuento</th>
+              <th>Descuento</th>
               <th>Total</th>
               <th>Opciones</th>
             </tr>
@@ -64,6 +66,8 @@ const Ventas = () => {
                 <td>{venta.numero_factura}</td>
                 <td>{`${venta.cliente_nombre} ${venta.cliente_apellido}`}</td>
                 <td>{`${venta.usuario_nombre} ${venta.usuario_apellido}`}</td>
+                <td>${venta.total_sin_descuento}</td>
+                <td>{venta.descuento}%</td>
                 <td>${venta.total}</td>
                 <td>
                   {/* <EditVentaForm venta={venta} /> */}

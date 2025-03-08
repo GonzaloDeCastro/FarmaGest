@@ -77,7 +77,6 @@ export const verFacturaVentaAPI = (ventaId) => async (dispatch) => {
 };
 
 export const addVentaAPI = (ventaData) => {
-  console.log("object", ventaData);
   return async (dispatch) => {
     try {
       const response = await axios.post(`${API}/ventas`, ventaData);
