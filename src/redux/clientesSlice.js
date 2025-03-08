@@ -134,8 +134,9 @@ export const addClienteAPI = (clienteData) => {
 export const deleteClienteAPI = (clienteData) => {
   return async (dispatch) => {
     try {
-      const response = await axios.delete(
-        `${API}/clientes/${clienteData.cliente_id}`
+      const response = await axios.put(
+        `${API}/clientes/delete/${clienteData.cliente_id}`,
+        clienteData
       );
 
       if (response.status === 200) {

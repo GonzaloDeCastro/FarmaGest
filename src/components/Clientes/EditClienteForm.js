@@ -5,7 +5,12 @@ import { useDispatch } from "react-redux";
 import { editClienteAPI } from "../../redux/clientesSlice";
 import { useForm } from "react-hook-form";
 
-const EditClienteForm = ({ clienteSelected, ObrasSociales, Ciudades }) => {
+const EditClienteForm = ({
+  clienteSelected,
+  ObrasSociales,
+  Ciudades,
+  usuarioId,
+}) => {
   const dispatch = useDispatch();
   const [show, setShow] = React.useState(false);
 
@@ -57,6 +62,7 @@ const EditClienteForm = ({ clienteSelected, ObrasSociales, Ciudades }) => {
           Ciudad:
             Ciudades.find((c) => c.ciudad_id === Number(data.ciudadID))
               ?.ciudad || "",
+          usuario_id: usuarioId,
         })
       );
       handleClose();

@@ -57,7 +57,7 @@ const Products = () => {
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };
-  console.log("keys ", keys);
+  console.log("Products ", Products);
   return (
     <div className="containerSelected">
       <div className="headerSelected">

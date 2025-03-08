@@ -75,6 +75,7 @@ const EditProductFormModal = ({ productSelected, Categorias, usuarioId }) => {
                   {...register("productoNombre", {
                     required: "Este campo es obligatorio",
                   })}
+                  autoFocus
                 />
                 {errors.productoNombre && (
                   <p className="text-danger">{errors.productoNombre.message}</p>

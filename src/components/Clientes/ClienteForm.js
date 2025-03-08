@@ -5,7 +5,7 @@ import { addClienteAPI } from "../../redux/clientesSlice";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 
-const ClienteFormModal = ({ Ciudades, ObrasSociales }) => {
+const ClienteFormModal = ({ Ciudades, ObrasSociales, usuarioId }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
 
@@ -45,6 +45,7 @@ const ClienteFormModal = ({ Ciudades, ObrasSociales }) => {
           Ciudad:
             Ciudades.find((c) => c.ciudad_id === Number(data.ciudadID))
               ?.ciudad || "",
+          usuario_id: usuarioId,
         })
       );
       handleClose();

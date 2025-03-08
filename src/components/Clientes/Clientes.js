@@ -19,7 +19,9 @@ const Clientes = () => {
   const [obraSocialID, setObraSocialID] = useState(0);
   const [ciudadID, setCiudadID] = useState(0);
   const pageSize = 8;
+
   const logged = JSON.parse(sessionStorage.getItem("logged"));
+  const usuarioId = logged?.sesion?.usuario_id;
   const sesion = logged?.sesion?.sesion_id;
   const clientes = useSelector(
     (state) => state && state.cliente && state.cliente
@@ -44,6 +46,7 @@ const Clientes = () => {
   );
 
   const handleDelete = (cliente) => {
+    const datoWithUserId = { ...cliente, usuario_id: usuarioId };
     Swal.fire({
       title: "Advertencia!",
       text: `¿Está seguro que desea eliminar al cliente ${cliente.Nombre} ${cliente.Apellido}?`,
@@ -53,7 +56,7 @@ const Clientes = () => {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(deleteClienteAPI(cliente));
+        dispatch(deleteClienteAPI(datoWithUserId));
       }
     });
   };
@@ -90,6 +93,7 @@ const Clientes = () => {
           <ClienteForm
             ObrasSociales={ObrasSociales && ObrasSociales}
             Ciudades={Ciudades && Ciudades}
+            usuarioId={usuarioId}
           />
         </div>
       </div>
@@ -147,6 +151,7 @@ const Clientes = () => {
                       clienteSelected={cliente}
                       ObrasSociales={ObrasSociales && ObrasSociales}
                       Ciudades={Ciudades && Ciudades}
+                      usuarioId={usuarioId}
                     />
                     <FaRegTrashAlt
                       className="iconABM"

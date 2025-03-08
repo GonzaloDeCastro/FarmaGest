@@ -81,6 +81,7 @@ const ProductFormModal = ({ Categorias, usuarioId }) => {
                   {...register("productoNombre", {
                     required: "Este campo es requerido",
                   })}
+                  autoFocus
                 />
                 {errors.productoNombre && (
                   <p style={{ color: "red" }}>

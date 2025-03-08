@@ -72,6 +72,7 @@ const ObraSocialForm = () => {
                   {...register("obraSocial", {
                     required: "Este campo es obligatorio",
                   })}
+                  autoFocus
                 />
                 {errors.obraSocial && (
                   <p className="text-danger">{errors.obraSocial.message}</p>

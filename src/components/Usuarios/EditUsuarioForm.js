@@ -86,6 +86,7 @@ const EditUsuarioFormModal = ({ usuarioSelected, Roles }) => {
                   id="nombre"
                   className="form-control"
                   {...register("nombre", { required: true })}
+                  autoFocus
                 />
                 {errors.nombre && (
                   <p style={{ color: "#b70f0a", fontWeight: "bold" }}>

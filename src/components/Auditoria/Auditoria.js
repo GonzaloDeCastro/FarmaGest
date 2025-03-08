@@ -2,45 +2,61 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAuditoriaProductosAPI } from "../../redux/auditoriaProductosSlice";
+import { getAuditoriaClientesAPI } from "../../redux/auditoriaClientesSlice";
 import { formatDate } from "../../functions/formatDate";
 import { useNavigate } from "react-router-dom";
 import styles from "./Auditoria.module.css";
 
-const AuditoriaProductos = () => {
+const Auditoria = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // 📌 Estados del componente
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [showBy, setShowBy] = useState(0);
+  const [auditoria, setAuditoria] = useState(0);
+  const [entidad, setEntidad] = useState([]); // Inicializamos vacío
+
   const pageSize = 8;
-  const navigate = useNavigate();
-  const auditoriaProductos = useSelector(
-    (state) => state && state.auditoriaProductos && state.auditoriaProductos
-  );
 
+  // 📌 Obtener datos de Redux
+  const auditoriaProductos = useSelector((state) => state.auditoriaProductos);
+  const auditoriaClientes = useSelector((state) => state.auditoriaClientes);
+
+  // 📌 Efecto para cargar la auditoría
   useEffect(() => {
-    dispatch(getAuditoriaProductosAPI(page, pageSize, search));
-  }, [dispatch, page, pageSize, search]);
+    const fetchAuditoria = async () => {
+      if (auditoria == 0) {
+        await dispatch(getAuditoriaProductosAPI(page, pageSize, search));
+      } else if (auditoria == 1) {
+        await dispatch(getAuditoriaClientesAPI(page, pageSize, search));
+      }
+    };
 
-  const keys = Object.keys(
-    (auditoriaProductos &&
-      auditoriaProductos.initialState &&
-      auditoriaProductos.initialState[0]) ||
-      {}
-  );
+    fetchAuditoria();
+  }, [dispatch, page, pageSize, search, auditoria]);
 
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-  };
-
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
-  };
+  // 📌 Efecto para actualizar `entidad` cuando los datos cambian
   useEffect(() => {
-    if (showBy == 1) {
-      navigate(`/sesiones`);
+    if (auditoria == 0) {
+      setEntidad(auditoriaProductos.initialState || []);
+    } else if (auditoria == 1) {
+      setEntidad(auditoriaClientes.initialState || []);
     }
+  }, [auditoria, auditoriaProductos, auditoriaClientes]);
+
+  // 📌 Obtener las claves de la entidad (si existen datos)
+  const keys = entidad.length > 0 ? Object.keys(entidad[0]) : [];
+
+  // 📌 Manejo de eventos
+  const handleSearchChange = (e) => setSearch(e.target.value);
+  const handlePageChange = (newPage) => setPage(newPage);
+
+  useEffect(() => {
+    if (showBy == 1) navigate(`/sesiones`);
   }, [showBy]);
-  console.log("showBy auditoria", showBy);
+
   return (
     <div className="containerSelected">
       <div className="headerSelected">
@@ -50,57 +66,75 @@ const AuditoriaProductos = () => {
             type="text"
             value={search}
             onChange={handleSearchChange}
-            placeholder="&#xF002; Buscar..."
+            placeholder="Buscar..."
           />
         </div>
-        <select
-          onChange={(e) => setShowBy(e.target.value)}
-          className="buttonSelect"
-          defaultValue={showBy}
-        >
-          <option value={0}>Auditoria</option>
-          <option value={1}>Sesiones</option>
-        </select>
+        <div style={{ display: "flex" }}>
+          <select
+            onChange={(e) => setAuditoria(Number(e.target.value))}
+            className="buttonSelect"
+            value={auditoria}
+            style={{ marginRight: "10px" }}
+          >
+            <option value={0}>Tabla Productos</option>
+            <option value={1}>Tabla Clientes</option>
+          </select>
+          <select
+            onChange={(e) => setShowBy(Number(e.target.value))}
+            className="buttonSelect"
+            value={showBy}
+          >
+            <option value={0}>Auditoría</option>
+            <option value={1}>Sesiones</option>
+          </select>
+        </div>
       </div>
+
+      {/* 📌 Tabla de auditoría */}
       <div className={styles.containerTableAndPagesSelected}>
         <table className={styles.headerTable}>
           <thead>
             <tr>
-              {keys.map((column) => {
-                return <th key={column}>{column}</th>;
-              })}
+              {keys.map((column) => (
+                <th key={column}>{column}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {auditoriaProductos &&
-            auditoriaProductos.initialState &&
-            auditoriaProductos.initialState.length === 0 ? (
+            {entidad.length === 0 ? (
               <tr>
                 <td colSpan={keys.length + 1} className="NoData">
                   Sin datos
                 </td>
               </tr>
             ) : (
-              auditoriaProductos &&
-              auditoriaProductos.initialState &&
-              auditoriaProductos.initialState.map((auditoria, index) => (
+              entidad.map((auditoria, index) => (
                 <tr key={index}>
-                  {keys.map((column) => {
-                    return (
-                      <td key={`${auditoria.id}-${column}`}>
-                        {column == "Fecha"
-                          ? formatDate(auditoria[column])
-                          : auditoria[column]}
-                      </td>
-                    );
-                  })}
+                  {keys.map((column) => (
+                    <td
+                      style={{
+                        width:
+                          column == "Fecha" || column == "Accion"
+                            ? "10%"
+                            : (column == "Producto" || column == "Nombre") &&
+                              "15%",
+                      }}
+                      key={`${auditoria.id}-${column}`}
+                    >
+                      {column == "Fecha"
+                        ? formatDate(auditoria[column])
+                        : auditoria[column]}
+                    </td>
+                  ))}
                 </tr>
               ))
             )}
           </tbody>
         </table>
       </div>
-      <div /* style={{ border: "solid 1px" }} */>
+
+      {/* 📌 Paginación */}
+      <div>
         <button
           onClick={() => handlePageChange(page - 1)}
           disabled={page === 1}
@@ -111,11 +145,7 @@ const AuditoriaProductos = () => {
         <button
           onClick={() => handlePageChange(page + 1)}
           style={{ marginLeft: "10px" }}
-          disabled={
-            auditoriaProductos &&
-            auditoriaProductos.initialState &&
-            auditoriaProductos.initialState.length < pageSize
-          }
+          disabled={entidad.length < pageSize}
           className="buttonPage"
         >
           Siguiente
@@ -125,4 +155,4 @@ const AuditoriaProductos = () => {
   );
 };
 
-export default AuditoriaProductos;
+export default Auditoria;

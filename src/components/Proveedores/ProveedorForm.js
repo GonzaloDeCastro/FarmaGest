@@ -60,6 +60,7 @@ const ProveedorForm = () => {
                   {...register("razon_social", {
                     required: "Este campo es requerido",
                   })}
+                  autoFocus
                 />
                 {errors.razon_social && (
                   <p style={{ color: "red" }}>{errors.razon_social.message}</p>

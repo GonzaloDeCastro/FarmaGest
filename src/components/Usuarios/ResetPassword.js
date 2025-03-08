@@ -79,6 +79,7 @@ const ResetPassword = ({ userID, userSelected, permissions_code }) => {
               value={password}
               onChange={handleChangePassword}
               autoComplete="new-password"
+              autoFocus
             />
           </div>
           <div className="form-group">
