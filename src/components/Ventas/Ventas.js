@@ -68,7 +68,10 @@ const Ventas = () => {
                 <td>
                   {/* <EditVentaForm venta={venta} /> */}
                   <div style={{ display: "flex" }}>
-                    <FacturaDetalle ventaId={venta.venta_id} />
+                    <FacturaDetalle
+                      ventaId={venta.venta_id}
+                      total={venta.total}
+                    />
                     <MdReceiptLong
                       data-tooltip-id="my-tooltip-NC"
                       data-tooltip-content="Nota de Crédito"

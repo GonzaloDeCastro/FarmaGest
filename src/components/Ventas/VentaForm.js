@@ -109,11 +109,14 @@ const VentaFormModal = ({ usuarioId }) => {
   }, [itemsAgregados]);
 
   const handleCrearFactura = () => {
+    let totalConDescuento = (total * (1 - obraSocial.Descuento)).toFixed(2);
+    let totalSinDescuento = total.toString();
     dispatch(
       addVentaAPI({
         cliente_id: cliente,
         itemsAgregados,
-        total,
+        totalConDescuento,
+        totalSinDescuento,
         usuario_id: usuarioId,
         numero_factura: ultimaVenta && ultimaVenta?.venta_id + 1,
         fecha_hora: dateSelectedFrom,
@@ -127,7 +130,7 @@ const VentaFormModal = ({ usuarioId }) => {
   const handleSelectDateFrom = (e) => {
     setDateSelectedFrom(e.target.value);
   };
-  console.log("obraSocial ", obraSocial);
+
   return (
     <>
       <div onClick={handleShow} className="buttonNewItem">
@@ -190,6 +193,57 @@ const VentaFormModal = ({ usuarioId }) => {
                 )}
                 {}
               </div>
+
+              {cliente !== 0 && (
+                <div
+                  className="form-group col-md-6"
+                  style={{ width: "30%", fontSize: "15px", marginLeft: "10px" }}
+                >
+                  <label style={{ display: "block", marginLeft: "10px" }}>
+                    Obra Social:
+                  </label>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center", // Alinea con los demás elementos
+                      marginLeft: "10px",
+                      padding: "5px 15px",
+                      borderRadius: "8px",
+                      background: "linear-gradient(135deg, #ff9800, #ff5722)", // Gradiente llamativo
+                      color: "white",
+                      fontWeight: "bold",
+                      boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "16px",
+                        margin: "0",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {obraSocial.obra_social}
+                    </div>
+                    <div
+                      style={{
+                        marginLeft: "10px",
+                        fontSize: "16px",
+                        fontWeight: "bold",
+                        backgroundColor: "#fff",
+                        color: "#d32f2f",
+                        padding: "3px 8px",
+                        borderRadius: "5px",
+                        boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
+                        whiteSpace: "nowrap",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      🔥 Descuento {obraSocial.Descuento * 100}%
+                    </div>
+                  </div>
+                </div>
+              )}
             </Form.Group>
 
             <Form.Group
@@ -238,8 +292,60 @@ const VentaFormModal = ({ usuarioId }) => {
               >
                 Crear Factura
               </Button>
-              <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-                {`Total: $${total} `}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  padding: "10px 15px",
+                  borderRadius: "8px",
+                  background: "#f8f9fa", // Color suave de fondo
+                  boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)", // Sombra ligera
+                  width: "100%",
+                  maxWidth: "400px", // Controlar el ancho
+                  marginRight: "2.2%",
+                }}
+              >
+                <span style={{ color: "#333" }}>SubTotal:</span>
+                <span
+                  style={{
+                    color: "#007fff",
+                    fontSize: "22px",
+                    fontWeight: "bold",
+                    backgroundColor: "#baddff",
+                    padding: "5px 10px",
+                    borderRadius: "5px",
+                  }}
+                >
+                  ${total.toFixed(2)}
+                </span>
+
+                <span
+                  style={{
+                    color: "#333",
+                    marginLeft: "15px",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Total:
+                </span>
+                <span
+                  style={{
+                    color: "#28a745",
+                    fontSize: "22px",
+                    fontWeight: "bold",
+                    backgroundColor: "#d4edda",
+                    padding: "5px 10px",
+                    borderRadius: "5px",
+                  }}
+                >
+                  $
+                  {total != 0
+                    ? (total * (1 - obraSocial.Descuento)).toFixed(2)
+                    : "0.00"}
+                </span>
               </div>
             </div>
           </Form>
