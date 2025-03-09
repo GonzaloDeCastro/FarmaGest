@@ -5,7 +5,6 @@ import { getVentasAPI } from "../../redux/ventasSlice";
 import { MdReceiptLong } from "react-icons/md";
 import VentaFormModal from "./VentaForm";
 import FacturaDetalle from "./FacturaDetalle";
-import { formatDate } from "../../functions/formatDate";
 
 const Ventas = () => {
   const dispatch = useDispatch();
@@ -62,7 +61,7 @@ const Ventas = () => {
           <tbody>
             {ventas.map((venta) => (
               <tr key={venta.venta_id}>
-                <td>{formatDate(venta.fecha_hora)}</td>
+                <td>{venta.fecha_hora.slice(0, 16).replace("T", " ")}</td>
                 <td>{venta.numero_factura}</td>
                 <td>{`${venta.cliente_nombre} ${venta.cliente_apellido}`}</td>
                 <td>{`${venta.usuario_nombre} ${venta.usuario_apellido}`}</td>

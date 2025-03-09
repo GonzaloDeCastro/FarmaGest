@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getSesionesAPI } from "../../redux/sesionesSlice";
-import { formatDate } from "../../functions/formatDate";
 import { formatString } from "../../functions/formatText";
 import { useNavigate } from "react-router-dom";
 import styles from "./Auditoria.module.css";
@@ -97,7 +96,7 @@ const Sesiones = () => {
                         column == "ultima_actividad"
                           ? sesion[column] == null
                             ? "-"
-                            : formatDate(sesion[column])
+                            : sesion[column].slice(0, 16).replace("T", " ")
                           : sesion[column]}
                       </td>
                     );

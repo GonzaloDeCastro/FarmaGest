@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAuditoriaProductosAPI } from "../../redux/auditoriaProductosSlice";
 import { getAuditoriaClientesAPI } from "../../redux/auditoriaClientesSlice";
 import { getAuditoriaObrasSocialesAPI } from "../../redux/auditoriaObrasSocialesSlice";
-import { formatDate } from "../../functions/formatDate";
 import { useNavigate } from "react-router-dom";
 import styles from "./Auditoria.module.css";
 
@@ -136,7 +135,7 @@ const Auditoria = () => {
                       key={`${auditoria.id}-${column}`}
                     >
                       {column == "Fecha"
-                        ? formatDate(auditoria[column])
+                        ? auditoria[column].slice(0, 16).replace("T", " ")
                         : auditoria[column]}
                     </td>
                   ))}
