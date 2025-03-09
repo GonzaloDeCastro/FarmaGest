@@ -329,6 +329,8 @@
   }
   .container {
     height: 92%;
+    max-width: 1850px;
+    max-height: 870px;
   }
   .chartContainer {
     height: 90%;
