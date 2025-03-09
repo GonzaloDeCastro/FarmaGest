@@ -19,6 +19,8 @@ import PrivateRouteUsuarios from "./PrivateUsuarios";
 import PrivateRouteObrasSociales from "./PrivateObrasSociales";
 import Auditoria from "../components/Auditoria/Auditoria";
 import Sesiones from "../components/Auditoria/Sesiones";
+import ForgotPassword from "../components/login/ForgotPassword";
+import ResetForgottenPassword from "../components/login/ResetForgottenPassword";
 
 const AppRouter = () => {
   const logged = JSON.parse(sessionStorage.getItem("logged"));
@@ -28,6 +30,11 @@ const AppRouter = () => {
         {/* Ruta pública para el formulario de inicio de sesión */}
         <Route element={<PublicRoute logged={logged} />}>
           <Route path="/login" element={<FormLogin />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route
+            path="/reset-password/:token"
+            element={<ResetForgottenPassword />}
+          />
         </Route>
 
         {/* Rutas privadas */}

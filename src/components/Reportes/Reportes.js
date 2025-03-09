@@ -145,13 +145,28 @@ const Reportes = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, `Reportes`);
 
     // Generar el archivo y disparar la descarga
-    XLSX.writeFile(workbook, `${fileName}-${data[0].fecha.toString()}.xlsx`);
+    XLSX.writeFile(workbook, `${fileName}.xlsx`);
   };
 
   const handleExportExcel = (data, fileName) => {
+    let mensajeExportar;
+
+    if (dateSelectedFrom != "" && dateSelectedTo != "") {
+      mensajeExportar = `¿Quieres exportar los datos con desde la fecha <b>${dateSelectedFrom}</b> hasta la fecha <b>${dateSelectedTo}</b> a un archivo  en Excel?`;
+      fileName = `${fileName}-desde-${dateSelectedFrom}-hasta-${dateSelectedTo}`;
+    } else if (dateSelectedFrom != "" && dateSelectedTo == "") {
+      mensajeExportar = `¿Quieres exportar los datos con desde la fecha <b>${dateSelectedFrom}</b> a un archivo  en Excel?`;
+      fileName = `${fileName}-desde-${dateSelectedFrom}`;
+    } else if (dateSelectedFrom == "" && dateSelectedTo != "") {
+      mensajeExportar = `¿Quieres exportar los datos con hasta la fecha <b>${dateSelectedTo}</b> a un archivo  en Excel?`;
+      fileName = `${fileName}-hasta-${dateSelectedTo}`;
+    } else if (dateSelectedFrom == "" && dateSelectedTo == "") {
+      mensajeExportar = `¿Quieres exportar los datos a un archivo  en Excel?`;
+      fileName = `${fileName}-sin-fecha-seleccionada`;
+    }
     Swal.fire({
       title: "Exportar a Excel",
-      html: `¿Quieres exportar los datos con fecha <b>${data[0].fecha}</b> a un archivo  en Excel?`,
+      html: `${mensajeExportar}`,
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Sí, exportar",
@@ -169,7 +184,8 @@ const Reportes = () => {
   };
 
   const [contador, setContador] = useState(0);
-
+  console.log("dateSelectedFrom ", dateSelectedFrom);
+  console.log("dateSelectedTo ", dateSelectedTo);
   return (
     <div className={styles.containerSelected}>
       <div className={styles.containerHeader}>
