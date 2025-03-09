@@ -22,12 +22,6 @@ export const { getVentas } = reportesSlice.actions;
 export const getReportesAPI =
   (dateSelectedFrom, dateSelectedTo, entitySelected, clienteProductoVendedor) =>
   async (dispatch) => {
-    console.log(
-      dateSelectedFrom,
-      dateSelectedTo,
-      entitySelected,
-      clienteProductoVendedor
-    );
     try {
       const response = await axios.get(`${API}/reportes`, {
         params: {

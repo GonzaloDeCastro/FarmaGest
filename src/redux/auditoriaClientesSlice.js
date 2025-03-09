@@ -31,7 +31,6 @@ export const getAuditoriaClientesAPI = (page, pageSize, search) => {
         },
       });
       if (response.status === 200) {
-        console.log(response.data);
         dispatch(getAuditoriaClientes(response.data));
       }
     } catch (error) {

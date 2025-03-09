@@ -38,7 +38,7 @@ const Sesiones = () => {
       navigate(`/auditoria`);
     }
   }, [showBy]);
-  console.log("showBy sesiones ", showBy);
+
   return (
     <div className="containerSelected">
       <div className="headerSelected">

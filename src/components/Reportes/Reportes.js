@@ -184,8 +184,7 @@ const Reportes = () => {
   };
 
   const [contador, setContador] = useState(0);
-  console.log("dateSelectedFrom ", dateSelectedFrom);
-  console.log("dateSelectedTo ", dateSelectedTo);
+
   return (
     <div className={styles.containerSelected}>
       <div className={styles.containerHeader}>

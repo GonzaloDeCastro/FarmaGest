@@ -18,7 +18,7 @@ const ResetPassword = ({ userID, userSelected, permissions_code }) => {
   const handleShow = () => setShow(true);
 
   const correo = userSelected.Correo;
-  console.log("userSelected ", userSelected);
+
   const handleChangePassword = (e) => setPassword(e.target.value);
   const handleChangeRepeatPassword = (e) => setRepeatPassword(e.target.value);
 
