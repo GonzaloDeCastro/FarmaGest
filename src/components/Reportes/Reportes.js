@@ -18,6 +18,7 @@ const Reportes = () => {
   const reportes = useSelector((state) => state.reporte.initialState || []);
   const [clienteProductoVendedor, setClienteProductoVendedor] = useState("");
   const [grafico, setGrafico] = useState(false);
+  const [disabled, setDisabled] = useState(false);
   const today = new Date();
   const lastTenDays = new Date();
   lastTenDays.setDate(today.getDate() - 10);
@@ -56,10 +57,12 @@ const Reportes = () => {
 
   const handleSelectDateFrom = (e) => {
     setDateSelectedFrom(e.target.value);
+    setDisabled(true);
   };
 
   const handleSelectDateTo = (e) => {
     setDateSelectedTo(e.target.value);
+    setDisabled(true);
   };
 
   const handleChangeEntity = (e) => {
@@ -114,6 +117,7 @@ const Reportes = () => {
   }, [entitySelected, clientes, productos, usuarios]);
 
   const handleAplicar = () => {
+    setDisabled(false);
     dispatch(
       getReportesAPI(
         dateSelectedFrom,
@@ -279,12 +283,21 @@ const Reportes = () => {
           >
             Aplicar
           </button>
+          {disabled && (
+            <div className={styles.warningBox}>
+              ⚠️{" "}
+              <span className={styles.warningText}>
+                Cambia fechas y reaplica.
+              </span>
+            </div>
+          )}
         </div>
+
         <div style={{ display: "flex" }}>
           <button
             className={styles.buttonAplicar}
             onClick={() => handleExportExcel(data, "Reportes")}
-            disabled={reportes.length === 0}
+            disabled={reportes.length === 0 || disabled}
           >
             <SiMicrosoftexcel
               style={{ width: "30px", height: "30px", marginRight: "5px" }}

@@ -299,6 +299,24 @@
   background-color: #f9f9f9; /* Color de fondo para la celda sin datos */
 }
 
+.warningBox {
+  background-color: #fef9c3; /* Amarillo claro */
+  color: #92400e; /* Texto en color amarillo oscuro */
+  padding: 6px; /* Espaciado interno */
+  border-radius: 6px; /* Bordes redondeados */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex; /* Alineación del ícono con el texto */
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-left: 10px;
+  max-width: fit-content; /* Para que no ocupe todo el ancho */
+}
+
+.warningText {
+  margin-left: 6px; /* Espaciado entre el ícono y el texto */
+}
+
 @media screen and (min-width: 1080px) and (min-height: 650px) {
   .headerTable th,
   .headerTable td {
