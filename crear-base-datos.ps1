@@ -80,17 +80,28 @@ if (-not (Test-Path $psqlPath)) {
     exit 1
 }
 
-# Verificar que el script SQL existe
-$scriptPath = Join-Path $PSScriptRoot "crear-base-datos.sql"
-if (-not (Test-Path $scriptPath)) {
-    Write-Host "ERROR: No se encontro el script SQL: $scriptPath" -ForegroundColor Red
-    Write-Host "Por favor, asegurate de que el archivo crear-base-datos.sql existe en el mismo directorio." -ForegroundColor Yellow
+# Verificar que los scripts SQL existen
+$scriptSoloDB = Join-Path $PSScriptRoot "crear-base-datos-solo.sql"
+$scriptEsquema = Join-Path $PSScriptRoot "crear-esquema-farmagest.sql"
+
+if (-not (Test-Path $scriptSoloDB)) {
+    Write-Host "ERROR: No se encontro el script SQL: $scriptSoloDB" -ForegroundColor Red
+    Write-Host "Por favor, asegurate de que el archivo crear-base-datos-solo.sql existe en el mismo directorio." -ForegroundColor Yellow
+    pause
+    exit 1
+}
+
+if (-not (Test-Path $scriptEsquema)) {
+    Write-Host "ERROR: No se encontro el script SQL: $scriptEsquema" -ForegroundColor Red
+    Write-Host "Por favor, asegurate de que el archivo crear-esquema-farmagest.sql existe en el mismo directorio." -ForegroundColor Yellow
     pause
     exit 1
 }
 
 Write-Host ""
-Write-Host "Script SQL encontrado: $scriptPath" -ForegroundColor Green
+Write-Host "Scripts SQL encontrados:" -ForegroundColor Green
+Write-Host "  - $scriptSoloDB" -ForegroundColor Gray
+Write-Host "  - $scriptEsquema" -ForegroundColor Gray
 
 # Solicitar credenciales de PostgreSQL
 Write-Host ""
@@ -165,13 +176,31 @@ if ($dbExists -match "1") {
 }
 
 Write-Host ""
-Write-Host "=== Creando Base de Datos y Tablas ===" -ForegroundColor Cyan
-Write-Host "Esto puede tomar unos momentos..." -ForegroundColor Yellow
+Write-Host "=== Creando Base de Datos ===" -ForegroundColor Cyan
+Write-Host "Paso 1/2: Creando la base de datos..." -ForegroundColor Yellow
 Write-Host ""
 
-# Ejecutar el script SQL
+# Ejecutar el script para crear solo la base de datos
 $env:PGPASSWORD = $dbPassword
-$result = & $psqlPath -U $dbUser -d postgres -f $scriptPath 2>&1
+$result = & $psqlPath -U $dbUser -d postgres -f $scriptSoloDB 2>&1
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host ""
+    Write-Host "[ERROR] Hubo un error al crear la base de datos" -ForegroundColor Red
+    Write-Host "Error: $result" -ForegroundColor Red
+    $env:PGPASSWORD = ""
+    pause
+    exit 1
+}
+
+Write-Host "[OK] Base de datos creada" -ForegroundColor Green
+Write-Host ""
+Write-Host "=== Creando Esquema y Tablas ===" -ForegroundColor Cyan
+Write-Host "Paso 2/2: Creando tablas, índices y datos iniciales..." -ForegroundColor Yellow
+Write-Host ""
+
+# Ejecutar el script para crear el esquema
+$result = & $psqlPath -U $dbUser -d farmagest -f $scriptEsquema 2>&1
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host ""
