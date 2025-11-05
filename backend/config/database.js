@@ -40,15 +40,21 @@ const pool = new Pool({
   connectionTimeoutMillis: 10000, // Aumentado para Render
 });
 
-// Manejo de errores de conexión
+// Manejo de errores de conexión - NO debe detener el servidor
 pool.on('error', (err, client) => {
-  console.error('Error inesperado en el cliente PostgreSQL:', err);
-  process.exit(-1);
+  console.error('⚠️  Error inesperado en el cliente PostgreSQL:', err);
+  // NO hacer process.exit aquí - el servidor debe seguir funcionando
 });
 
-// Función para probar la conexión
+// Función para probar la conexión - NO bloquea el inicio del servidor
 pool.on('connect', () => {
   console.log('✅ Conexión a PostgreSQL establecida');
+});
+
+// Intentar conectar al inicio (opcional, no bloquea)
+pool.connect().catch(err => {
+  console.warn('⚠️  No se pudo conectar a PostgreSQL al inicio:', err.message);
+  console.log('💡 El servidor seguirá funcionando, la conexión se intentará cuando sea necesaria');
 });
 
 // Función para ejecutar queries
