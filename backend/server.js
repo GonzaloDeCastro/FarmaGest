@@ -19,7 +19,6 @@ const reportesRoutes = require('./routes/reportes');
 const auditoriaRoutes = require('./routes/auditoria');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 // Verificar que el puerto esté configurado
 if (!process.env.PORT && process.env.NODE_ENV === 'production') {
@@ -56,7 +55,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// Ruta de salud (health check)
+// Ruta de salud (health check) - conexión lazy a la base de datos
 app.get('/health', async (req, res) => {
   try {
     const result = await query('SELECT NOW()');
@@ -66,6 +65,7 @@ app.get('/health', async (req, res) => {
       timestamp: result.rows[0].now
     });
   } catch (error) {
+    console.error('Error en health check:', error);
     res.status(500).json({
       status: 'ERROR',
       database: 'disconnected',
@@ -102,22 +102,36 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Iniciar servidor
+// Iniciar servidor - DEBE ser lo primero para que Render detecte el puerto
+const PORT = process.env.PORT || 5000;
+
+console.log(`🔍 Iniciando servidor en puerto ${PORT}...`);
+console.log(`🔍 NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
+console.log(`🔍 DATABASE_URL configurada: ${process.env.DATABASE_URL ? 'Sí' : 'No'}`);
+
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor corriendo en http://0.0.0.0:${PORT}`);
   console.log(`📊 Entorno: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 Base de datos: ${process.env.DB_NAME || 'farmagest'}`);
   console.log(`✅ Servidor listo para recibir conexiones`);
+  console.log(`✅ Puerto ${PORT} abierto y escuchando`);
 });
 
 // Manejo de errores del servidor
 server.on('error', (error) => {
+  console.error('❌ Error al iniciar el servidor:', error);
   if (error.code === 'EADDRINUSE') {
     console.error(`❌ Puerto ${PORT} ya está en uso`);
   } else {
     console.error('❌ Error del servidor:', error);
   }
   process.exit(1);
+});
+
+// Verificar que el servidor esté escuchando
+server.on('listening', () => {
+  const addr = server.address();
+  console.log(`✅ Servidor escuchando en ${addr.address}:${addr.port}`);
 });
 
 module.exports = app;

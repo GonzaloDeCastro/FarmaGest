@@ -2,11 +2,16 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
+console.log('🔍 Configurando conexión a PostgreSQL...');
+console.log(`🔍 DATABASE_URL presente: ${process.env.DATABASE_URL ? 'Sí' : 'No'}`);
+
 // Render proporciona DATABASE_URL, si no existe usa variables individuales
 let poolConfig;
 if (process.env.DATABASE_URL) {
   // Detecta si es una conexión externa (Render External DB URL)
   const isExternalConnection = process.env.DATABASE_URL.includes('.render.com');
+  
+  console.log(`🔍 Tipo de conexión: ${isExternalConnection ? 'Externa (Render)' : 'Interna'}`);
   
   // Render usa DATABASE_URL - siempre requiere SSL para conexiones externas
   poolConfig = {
@@ -16,6 +21,7 @@ if (process.env.DATABASE_URL) {
       : false
   };
 } else {
+  console.log('🔍 Usando configuración con variables individuales');
   // Configuración local o con variables individuales
   poolConfig = {
     host: process.env.DB_HOST || 'localhost',
