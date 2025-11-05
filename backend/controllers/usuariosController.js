@@ -103,19 +103,8 @@ const loginUsuario = async (req, res) => {
     
     const usuario = usuarioResult.rows[0];
     
-    // Verificar contraseña (comparar hash)
-    // NOTA: El usuario admin tiene un hash temporal, necesitamos actualizarlo desde el backend
-    // Por ahora, si es el admin@farmagest.com, permitimos cualquier contraseña temporalmente
-    let passwordValid = false;
-    
-    if (usuario.correo === 'admin@farmagest.com') {
-      // Para el admin temporal, verificar si el hash es el temporal o hacer hash de la contraseña
-      // Por ahora, permitimos cualquier contraseña para desarrollo
-      passwordValid = true;
-    } else {
-      // Para otros usuarios, comparar con bcrypt
-      passwordValid = await bcrypt.compare(contrasena, usuario.contrasena);
-    }
+    // Verificar contraseña (comparar hash con bcrypt)
+    const passwordValid = await bcrypt.compare(contrasena, usuario.contrasena);
     
     if (!passwordValid) {
       return res.status(401).json({ mensaje: 'Usuario o contraseña incorrectos' });
