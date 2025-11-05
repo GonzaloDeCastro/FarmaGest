@@ -4,7 +4,7 @@
   "description": "Backend API para FarmaGest - Sistema de gestión de farmacia",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node start.js",
     "dev": "nodemon server.js",
     "migrate": "node scripts/migrate.js",
     "setup-users": "node scripts/setupUsers.js",

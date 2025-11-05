@@ -4,8 +4,12 @@ const cors = require('cors');
 const morgan = require('morgan');
 require('dotenv').config();
 
+console.log('📦 Cargando módulos...');
+
 // Importar configuración de base de datos
 const { query } = require('./config/database');
+
+console.log('📦 Cargando rutas...');
 
 // Importar rutas
 const usuariosRoutes = require('./routes/usuarios');
@@ -17,6 +21,8 @@ const ventasRoutes = require('./routes/ventas');
 const sesionesRoutes = require('./routes/sesiones');
 const reportesRoutes = require('./routes/reportes');
 const auditoriaRoutes = require('./routes/auditoria');
+
+console.log('✅ Todos los módulos cargados correctamente');
 
 const app = express();
 
