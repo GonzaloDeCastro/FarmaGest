@@ -67,5 +67,10 @@ async function setupAdmin() {
   }
 }
 
-setupAdmin();
+// Si se ejecuta como módulo, exportar la función
+if (require.main === module) {
+  setupAdmin();
+} else {
+  module.exports = setupAdmin;
+}
 
