@@ -51,11 +51,8 @@ pool.on('connect', () => {
   console.log('✅ Conexión a PostgreSQL establecida');
 });
 
-// Intentar conectar al inicio (opcional, no bloquea)
-pool.connect().catch(err => {
-  console.warn('⚠️  No se pudo conectar a PostgreSQL al inicio:', err.message);
-  console.log('💡 El servidor seguirá funcionando, la conexión se intentará cuando sea necesaria');
-});
+// NO intentar conectar al inicio - conexión lazy
+// La conexión se establecerá cuando sea necesaria
 
 // Función para ejecutar queries
 const query = async (text, params) => {

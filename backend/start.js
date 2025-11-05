@@ -16,16 +16,20 @@ if (process.env.DATABASE_URL) {
 if (process.env.PORT) {
   console.log(`✅ PORT configurado: ${process.env.PORT}`);
 } else {
-  console.warn('⚠️  PORT no está configurado');
+  console.warn('⚠️  PORT no está configurado - usando puerto por defecto');
 }
 
-// Cargar el servidor
+// Cargar el servidor SIN try-catch para ver errores completos
+console.log('📦 Cargando módulo del servidor...');
+console.log('📂 Directorio actual:', process.cwd());
+console.log('📂 Intentando cargar: ./server.js');
+
 try {
-  console.log('📦 Cargando módulo del servidor...');
   require('./server');
   console.log('✅ Módulo del servidor cargado correctamente');
 } catch (error) {
   console.error('❌ Error al cargar el servidor:', error);
+  console.error('❌ Stack:', error.stack);
   process.exit(1);
 }
 
