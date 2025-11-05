@@ -1,68 +1,76 @@
-// Script para migrar la base de datos en Railway
-// Este script se puede ejecutar desde Railway CLI o localmente con las credenciales de Railway
+// Script de migración para ejecutar el esquema en Render
+// Ejecutar: node backend/scripts/migrate.js
 
-const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
+const { query } = require('../config/database');
 
-// Las credenciales vendrán de las variables de entorno de Railway
-const pool = new Pool({
-  host: process.env.DB_HOST || process.env.PGHOST,
-  port: process.env.DB_PORT || process.env.PGPORT,
-  database: process.env.DB_NAME || process.env.PGDATABASE,
-  user: process.env.DB_USER || process.env.PGUSER,
-  password: process.env.DB_PASSWORD || process.env.PGPASSWORD,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-});
-
-async function migrateDatabase() {
+async function migrate() {
   try {
-    console.log('🔄 Iniciando migración de base de datos...');
+    console.log('🚀 Iniciando migración de base de datos...');
     
     // Leer el archivo SQL
-    const sqlPath = path.join(__dirname, '..', 'crear-todo-farmagest.sql');
-    const sqlContent = fs.readFileSync(sqlPath, 'utf8');
+    const sqlPath = path.join(__dirname, '../../crear-esquema-farmagest.sql');
+    const sql = fs.readFileSync(sqlPath, 'utf8');
     
-    // Dividir por comandos (separados por punto y coma)
-    const commands = sqlContent
+    // Dividir por ; y ejecutar cada comando
+    const commands = sql
       .split(';')
       .map(cmd => cmd.trim())
       .filter(cmd => cmd.length > 0 && !cmd.startsWith('--'));
     
-    console.log(`📝 Ejecutando ${commands.length} comandos SQL...`);
+    console.log(`📋 Ejecutando ${commands.length} comandos SQL...`);
     
     for (let i = 0; i < commands.length; i++) {
       const command = commands[i];
-      if (command.includes('\\c') || command.includes('\\gexec')) {
-        // Ignorar comandos de psql
+      
+      // Saltar comentarios y líneas vacías
+      if (command.startsWith('--') || command.length === 0) {
         continue;
       }
       
       try {
-        await pool.query(command);
-        console.log(`✅ Comando ${i + 1}/${commands.length} ejecutado`);
+        console.log(`\n[${i + 1}/${commands.length}] Ejecutando comando...`);
+        await query(command);
+        console.log(`✅ Comando ${i + 1} ejecutado correctamente`);
       } catch (error) {
-        // Ignorar errores de "ya existe" pero mostrar otros
-        if (!error.message.includes('already exists') && !error.message.includes('duplicate')) {
-          console.warn(`⚠️  Error en comando ${i + 1}:`, error.message);
+        // Si es un error de "ya existe", lo ignoramos
+        if (error.message.includes('already exists') || 
+            error.message.includes('duplicate key') ||
+            error.message.includes('relation already exists')) {
+          console.log(`⚠️  Comando ${i + 1} ya existe (se omite)`);
+        } else {
+          console.error(`❌ Error en comando ${i + 1}:`, error.message);
+          throw error;
         }
       }
     }
     
-    console.log('✅ Migración completada');
+    console.log('\n✅ Migración completada exitosamente!');
     
-    // Ejecutar script de usuarios iniciales
-    console.log('🔐 Configurando usuarios iniciales...');
-    const setupUsers = require('./scripts/setupUsers');
-    await setupUsers();
+    // Verificar que las tablas se crearon
+    const tables = await query(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public'
+      ORDER BY table_name;
+    `);
     
-    console.log('🎉 Base de datos lista!');
+    console.log(`\n📊 Tablas creadas: ${tables.rows.length}`);
+    tables.rows.forEach(table => {
+      console.log(`   - ${table.table_name}`);
+    });
+    
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error en migración:', error);
+    console.error('\n❌ Error en la migración:', error);
     process.exit(1);
   }
 }
 
-migrateDatabase();
+// Ejecutar si se llama directamente
+if (require.main === module) {
+  migrate();
+}
 
+module.exports = migrate;
