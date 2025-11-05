@@ -9,17 +9,18 @@ Railway ofrece un **plan gratuito** con créditos mensuales que es suficiente pa
 ## 🆓 Plan Gratuito de Railway
 
 ### Incluye:
-- **$5 USD en créditos gratis cada mes**
+- **$1 USD en créditos gratis cada mes**
 - **Base de datos PostgreSQL incluida** (sin costo adicional)
 - **Despliegue automático desde GitHub**
 - **Sin límite de proyectos**
 - **Sin tarjeta de crédito requerida** (para empezar)
+- **Límites:** 0.5 GB RAM, 1 vCPU por servicio, 0.5 GB almacenamiento
 
 ### ¿Cuánto cuesta usar Railway?
 
 **Backend Node.js/Express:**
 - Aproximadamente **$0.10 - $0.50 USD/día** dependiendo del uso
-- Con $5 USD gratis = **~10-50 días gratis** al mes
+- Con $1 USD gratis = **~2-10 días gratis** al mes
 
 **PostgreSQL:**
 - **GRATIS** - No consume créditos del plan gratuito
@@ -28,9 +29,9 @@ Railway ofrece un **plan gratuito** con créditos mensuales que es suficiente pa
 ### ¿Cuándo se acaban los créditos?
 
 Si tu backend está corriendo **24/7**:
-- Puede consumir los $5 USD en aproximadamente **10-15 días**
-- Después de eso, Railway pausará tu servicio automáticamente
-- Puedes reactivarlo cuando quieras
+- Puede consumir los $1 USD en aproximadamente **2-10 días** (dependiendo del uso)
+- Después de eso, Railway aplicará cargos según el uso o pausará el servicio
+- Puedes actualizar a plan de pago o usar Render para más horas gratis
 
 ---
 
@@ -107,10 +108,11 @@ Si tu backend está corriendo **24/7**:
 
 **Railway Gratis:**
 - ✅ Sí, es gratuito
-- ✅ $5 USD créditos/mes
+- ✅ $1 USD créditos/mes (actualizado 2024)
 - ✅ PostgreSQL incluido
-- ✅ Suficiente para desarrollo y pruebas
-- ⚠️ Puede agotarse en ~10-15 días si está 24/7
+- ✅ Suficiente para desarrollo y pruebas pequeñas
+- ⚠️ Puede agotarse en ~2-10 días si está 24/7
+- 💡 **Plan Hobby:** $5/mes incluye $5 créditos adicionales
 
 **Recomendación:**
 - Para empezar: **Railway gratuito** ✅
