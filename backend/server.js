@@ -21,6 +21,11 @@ const auditoriaRoutes = require('./routes/auditoria');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Verificar que el puerto esté configurado
+if (!process.env.PORT && process.env.NODE_ENV === 'production') {
+  console.warn('⚠️  PORT no está configurado en producción');
+}
+
 // Middlewares
 app.use(cors({
   origin: process.env.CORS_ORIGIN 
@@ -98,10 +103,21 @@ app.use((err, req, res, next) => {
 });
 
 // Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Servidor corriendo en http://0.0.0.0:${PORT}`);
   console.log(`📊 Entorno: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 Base de datos: ${process.env.DB_NAME || 'farmagest'}`);
+  console.log(`✅ Servidor listo para recibir conexiones`);
+});
+
+// Manejo de errores del servidor
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`❌ Puerto ${PORT} ya está en uso`);
+  } else {
+    console.error('❌ Error del servidor:', error);
+  }
+  process.exit(1);
 });
 
 module.exports = app;

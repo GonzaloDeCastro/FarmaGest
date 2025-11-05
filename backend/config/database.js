@@ -31,7 +31,7 @@ const pool = new Pool({
   ...poolConfig,
   max: 20, // máximo de conexiones en el pool
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 10000, // Aumentado para Render
 });
 
 // Manejo de errores de conexión
