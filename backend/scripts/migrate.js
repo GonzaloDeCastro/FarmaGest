@@ -14,10 +14,32 @@ async function migrate() {
     const sql = fs.readFileSync(sqlPath, 'utf8');
     
     // Dividir por ; y ejecutar cada comando
-    const commands = sql
+    // Remover comentarios de múltiples líneas y líneas de comentario
+    const cleanSql = sql
+      .split('\n')
+      .map(line => {
+        // Remover comentarios de línea
+        const commentIndex = line.indexOf('--');
+        if (commentIndex !== -1) {
+          return line.substring(0, commentIndex);
+        }
+        return line;
+      })
+      .join('\n');
+    
+    const commands = cleanSql
       .split(';')
       .map(cmd => cmd.trim())
-      .filter(cmd => cmd.length > 0 && !cmd.startsWith('--'));
+      .filter(cmd => {
+        // Filtrar comandos vacíos y comentarios
+        if (cmd.length === 0) return false;
+        if (cmd.startsWith('--')) return false;
+        // Filtrar comandos SELECT de verificación al final
+        if (cmd.toUpperCase().includes('SELECT') && cmd.toUpperCase().includes('information_schema')) {
+          return false;
+        }
+        return true;
+      });
     
     console.log(`📋 Ejecutando ${commands.length} comandos SQL...`);
     
@@ -30,18 +52,26 @@ async function migrate() {
       }
       
       try {
-        console.log(`\n[${i + 1}/${commands.length}] Ejecutando comando...`);
+        // Mostrar solo los primeros 50 caracteres del comando para no saturar la consola
+        const commandPreview = command.length > 50 
+          ? command.substring(0, 50) + '...' 
+          : command;
+        console.log(`\n[${i + 1}/${commands.length}] ${commandPreview}`);
         await query(command);
         console.log(`✅ Comando ${i + 1} ejecutado correctamente`);
       } catch (error) {
         // Si es un error de "ya existe", lo ignoramos
         if (error.message.includes('already exists') || 
             error.message.includes('duplicate key') ||
-            error.message.includes('relation already exists')) {
+            error.message.includes('relation already exists') ||
+            error.message.includes('ON CONFLICT') ||
+            error.code === '23505') { // Código de violación de clave única
           console.log(`⚠️  Comando ${i + 1} ya existe (se omite)`);
         } else {
           console.error(`❌ Error en comando ${i + 1}:`, error.message);
-          throw error;
+          console.error(`   Comando completo:`, command.substring(0, 200));
+          // Continuar con el siguiente comando en lugar de fallar completamente
+          console.log(`   Continuando con el siguiente comando...`);
         }
       }
     }

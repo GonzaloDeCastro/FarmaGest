@@ -5,10 +5,15 @@ require('dotenv').config();
 // Render proporciona DATABASE_URL, si no existe usa variables individuales
 let poolConfig;
 if (process.env.DATABASE_URL) {
-  // Render usa DATABASE_URL
+  // Detecta si es una conexión externa (Render External DB URL)
+  const isExternalConnection = process.env.DATABASE_URL.includes('.render.com');
+  
+  // Render usa DATABASE_URL - siempre requiere SSL para conexiones externas
   poolConfig = {
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    ssl: isExternalConnection || process.env.NODE_ENV === 'production' 
+      ? { rejectUnauthorized: false } 
+      : false
   };
 } else {
   // Configuración local o con variables individuales
