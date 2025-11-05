@@ -4,6 +4,9 @@ import { FaPlusCircle, FaSave } from "react-icons/fa";
 import { addProductoAPI } from "../../redux/productosSlice";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
+import ProductoBuilder from "../../patterns/builders/ProductoBuilder";
+import ProductoAdapter from "../../patterns/adapters/ProductoAdapter";
+import Swal from "sweetalert2";
 
 const ProductFormModal = ({ Categorias, usuarioId }) => {
   const dispatch = useDispatch();
@@ -26,21 +29,28 @@ const ProductFormModal = ({ Categorias, usuarioId }) => {
 
   const handleAddProduct = (data) => {
     try {
-      dispatch(
-        addProductoAPI({
-          nombre: data.productoNombre,
-          codigo: data.codigo,
-          marca: data.marca,
-          categoria_id: data.categoriaID === 0 ? null : data.categoriaID,
-          precio: data.precio,
-          stock: data.cantidad,
-          Categoria: data.categoriaDesc,
-          usuario_id: usuarioId,
-        })
-      );
+      // Usar Builder Pattern para construir el objeto de producto
+      const productoData = new ProductoBuilder()
+        .setNombre(data.productoNombre)
+        .setCodigo(data.codigo)
+        .setMarca(data.marca)
+        .setCategoria(data.categoriaID, data.categoriaDesc)
+        .setPrecio(data.precio)
+        .setStock(data.cantidad)
+        .setUsuario(usuarioId)
+        .build();
+
+      // Usar Adapter Pattern para transformar a formato del backend
+      const backendData = ProductoAdapter.toBackendFormat(data, usuarioId);
+      
+      dispatch(addProductoAPI(backendData));
       handleClose();
     } catch (error) {
-      console.error("Error al agregar el producto:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error de validación",
+        text: error.message,
+      });
     }
   };
 

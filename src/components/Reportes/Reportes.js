@@ -11,6 +11,8 @@ import { getReportesAPI } from "../../redux/reportesSlice";
 import { FaTableList } from "react-icons/fa6";
 import { BiBarChartAlt2 } from "react-icons/bi";
 import Swal from "sweetalert2";
+import { VisualizationStrategyFactory } from "../../patterns/strategies/VisualizationStrategy";
+import { ExcelExportStrategy } from "../../patterns/strategies/ExportStrategy";
 
 const Reportes = () => {
   const dispatch = useDispatch();
@@ -128,46 +130,32 @@ const Reportes = () => {
     );
   };
 
-  const data = reportes
-    .map((item) => ({
-      fecha: new Date(item.fecha).toISOString().split("T")[0],
-      cantidad_ventas: parseFloat(item.cantidad_ventas),
-      monto: parseFloat(item.monto_total),
-    }))
-    .sort((a, b) => new Date(a.fecha) - new Date(b.fecha)); // Ordenar por fecha de menor a mayor
+  // Preparar datos para visualización
+  const data = reportes && reportes.length > 0
+    ? reportes
+        .map((item) => ({
+          fecha: new Date(item.fecha).toISOString().split("T")[0],
+          cantidad_ventas: parseFloat(item.cantidad_ventas),
+          monto: parseFloat(item.monto_total),
+        }))
+        .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
+    : [];
 
-  // Encontrar el valor máximo para escalar las barras
-  const maxMonto = Math.max(...data.map((item) => item.monto));
-  const maxCantidadVentas = Math.max(
-    ...data.map((item) => item.cantidad_ventas)
-  );
-
-  const exportToExcel = (data, fileName) => {
-    // Crear una hoja de trabajo (workbook)
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, `Reportes`);
-
-    // Generar el archivo y disparar la descarga
-    XLSX.writeFile(workbook, `${fileName}.xlsx`);
-  };
+  // Usar Strategy Pattern para exportación
+  const exportStrategy = new ExcelExportStrategy();
 
   const handleExportExcel = (data, fileName) => {
-    let mensajeExportar;
+    // Usar Strategy Pattern para generar nombre de archivo y mensaje
+    const finalFileName = exportStrategy.generateFileName(
+      fileName,
+      dateSelectedFrom,
+      dateSelectedTo
+    );
+    const mensajeExportar = exportStrategy.generateMessage(
+      dateSelectedFrom,
+      dateSelectedTo
+    );
 
-    if (dateSelectedFrom != "" && dateSelectedTo != "") {
-      mensajeExportar = `¿Quieres exportar los datos con desde la fecha <b>${dateSelectedFrom}</b> hasta la fecha <b>${dateSelectedTo}</b> a un archivo  en Excel?`;
-      fileName = `${fileName}-desde-${dateSelectedFrom}-hasta-${dateSelectedTo}`;
-    } else if (dateSelectedFrom != "" && dateSelectedTo == "") {
-      mensajeExportar = `¿Quieres exportar los datos con desde la fecha <b>${dateSelectedFrom}</b> a un archivo  en Excel?`;
-      fileName = `${fileName}-desde-${dateSelectedFrom}`;
-    } else if (dateSelectedFrom == "" && dateSelectedTo != "") {
-      mensajeExportar = `¿Quieres exportar los datos con hasta la fecha <b>${dateSelectedTo}</b> a un archivo  en Excel?`;
-      fileName = `${fileName}-hasta-${dateSelectedTo}`;
-    } else if (dateSelectedFrom == "" && dateSelectedTo == "") {
-      mensajeExportar = `¿Quieres exportar los datos a un archivo  en Excel?`;
-      fileName = `${fileName}-sin-fecha-seleccionada`;
-    }
     Swal.fire({
       title: "Exportar a Excel",
       html: `${mensajeExportar}`,
@@ -177,10 +165,10 @@ const Reportes = () => {
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        exportToExcel(data, fileName);
+        exportStrategy.export(data, finalFileName);
         Swal.fire({
           title: "Exportación completada",
-          text: `El archivo "${fileName}-${data[0].fecha}.xlsx" ha sido descargado.`,
+          text: `El archivo "${finalFileName}.xlsx" ha sido descargado.`,
           icon: "success",
         });
       }
@@ -188,6 +176,19 @@ const Reportes = () => {
   };
 
   const [contador, setContador] = useState(0);
+
+  // Determinar tipo de visualización según estado
+  const getVisualizationType = () => {
+    if (!grafico) return "table";
+    return contador % 2 === 0 ? "amount-chart" : "quantity-chart";
+  };
+
+  // Crear estrategia de visualización
+  const visualizationStrategy = VisualizationStrategyFactory.createStrategy(
+    getVisualizationType(),
+    data,
+    styles
+  );
 
   return (
     <div className={styles.containerSelected}>
@@ -335,7 +336,8 @@ const Reportes = () => {
           </div>
         </div>
       </div>
-      {grafico ? (
+      {/* Usar Strategy Pattern para renderizar visualización */}
+      {grafico && (
         <div className={styles.container}>
           <h3 className={styles.title} style={{ display: "flex" }}>
             <div
@@ -351,83 +353,9 @@ const Reportes = () => {
               {"Cantidad de Ventas por Fecha"}
             </div>
           </h3>
-          <div className={styles.chartContainer}>
-            {/* Renderizar líneas guía en el eje Y */}
-            <div className={styles.yAxis}>
-              {[...Array(6)].map((_, index) => (
-                <div key={index} className={styles.yAxisLine}>
-                  <div className={styles.yGuideLine}></div>{" "}
-                  {/* Solo líneas guía */}
-                </div>
-              ))}
-            </div>
-
-            {/* Renderizar barras */}
-            <div className={styles.bars}>
-              {data.map((item, index) => (
-                <div key={index} className={styles.barWrapper}>
-                  {contador % 2 === 0 ? (
-                    <div
-                      className={styles.bar}
-                      style={{
-                        height: `${(item.monto / maxMonto) * 100}%`,
-                      }}
-                    >
-                      <span className={styles.barLabel}>
-                        ${item.monto.toLocaleString()}
-                      </span>
-                    </div>
-                  ) : (
-                    <div
-                      className={styles.barCantidad}
-                      style={{
-                        height: `${
-                          (item.cantidad_ventas / maxCantidadVentas) * 100
-                        }%`,
-                      }}
-                    >
-                      <span className={styles.barLabel}>
-                        {item.cantidad_ventas.toLocaleString()}
-                      </span>
-                    </div>
-                  )}
-
-                  <div className={styles.label}>{item.fecha}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className={styles.tableContainer}>
-          <table className={styles.headerTable}>
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Cantidad de Ventas</th>
-                <th>Monto Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reportes && reportes.length > 0 ? (
-                reportes.map((reporte, index) => (
-                  <tr key={index}>
-                    <td>{reporte.fecha.slice(0, 10)}</td>
-                    <td>{reporte.cantidad_ventas}</td>
-                    <td>${reporte.monto_total}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3" className={styles.noData}>
-                    No hay ventas en este rango de fecha
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
         </div>
       )}
+      {visualizationStrategy.render(data)}
     </div>
   );
 };

@@ -11,6 +11,8 @@ import AgregarItems from "./AgregarItems";
 import { FaRegTrashAlt } from "react-icons/fa";
 import EditarItem from "./EditItems";
 import Swal from "sweetalert2";
+import VentaBuilder from "../../patterns/builders/VentaBuilder";
+import SelectAdapter from "../../patterns/adapters/SelectAdapter";
 const VentaFormModal = ({ usuarioId }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
@@ -55,12 +57,8 @@ const VentaFormModal = ({ usuarioId }) => {
     dispatch(getObrasSocialesAPI(0, 999));
   }, [dispatch, items, show]);
 
-  let optionsClientes =
-    clientes &&
-    clientes?.initialState?.map((cliente) => ({
-      value: cliente.cliente_id,
-      label: `${cliente.DNI} - ${cliente.Apellido} ${cliente.Nombre}`,
-    }));
+  // Usar Adapter Pattern para transformar clientes a formato de react-select
+  const optionsClientes = SelectAdapter.clienteToSelectOptions(clientes);
 
   const handleCliente = (event) => {
     const selectedCliente = event.target.value;
@@ -109,25 +107,31 @@ const VentaFormModal = ({ usuarioId }) => {
   }, [itemsAgregados]);
 
   const handleCrearFactura = () => {
-    let totalConDescuento = (total * (1 - obraSocial.Descuento)).toFixed(2);
-    let totalSinDescuento = total.toString();
-    let descuento = obraSocial.Descuento * 100;
-    dispatch(
-      addVentaAPI({
-        cliente_id: cliente,
-        itemsAgregados,
-        totalConDescuento,
-        totalSinDescuento,
-        descuento: descuento,
-        usuario_id: usuarioId,
-        numero_factura: ultimaVenta && ultimaVenta?.venta_id + 1,
-        fecha_hora: dateSelectedFrom,
-      })
-    );
-    handleClose();
-    setCliente(0);
-    setItemsAgregados([]);
-    setDateSelectedFrom(formattedToday);
+    try {
+      // Usar Builder Pattern para construir el objeto de venta
+      const ventaData = new VentaBuilder()
+        .setCliente(cliente)
+        .setItems(itemsAgregados)
+        .setObraSocial(obraSocial)
+        .calculateTotal()
+        .applyDescuento()
+        .setUsuario(usuarioId)
+        .setNumeroFactura(ultimaVenta && ultimaVenta?.venta_id + 1)
+        .setFechaHora(dateSelectedFrom)
+        .build();
+
+      dispatch(addVentaAPI(ventaData));
+      handleClose();
+      setCliente(0);
+      setItemsAgregados([]);
+      setDateSelectedFrom(formattedToday);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error de validación",
+        text: error.message,
+      });
+    }
   };
   const handleSelectDateFrom = (e) => {
     setDateSelectedFrom(e.target.value);
