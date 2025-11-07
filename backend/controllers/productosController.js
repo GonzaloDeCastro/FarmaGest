@@ -62,7 +62,7 @@ const getProductos = async (req, res) => {
 // Obtener categorías
 const getCategorias = async (req, res) => {
   try {
-    const result = await query('SELECT categoria_id, categoria, descripcion FROM categorias ORDER BY categoria');
+    const result = await query('SELECT categoria_id, categoria AS nombre, descripcion FROM categorias ORDER BY categoria');
     res.json(result.rows);
   } catch (error) {
     console.error('Error al obtener categorías:', error);

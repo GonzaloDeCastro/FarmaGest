@@ -4,53 +4,81 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import API from "../config";
 
+const initialState = {
+  initialState: [],
+  obrasSocialesState: [],
+  ciudadesState: [],
+  pagination: {
+    total: 0,
+    page: 1,
+    pageSize: 10,
+  },
+};
+
 const clientesSlice = createSlice({
   name: "clientes",
-  initialState: {},
-  obrasSocialesState: {},
-  ciudadesState: {},
+  initialState,
   reducers: {
     getClientes: (state, action) => {
-      return {
-        ...state,
-        initialState: action.payload,
-      };
+      const payload = action.payload;
+
+      const clientes = Array.isArray(payload?.clientes)
+        ? payload.clientes
+        : Array.isArray(payload)
+        ? payload
+        : [];
+
+      state.initialState = clientes;
+
+      if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+        state.pagination = {
+          total: payload.total ?? state.pagination.total,
+          page: payload.page ?? state.pagination.page,
+          pageSize: payload.pageSize ?? state.pagination.pageSize,
+        };
+      }
     },
     getObrasSociales: (state, action) => {
-      return {
-        ...state,
-        obrasSocialesState: action.payload,
-      };
+      const payload = action.payload;
+      const obrasSociales = Array.isArray(payload?.obrasSociales)
+        ? payload.obrasSociales
+        : Array.isArray(payload)
+        ? payload
+        : [];
+
+      state.obrasSocialesState = obrasSociales;
     },
     getCiudades: (state, action) => {
-      return {
-        ...state,
-        ciudadesState: action.payload,
-      };
+      state.ciudadesState = Array.isArray(action.payload)
+        ? action.payload
+        : [];
     },
     addCliente: (state, action) => {
-      return {
-        ...state,
-        initialState: [action.payload, ...state.initialState],
-      };
+      const currentClientes = Array.isArray(state.initialState)
+        ? state.initialState
+        : [];
+
+      state.initialState = [action.payload, ...currentClientes];
     },
     deleteCliente: (state, action) => {
-      return {
-        ...state,
-        initialState: state.initialState?.filter(
-          (cliente) => cliente?.cliente_id !== action?.payload
-        ),
-      };
+      const currentClientes = Array.isArray(state.initialState)
+        ? state.initialState
+        : [];
+
+      state.initialState = currentClientes.filter(
+        (cliente) => cliente?.cliente_id !== action?.payload
+      );
     },
     editCliente: (state, action) => {
-      return {
-        ...state,
-        initialState: state.initialState.map((cliente) =>
-          cliente?.cliente_id === action?.payload?.cliente_id
-            ? action.payload
-            : cliente
-        ),
-      };
+      const currentClientes = Array.isArray(state.initialState)
+        ? state.initialState
+        : [];
+
+      state.initialState = currentClientes.map((cliente) =>
+        cliente?.cliente_id === action?.payload?.cliente_id
+          ? action.payload
+          : cliente
+      );
     },
   },
 });

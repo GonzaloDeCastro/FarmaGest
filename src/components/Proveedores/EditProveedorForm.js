@@ -9,32 +9,47 @@ const EditProveedorForm = ({ proveedorSelected }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
 
+  const iniciales = {
+    razon_social:
+      proveedorSelected?.razon_social ||
+      proveedorSelected?.Razon_social ||
+      proveedorSelected?.RazonSocial ||
+      proveedorSelected?.Razon_Social ||
+      proveedorSelected?.RazonSocial ||
+      proveedorSelected?.razonSocial ||
+      "",
+    telefono:
+      proveedorSelected?.telefono ||
+      proveedorSelected?.Telefono ||
+      proveedorSelected?.phone ||
+      "",
+    direccion:
+      proveedorSelected?.direccion ||
+      proveedorSelected?.Direccion ||
+      proveedorSelected?.address ||
+      "",
+    email:
+      proveedorSelected?.email ||
+      proveedorSelected?.Email ||
+      "",
+  };
+
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm({
-    defaultValues: {
-      razon_social: proveedorSelected?.razon_social,
-      telefono: proveedorSelected?.Telefono,
-      direccion: proveedorSelected?.Direccion,
-      email: proveedorSelected?.Email,
-    },
+    defaultValues: iniciales,
   });
 
   const handleClose = () => {
     setShow(false);
-    reset();
+    reset(iniciales);
   };
 
   const handleShow = () => {
-    reset({
-      razon_social: proveedorSelected?.razon_social,
-      telefono: proveedorSelected?.Telefono,
-      direccion: proveedorSelected?.Direccion,
-      email: proveedorSelected?.Email,
-    });
+    reset(iniciales);
     setShow(true);
   };
 

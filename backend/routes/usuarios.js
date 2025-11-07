@@ -8,7 +8,8 @@ const {
   createUsuario,
   updateUsuario,
   deleteUsuario,
-  updatePassword
+  updatePassword,
+  logoutUsuario
 } = require('../controllers/usuariosController');
 
 // Rutas
@@ -16,6 +17,7 @@ router.get('/login', loginUsuario);
 router.get('/roles', getRoles);
 router.get('/', getUsuarios);
 router.post('/', createUsuario);
+router.put('/logout/:sesion_id', logoutUsuario);
 router.put('/:usuario_id', updateUsuario);
 router.delete('/:usuario_id', deleteUsuario);
 router.put('/pwd/:correo', updatePassword);

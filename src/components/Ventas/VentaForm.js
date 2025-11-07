@@ -3,9 +3,10 @@ import styles from "./Ventas.module.css";
 import { Button, Modal, Form } from "react-bootstrap";
 import { FaPlusCircle, FaSave } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { addVentaAPI, getUltimaVentaAPI } from "../../redux/ventasSlice";
+import { addVentaAPI, getUltimaVentaAPI, getVentasByClienteAPI } from "../../redux/ventasSlice";
 import { getClientesAPI } from "../../redux/clientesSlice";
 import { getObrasSocialesAPI } from "../../redux/obrasSocialesSlice";
+import { getProductosAPI, getCategoriasAPI } from "../../redux/productosSlice";
 import Select from "react-select";
 import AgregarItems from "./AgregarItems";
 import { FaRegTrashAlt } from "react-icons/fa";
@@ -13,14 +14,22 @@ import EditarItem from "./EditItems";
 import Swal from "sweetalert2";
 import VentaBuilder from "../../patterns/builders/VentaBuilder";
 import SelectAdapter from "../../patterns/adapters/SelectAdapter";
+import ProductRecommendations from "./ProductRecommendations";
 const VentaFormModal = ({ usuarioId }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
   const [cliente, setCliente] = useState(0);
   const [itemsAgregados, setItemsAgregados] = useState([]);
-  const [obraSocial, setObraSocial] = useState([]);
+  const [obraSocial, setObraSocial] = useState({
+    obra_social: "Sin obra social",
+    Descuento: 0,
+    descuento: 0,
+  });
   const [total, setTotal] = useState(0);
   const today = new Date();
+
+  const logged = JSON.parse(sessionStorage.getItem("logged"));
+  const sesion = logged?.sesion?.sesion_id;
 
   const formattedToday = `${today.getFullYear()}-${String(
     today.getMonth() + 1
@@ -30,46 +39,105 @@ const VentaFormModal = ({ usuarioId }) => {
 
   const [dateSelectedFrom, setDateSelectedFrom] = useState(formattedToday);
 
+  const normalizeDiscount = (value) => {
+    const parsed = parseFloat(value);
+    if (isNaN(parsed) || parsed <= 0) {
+      return 0;
+    }
+    return parsed > 1 ? parsed / 100 : parsed;
+  };
+
   const handleClose = () => {
     setShow(false);
+    setCliente(0);
+    setItemsAgregados([]);
+    setObraSocial({
+      obra_social: "Sin obra social",
+      Descuento: 0,
+      descuento: 0,
+    });
+    setVentasCliente([]);
   };
 
   const handleShow = () => setShow(true);
 
-  const clientes = useSelector(
-    (state) => state && state.cliente && state.cliente
-  );
+  const clientesState = useSelector((state) => state?.cliente);
+  const clientes = clientesState?.initialState || [];
   const obrasSociales = useSelector(
-    (state) =>
-      state &&
-      state.cliente &&
-      state.obrasocial &&
-      state.obrasocial.initialState
+    (state) => state?.obrasocial?.initialState || []
   );
-  const ultimaVenta = useSelector(
-    (state) => state && state.venta && state.venta.ultimaVentaState
-  );
+  const ultimaVenta = useSelector((state) => state?.venta?.ultimaVentaState);
 
-  const items = useSelector((state) => state && state?.item?.initialState);
+  const productos = useSelector((state) => state.producto?.initialState || []);
+  const ventasHistoricas = useSelector((state) => state.venta?.initialState || []);
+  const [ventasCliente, setVentasCliente] = useState([]);
+
   useEffect(() => {
-    dispatch(getClientesAPI());
+    const pageSizeFull = 999;
+    dispatch(getClientesAPI(1, pageSizeFull, "", null, null, sesion));
     dispatch(getUltimaVentaAPI());
-    dispatch(getObrasSocialesAPI(0, 999));
-  }, [dispatch, items, show]);
+    dispatch(getObrasSocialesAPI(1, pageSizeFull));
+    dispatch(getProductosAPI(1, pageSizeFull, "", sesion));
+    dispatch(getCategoriasAPI());
+  }, [dispatch, sesion, show]);
+
+  // Cargar historial de ventas del cliente cuando se selecciona
+  useEffect(() => {
+    const loadClienteHistory = async () => {
+      if (cliente && cliente !== 0) {
+        try {
+          // Intentar obtener historial específico del cliente
+          const ventas = await dispatch(getVentasByClienteAPI(cliente));
+          if (ventas && Array.isArray(ventas) && ventas.length > 0) {
+            setVentasCliente(ventas);
+          } else {
+            // Si no hay endpoint específico, usar ventas generales como fallback
+            setVentasCliente([]);
+          }
+        } catch (error) {
+          console.warn("No se pudo cargar historial específico del cliente, usando ventas generales:", error);
+          setVentasCliente([]);
+        }
+      } else {
+        setVentasCliente([]);
+      }
+    };
+
+    loadClienteHistory();
+  }, [cliente, dispatch]);
 
   // Usar Adapter Pattern para transformar clientes a formato de react-select
   const optionsClientes = SelectAdapter.clienteToSelectOptions(clientes);
 
   const handleCliente = (event) => {
-    const selectedCliente = event.target.value;
+    const selectedValue = event.target.value;
+    const selectedCliente = selectedValue ? Number(selectedValue) : 0;
     setCliente(selectedCliente);
-    const obraSocialID = clientes?.initialState?.find(
-      (c) => c.cliente_id == selectedCliente
-    ).obra_social_id;
-    const obraSocialEncontrada =
-      obrasSociales &&
-      obrasSociales?.find((o) => o.obra_social_id == obraSocialID);
-    setObraSocial(obraSocialEncontrada);
+    const clienteSeleccionado = clientes.find(
+      (c) => c.cliente_id === selectedCliente
+    );
+    const obraSocialID = clienteSeleccionado?.obra_social_id;
+    const obraSocialEncontrada = Array.isArray(obrasSociales)
+      ? obrasSociales.find((o) => o.obra_social_id === obraSocialID)
+      : null;
+
+    if (obraSocialEncontrada) {
+      const normalizedDiscount = normalizeDiscount(
+        obraSocialEncontrada.Descuento ?? obraSocialEncontrada.descuento
+      );
+      setObraSocial({
+        ...obraSocialEncontrada,
+        obra_social: obraSocialEncontrada.obra_social,
+        Descuento: normalizedDiscount,
+        descuento: normalizedDiscount,
+      });
+    } else {
+      setObraSocial({
+        obra_social: "Sin obra social",
+        Descuento: 0,
+        descuento: 0,
+      });
+    }
   };
 
   // En VentaFormModal
@@ -98,12 +166,12 @@ const VentaFormModal = ({ usuarioId }) => {
   };
 
   useEffect(() => {
-    let total = 0;
-    itemsAgregados.forEach((item) => {
-      total += parseInt(item.total);
-    });
+    const totalCalculado = itemsAgregados.reduce(
+      (acc, item) => acc + (parseFloat(item.total) || 0),
+      0
+    );
 
-    setTotal(total);
+    setTotal(totalCalculado);
   }, [itemsAgregados]);
 
   const handleCrearFactura = () => {
@@ -136,6 +204,10 @@ const VentaFormModal = ({ usuarioId }) => {
   const handleSelectDateFrom = (e) => {
     setDateSelectedFrom(e.target.value);
   };
+
+  const descuentoActual = normalizeDiscount(
+    obraSocial?.Descuento ?? obraSocial?.descuento ?? 0
+  );
 
   return (
     <>
@@ -228,7 +300,7 @@ const VentaFormModal = ({ usuarioId }) => {
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {obraSocial.obra_social}
+                      {obraSocial?.obra_social ?? "Sin obra social"}
                     </div>
                     <div
                       style={{
@@ -245,7 +317,7 @@ const VentaFormModal = ({ usuarioId }) => {
                         alignItems: "center",
                       }}
                     >
-                      🔥 Descuento {obraSocial.Descuento * 100}%
+                      🔥 Descuento {(descuentoActual * 100).toFixed(0)}%
                     </div>
                   </div>
                 </div>
@@ -263,7 +335,9 @@ const VentaFormModal = ({ usuarioId }) => {
                     <th>Detalle Producto</th>
                     <th>Cantidad</th>
                     <th>Precio</th>
-                    <AgregarItems onAgregarItem={handleAgregarItem} />
+                    <th style={{ width: "1%", whiteSpace: "nowrap" }}>
+                      <AgregarItems onAgregarItem={handleAgregarItem} />
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -284,6 +358,18 @@ const VentaFormModal = ({ usuarioId }) => {
                 </tbody>
               </table>
             </Form.Group>
+
+            {/* Componente de Recomendaciones IA */}
+            {cliente !== 0 && productos.length > 0 && (
+              <ProductRecommendations
+                clienteId={cliente}
+                ventasHistoricas={ventasCliente.length > 0 ? ventasCliente : ventasHistoricas}
+                productos={productos}
+                itemsYaAgregados={itemsAgregados}
+                onAddProduct={handleAgregarItem}
+              />
+            )}
+
             <div
               style={{
                 display: "flex",
@@ -310,7 +396,7 @@ const VentaFormModal = ({ usuarioId }) => {
                   <div className={styles.valorTotal}>
                     $
                     {total !== 0
-                      ? (total * (1 - obraSocial.Descuento)).toFixed(2)
+                      ? (total * (1 - descuentoActual)).toFixed(2)
                       : "0.00"}
                   </div>
                 </div>

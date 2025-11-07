@@ -4,39 +4,64 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import API from "../config";
 
+const initialState = {
+  initialState: [],
+  pagination: {
+    total: 0,
+    page: 1,
+    pageSize: 5,
+  },
+};
+
 const obraSocialDataSlice = createSlice({
   name: "obra_social",
-  initialState: {},
+  initialState,
   reducers: {
     getObrasSociales: (state, action) => {
-      return {
-        ...state,
-        initialState: action.payload,
-      };
+      const payload = action.payload;
+
+      const obras = Array.isArray(payload?.obrasSociales)
+        ? payload.obrasSociales
+        : Array.isArray(payload)
+        ? payload
+        : [];
+
+      state.initialState = obras;
+
+      if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+        state.pagination = {
+          total: payload.total ?? state.pagination.total,
+          page: payload.page ?? state.pagination.page,
+          pageSize: payload.pageSize ?? state.pagination.pageSize,
+        };
+      }
     },
     addObraSocial: (state, action) => {
-      return {
-        ...state,
-        initialState: [action.payload, ...state.initialState],
-      };
+      const currentObras = Array.isArray(state.initialState)
+        ? state.initialState
+        : [];
+
+      state.initialState = [action.payload, ...currentObras];
     },
     deleteObraSocial: (state, action) => {
-      return {
-        ...state,
-        initialState: state.initialState.filter(
-          (obraSocial) => obraSocial.obra_social_id !== action.payload
-        ),
-      };
+      const currentObras = Array.isArray(state.initialState)
+        ? state.initialState
+        : [];
+
+      state.initialState = currentObras.filter(
+        (obraSocial) => obraSocial.obra_social_id !== action.payload
+      );
     },
     editObraSocial: (state, action) => {
-      return {
-        ...state,
-        initialState: state.initialState.map((obraSocial) =>
-          obraSocial.obra_social_id == action.payload.obra_social_id
-            ? action.payload
-            : obraSocial
-        ),
-      };
+      const currentObras = Array.isArray(state.initialState)
+        ? state.initialState
+        : [];
+
+      state.initialState = currentObras.map((obraSocial) =>
+        obraSocial.obra_social_id === action.payload.obra_social_id
+          ? action.payload
+          : obraSocial
+      );
     },
   },
 });

@@ -38,8 +38,12 @@ class VentaBuilder {
   }
 
   setObraSocial(obraSocial) {
-    if (obraSocial && obraSocial.Descuento !== undefined) {
-      this.venta.descuento = obraSocial.Descuento * 100;
+    if (obraSocial) {
+      const descuentoValor =
+        obraSocial.Descuento ?? obraSocial.descuento ?? null;
+      if (descuentoValor !== null && descuentoValor !== undefined) {
+        this.venta.descuento = parseFloat(descuentoValor) * 100;
+      }
     }
     return this;
   }
@@ -102,4 +106,6 @@ class VentaBuilder {
 }
 
 export default VentaBuilder;
+
+
 

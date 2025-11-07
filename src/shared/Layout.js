@@ -21,7 +21,21 @@ const Layout = ({ children, title }) => {
   }
   const logged = JSON.parse(sessionStorage.getItem("logged"));
 
-  const permisos = logged.sesion.permisos;
+  // Validar que logged y sesion existan antes de acceder a permisos
+  // Si logged es null, usar un array vacío
+  // Si logged.sesion no existe, usar un array vacío
+  // Si permisos no existe o no es un array, usar un array vacío
+  let permisos = [];
+  if (logged && logged.sesion) {
+    permisos = Array.isArray(logged.sesion.permisos) 
+      ? logged.sesion.permisos 
+      : (logged.sesion.permisos ? [logged.sesion.permisos] : []);
+  }
+  
+  // Debug: mostrar en consola si no hay permisos (solo en desarrollo)
+  if (process.env.NODE_ENV === 'development' && permisos.length === 0 && logged) {
+    console.warn('⚠️ No se encontraron permisos en sessionStorage:', logged);
+  }
 
   return (
     <div className="containerGeneralAPP">

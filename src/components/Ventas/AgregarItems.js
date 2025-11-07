@@ -51,19 +51,41 @@ const AgregarItems = ({ onAgregarItem }) => {
   const handleShow = () => setShow(true);
 
   const onSubmit = (data) => {
-    let productoNombre = productos.find(
+    const productoSeleccionado = productos.find(
       (p) => p.producto_id === data.productoId
-    ).Nombre;
-    let dataComplete = { ...data, nombre: productoNombre };
-    onAgregarItem(dataComplete); // Llama a la función de callback para actualizar el estado en VentaFormModal
+    );
+
+    if (!productoSeleccionado) {
+      return;
+    }
+
+    const precioProducto =
+      parseFloat(
+        productoSeleccionado.Precio ?? productoSeleccionado.precio ?? 0
+      ) || 0;
+
+    const productoNombre =
+      productoSeleccionado.Nombre ?? productoSeleccionado.nombre ?? "";
+
+    const dataComplete = {
+      ...data,
+      precio: precioProducto,
+      total: (data.cantidad || 0) * precioProducto,
+      nombre: productoNombre,
+    };
+
+    onAgregarItem(dataComplete);
     handleClose();
   };
 
   const updateTotal = (cantidad, precio) => {
-    if (isNaN(cantidad) || isNaN(precio)) {
+    const cantidadNumber = parseFloat(cantidad) || 0;
+    const precioNumber = parseFloat(precio) || 0;
+
+    if (isNaN(cantidadNumber) || isNaN(precioNumber)) {
       setValue("total", 0);
     } else {
-      setValue("total", cantidad * precio);
+      setValue("total", cantidadNumber * precioNumber);
     }
   };
 
@@ -71,18 +93,27 @@ const AgregarItems = ({ onAgregarItem }) => {
     const selectedProducto = productos.find(
       (p) => p.producto_id === productoId
     );
-    const stock = selectedProducto && selectedProducto.Stock;
+    const stock =
+      selectedProducto?.Stock ?? selectedProducto?.stock ?? null;
     if (selectedProducto) {
-      setValue("precio", selectedProducto.Precio);
-      updateTotal(watch("cantidad"), selectedProducto.Precio);
+      const precioSeleccionado =
+        parseFloat(
+          selectedProducto.Precio ?? selectedProducto.precio ?? 0
+        ) || 0;
+      setValue("precio", precioSeleccionado);
+      updateTotal(watch("cantidad"), precioSeleccionado);
     }
     setOutOfStock(stock);
   };
 
-  const optionsProductos = productos.map((producto) => ({
-    value: producto.producto_id,
-    label: `${producto.Codigo} - ${producto.Nombre}`,
-  }));
+  const optionsProductos = productos.map((producto) => {
+    const codigo = producto.Codigo ?? producto.codigo ?? "";
+    const nombre = producto.Nombre ?? producto.nombre ?? "";
+    return {
+      value: producto.producto_id,
+      label: codigo ? `${codigo} - ${nombre}` : nombre,
+    };
+  });
 
   return (
     <>
@@ -147,7 +178,9 @@ const AgregarItems = ({ onAgregarItem }) => {
                 {...register("cantidad", {
                   required: "Debe elegir al menos 1 unidad",
                 })}
-                onChange={(e) => setValue("cantidad", parseInt(e.target.value))}
+                onChange={(e) =>
+                  setValue("cantidad", parseInt(e.target.value, 10) || 0)
+                }
               />
               {errors.cantidad && (
                 <p className="text-danger">{errors.cantidad.message}</p>
@@ -156,12 +189,12 @@ const AgregarItems = ({ onAgregarItem }) => {
 
             <Form.Group className="mb-3">
               <label>Precio Unitario:</label>
-              <p>{`$${watch("precio")}`}</p>
+              <p>{`$${Number(watch("precio") || 0).toFixed(2)}`}</p>
             </Form.Group>
 
             <Form.Group className="mb-3">
               <label>Total:</label>
-              <p>{`$${watch("total")}`}</p>
+              <p>{`$${Number(watch("total") || 0).toFixed(2)}`}</p>
             </Form.Group>
             {outOfStock && outOfStock < 1 ? (
               <p className="text-danger">
@@ -174,7 +207,7 @@ const AgregarItems = ({ onAgregarItem }) => {
             <Button
               type="submit"
               variant="primary"
-              disabled={errors.length > 0}
+              disabled={Object.keys(errors).length > 0}
             >
               Agregar Item
             </Button>

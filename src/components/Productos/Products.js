@@ -28,7 +28,13 @@ const Products = () => {
   const Products = useSelector((state) => state && state?.producto);
   const Categorias = useSelector(
     (state) => state && state?.producto && state?.producto?.categoriasState
-  );
+  ) || [];
+
+  // Debug: verificar categorías (solo en desarrollo)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔍 Categorías en Redux:', Categorias);
+    console.log('🔍 Tipo:', typeof Categorias, 'Es array?', Array.isArray(Categorias));
+  }
 
   const keys = Object?.keys(
     (Products && Products.initialState && Products.initialState[0]) || {}
@@ -63,6 +69,8 @@ const Products = () => {
       <div className="headerSelected">
         <div>
           <input
+            id="search-productos"
+            name="search-productos"
             className="inputSearch"
             type="text"
             onChange={handleSearchChange}
@@ -90,11 +98,15 @@ const Products = () => {
           </thead>
           <tbody>
             {Object?.keys(Products)?.length === 0 ? (
-              <div
-                className="spinner-border"
-                style={{ marginTop: "10%", width: "100px", height: "100px" }}
-                role="status"
-              />
+              <tr>
+                <td colSpan={keys?.length || 1} style={{ textAlign: "center", padding: "40px" }}>
+                  <div
+                    className="spinner-border"
+                    style={{ marginTop: "10%", width: "100px", height: "100px" }}
+                    role="status"
+                  />
+                </td>
+              </tr>
             ) : Products?.initialState?.length > 0 ? (
               Products?.initialState?.map((dato) => (
                 <tr
@@ -139,7 +151,11 @@ const Products = () => {
                 </tr>
               ))
             ) : (
-              <div className="NoData">sin datos </div>
+              <tr>
+                <td colSpan={keys?.length || 1} className="NoData" style={{ textAlign: "center", padding: "20px" }}>
+                  sin datos
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

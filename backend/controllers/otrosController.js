@@ -281,38 +281,226 @@ const getVentas = async (req, res) => {
   }
 };
 
+const getVentasByCliente = async (req, res) => {
+  try {
+    const { clienteId } = req.params;
+    const ventasResult = await query(
+      `SELECT v.venta_id, v.fecha, v.total, v.subtotal, v.descuento, v.cliente_id
+       FROM ventas v
+       WHERE v.cliente_id = $1
+       ORDER BY v.fecha DESC
+       LIMIT 50`,
+      [clienteId]
+    );
+
+    if (ventasResult.rows.length === 0) {
+      return res.json([]);
+    }
+
+    const ventaIds = ventasResult.rows.map((venta) => venta.venta_id);
+
+    const itemsResult = await query(
+      `SELECT vi.venta_id, vi.producto_id, vi.cantidad, vi.precio_unitario, vi.subtotal
+       FROM ventas_items vi
+       WHERE vi.venta_id = ANY($1::int[])`,
+      [ventaIds]
+    );
+
+    const itemsByVenta = itemsResult.rows.reduce((acc, item) => {
+      if (!acc[item.venta_id]) {
+        acc[item.venta_id] = [];
+      }
+      acc[item.venta_id].push({
+        producto_id: item.producto_id,
+        productoId: item.producto_id,
+        cantidad: item.cantidad,
+        precio_unitario: item.precio_unitario,
+        precio: item.precio_unitario,
+        subtotal: item.subtotal,
+        total: item.subtotal,
+      });
+      return acc;
+    }, {});
+
+    const ventas = ventasResult.rows.map((venta) => ({
+      ...venta,
+      items: itemsByVenta[venta.venta_id] || [],
+    }));
+
+    res.json(ventas);
+  } catch (error) {
+    console.error('Error al obtener ventas del cliente:', error);
+    res.status(500).json({ mensaje: 'Error al obtener ventas del cliente', error: error.message });
+  }
+};
+
+const getUltimaVenta = async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT v.*, c.nombre as cliente_nombre, c.apellido as cliente_apellido,
+              u.nombre as usuario_nombre, u.apellido as usuario_apellido
+       FROM ventas v
+       LEFT JOIN clientes c ON v.cliente_id = c.cliente_id
+       LEFT JOIN usuarios u ON v.usuario_id = u.usuario_id
+       ORDER BY v.venta_id DESC
+       LIMIT 1`
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(200).json(null);
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error al obtener la última venta:', error);
+    res.status(500).json({ mensaje: 'Error al obtener la última venta', error: error.message });
+  }
+};
+
+const getVentaDetalle = async (req, res) => {
+  try {
+    const { ventaId } = req.params;
+
+    const ventaResult = await query(
+      `SELECT v.venta_id,
+              v.fecha,
+              v.fecha_hora,
+              v.subtotal,
+              v.descuento,
+              v.total,
+              LPAD(v.venta_id::text, 8, '0') AS numero_formateado,
+              c.nombre AS cliente_nombre,
+              c.apellido AS cliente_apellido,
+              u.nombre AS usuario_nombre,
+              u.apellido AS usuario_apellido,
+              os.obra_social,
+              os.descuento AS obra_social_descuento
+       FROM ventas v
+       LEFT JOIN clientes c ON v.cliente_id = c.cliente_id
+       LEFT JOIN usuarios u ON v.usuario_id = u.usuario_id
+       LEFT JOIN obras_sociales os ON c.obra_social_id = os.obra_social_id
+       WHERE v.venta_id = $1`,
+      [ventaId]
+    );
+
+    if (ventaResult.rows.length === 0) {
+      return res.status(404).json({ mensaje: 'Venta no encontrada' });
+    }
+
+    const venta = ventaResult.rows[0];
+
+    const itemsResult = await query(
+      `SELECT vi.venta_item_id,
+              vi.producto_id,
+              p.nombre AS producto_nombre,
+              vi.cantidad,
+              vi.precio_unitario,
+              vi.subtotal
+       FROM ventas_items vi
+       LEFT JOIN productos p ON vi.producto_id = p.producto_id
+       WHERE vi.venta_id = $1
+       ORDER BY vi.venta_item_id`,
+      [ventaId]
+    );
+
+    const items = itemsResult.rows.map((item) => ({
+      item_id: item.venta_item_id,
+      producto_id: item.producto_id,
+      producto_nombre: item.producto_nombre,
+      cantidad: Number(item.cantidad),
+      precio_unitario: Number(item.precio_unitario).toFixed(2),
+      subtotal: Number(item.subtotal).toFixed(2),
+    }));
+
+    const totalSinDescuento = Number(venta.subtotal || 0);
+    const rawDiscount = venta.descuento ?? 0;
+    const discountFraction = typeof rawDiscount === 'number'
+      ? (rawDiscount > 1 ? rawDiscount / 100 : rawDiscount)
+      : 0;
+
+    const descuentoMonto = totalSinDescuento * discountFraction;
+    const subtotalConDescuento = totalSinDescuento - descuentoMonto;
+    const ivaPorcentaje = 0.21;
+    const ivaMonto = subtotalConDescuento * ivaPorcentaje;
+    const totalConIva = subtotalConDescuento + ivaMonto;
+
+    res.json({
+      venta_id: venta.venta_id,
+      numero_factura: venta.numero_formateado,
+      fecha: venta.fecha,
+      fecha_hora: venta.fecha_hora,
+      cliente_nombre: venta.cliente_nombre,
+      cliente_apellido: venta.cliente_apellido,
+      usuario_nombre: venta.usuario_nombre,
+      usuario_apellido: venta.usuario_apellido,
+      obra_social: venta.obra_social,
+      obra_social_descuento:
+        venta.obra_social_descuento && venta.obra_social_descuento > 1
+          ? Number(venta.obra_social_descuento) / 100
+          : Number(venta.obra_social_descuento || 0),
+      total_sin_descuento: totalSinDescuento.toFixed(2),
+      descuento_porcentaje: (discountFraction * 100).toFixed(2),
+      descuento_monto: descuentoMonto.toFixed(2),
+      subtotal_con_descuento: subtotalConDescuento.toFixed(2),
+      iva_porcentaje: (ivaPorcentaje * 100).toFixed(2),
+      iva_monto: ivaMonto.toFixed(2),
+      total: totalConIva.toFixed(2),
+      items,
+    });
+  } catch (error) {
+    console.error('Error al obtener detalle de venta:', error);
+    res.status(500).json({ mensaje: 'Error al obtener detalle de venta', error: error.message });
+  }
+};
+
 const createVenta = async (req, res) => {
   try {
     const { cliente_id, usuario_id, items, subtotal, descuento, total, forma_pago } = req.body;
-    
+
     const client = await require('../config/database').getClient();
     try {
       await client.query('BEGIN');
-      
-      // Crear venta
+
+      for (const item of items) {
+        const stockResult = await client.query(
+          'SELECT stock, nombre FROM productos WHERE producto_id = $1',
+          [item.producto_id]
+        );
+
+        if (stockResult.rows.length === 0) {
+          await client.query('ROLLBACK');
+          return res.status(404).json({ mensaje: `Producto ${item.producto_id} no encontrado` });
+        }
+
+        if (Number(stockResult.rows[0].stock) < Number(item.cantidad)) {
+          await client.query('ROLLBACK');
+          return res.status(400).json({
+            mensaje: `Stock insuficiente para ${stockResult.rows[0].nombre}. Disponible: ${stockResult.rows[0].stock}`,
+          });
+        }
+      }
+
       const ventaResult = await client.query(
         `INSERT INTO ventas (cliente_id, usuario_id, subtotal, descuento, total, forma_pago)
          VALUES ($1, $2, $3, $4, $5, $6) RETURNING venta_id`,
         [cliente_id || null, usuario_id, subtotal, descuento || 0, total, forma_pago || null]
       );
-      
+
       const venta_id = ventaResult.rows[0].venta_id;
-      
-      // Crear items
+
       for (const item of items) {
         await client.query(
           `INSERT INTO ventas_items (venta_id, producto_id, cantidad, precio_unitario, subtotal)
            VALUES ($1, $2, $3, $4, $5)`,
           [venta_id, item.producto_id, item.cantidad, item.precio_unitario, item.subtotal]
         );
-        
-        // Actualizar stock
+
         await client.query(
           `UPDATE productos SET stock = stock - $1 WHERE producto_id = $2`,
           [item.cantidad, item.producto_id]
         );
       }
-      
+
       await client.query('COMMIT');
       res.status(201).json({ venta_id, mensaje: 'Venta creada correctamente' });
     } catch (error) {
@@ -366,6 +554,129 @@ const getAuditoria = async (req, res) => {
   }
 };
 
+const getAuditoriaProductosList = async (req, res) => {
+  try {
+    const { page = 1, pageSize = 10, search = "" } = req.query;
+    const limit = Math.max(parseInt(pageSize, 10) || 10, 1);
+    const offset = (Math.max(parseInt(page, 10) || 1, 1) - 1) * limit;
+
+    const params = [];
+    let paramIndex = 1;
+    let whereClause = "";
+
+    if (search) {
+      whereClause = `WHERE (COALESCE(p.nombre, '') ILIKE $${paramIndex} OR COALESCE(ap.accion, '') ILIKE $${paramIndex} OR COALESCE(u.nombre, '') ILIKE $${paramIndex} OR COALESCE(u.apellido, '') ILIKE $${paramIndex})`;
+      params.push(`%${search}%`);
+      paramIndex += 1;
+    }
+
+    const limitParam = paramIndex++;
+    const offsetParam = paramIndex++;
+
+    params.push(limit, offset);
+
+    const queryText = `SELECT ap.auditoria_id, ap.fecha, ap.accion,
+                              p.nombre AS producto,
+                              u.nombre || ' ' || u.apellido AS usuario,
+                              ap.datos_anteriores,
+                              ap.datos_nuevos
+                       FROM auditoria_productos ap
+                       LEFT JOIN productos p ON ap.producto_id = p.producto_id
+                       LEFT JOIN usuarios u ON ap.usuario_id = u.usuario_id
+                       ${whereClause}
+                       ORDER BY ap.fecha DESC
+                       LIMIT $${limitParam} OFFSET $${offsetParam}`;
+
+    const result = await query(queryText, params);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error al obtener auditoría de productos:', error);
+    res.status(500).json({ mensaje: 'Error al obtener auditoría de productos', error: error.message });
+  }
+};
+
+const getAuditoriaClientesList = async (req, res) => {
+  try {
+    const { page = 1, pageSize = 10, search = "" } = req.query;
+    const limit = Math.max(parseInt(pageSize, 10) || 10, 1);
+    const offset = (Math.max(parseInt(page, 10) || 1, 1) - 1) * limit;
+
+    const params = [];
+    let paramIndex = 1;
+    let whereClause = "";
+
+    if (search) {
+      whereClause = `WHERE (COALESCE(c.nombre, '') ILIKE $${paramIndex} OR COALESCE(c.apellido, '') ILIKE $${paramIndex} OR COALESCE(ac.accion, '') ILIKE $${paramIndex} OR COALESCE(u.nombre, '') ILIKE $${paramIndex} OR COALESCE(u.apellido, '') ILIKE $${paramIndex})`;
+      params.push(`%${search}%`);
+      paramIndex += 1;
+    }
+
+    const limitParam = paramIndex++;
+    const offsetParam = paramIndex++;
+
+    params.push(limit, offset);
+
+    const queryText = `SELECT ac.auditoria_id, ac.fecha, ac.accion,
+                              c.nombre || ' ' || c.apellido AS cliente,
+                              u.nombre || ' ' || u.apellido AS usuario,
+                              ac.datos_anteriores,
+                              ac.datos_nuevos
+                       FROM auditoria_clientes ac
+                       LEFT JOIN clientes c ON ac.cliente_id = c.cliente_id
+                       LEFT JOIN usuarios u ON ac.usuario_id = u.usuario_id
+                       ${whereClause}
+                       ORDER BY ac.fecha DESC
+                       LIMIT $${limitParam} OFFSET $${offsetParam}`;
+
+    const result = await query(queryText, params);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error al obtener auditoría de clientes:', error);
+    res.status(500).json({ mensaje: 'Error al obtener auditoría de clientes', error: error.message });
+  }
+};
+
+const getAuditoriaObrasSocialesList = async (req, res) => {
+  try {
+    const { page = 1, pageSize = 10, search = "" } = req.query;
+    const limit = Math.max(parseInt(pageSize, 10) || 10, 1);
+    const offset = (Math.max(parseInt(page, 10) || 1, 1) - 1) * limit;
+
+    const params = [];
+    let paramIndex = 1;
+    let whereClause = "";
+
+    if (search) {
+      whereClause = `WHERE (COALESCE(os.obra_social, '') ILIKE $${paramIndex} OR COALESCE(aos.accion, '') ILIKE $${paramIndex} OR COALESCE(u.nombre, '') ILIKE $${paramIndex} OR COALESCE(u.apellido, '') ILIKE $${paramIndex})`;
+      params.push(`%${search}%`);
+      paramIndex += 1;
+    }
+
+    const limitParam = paramIndex++;
+    const offsetParam = paramIndex++;
+
+    params.push(limit, offset);
+
+    const queryText = `SELECT aos.auditoria_id, aos.fecha, aos.accion,
+                              os.obra_social,
+                              u.nombre || ' ' || u.apellido AS usuario,
+                              aos.datos_anteriores,
+                              aos.datos_nuevos
+                       FROM auditoria_obras_sociales aos
+                       LEFT JOIN obras_sociales os ON aos.obra_social_id = os.obra_social_id
+                       LEFT JOIN usuarios u ON aos.usuario_id = u.usuario_id
+                       ${whereClause}
+                       ORDER BY aos.fecha DESC
+                       LIMIT $${limitParam} OFFSET $${offsetParam}`;
+
+    const result = await query(queryText, params);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error al obtener auditoría de obras sociales:', error);
+    res.status(500).json({ mensaje: 'Error al obtener auditoría de obras sociales', error: error.message });
+  }
+};
+
 module.exports = {
   // Clientes
   getClientes,
@@ -386,7 +697,14 @@ module.exports = {
   getSesiones,
   // Ventas
   getVentas,
+  getUltimaVenta,
+  getVentasByCliente,
+  getVentaDetalle,
   createVenta,
+  // Auditoría listas
+  getAuditoriaProductosList,
+  getAuditoriaClientesList,
+  getAuditoriaObrasSocialesList,
   // Reportes
   getReportes,
   // Auditoría

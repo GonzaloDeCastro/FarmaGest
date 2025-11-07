@@ -87,18 +87,22 @@ const Proveedores = () => {
           </thead>
           <tbody>
             {Object?.keys(Proveedores)?.length === 0 ? (
-              <div
-                className="spinner-border"
-                style={{ marginTop: "10%", width: "100px", height: "100px" }}
-                role="status"
-              />
+              <tr>
+                <td colSpan={keys.length + 1}>
+                  <div
+                    className="spinner-border"
+                    style={{ width: "40px", height: "40px" }}
+                    role="status"
+                  />
+                </td>
+              </tr>
             ) : Proveedores?.initialState?.length > 0 ? (
               Proveedores?.initialState?.map((dato) => (
                 <tr key={dato.proveedor_id}>
                   {keys
                     ?.filter((column) => column !== "proveedor_id") //filtro para que no aparezca la columna id
                     .map((column) => (
-                      <td key={`${dato.id}-${column}`}>{dato[column]}</td>
+                      <td key={`${dato.proveedor_id}-${column}`}>{dato[column]}</td>
                     ))}
                   <td
                     style={{
@@ -114,7 +118,11 @@ const Proveedores = () => {
                 </tr>
               ))
             ) : (
-              <div className="NoData">sin datos</div>
+              <tr>
+                <td colSpan={keys.length + 1} className="NoData">
+                  Sin datos
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

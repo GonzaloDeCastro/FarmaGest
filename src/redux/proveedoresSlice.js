@@ -4,39 +4,64 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import API from "../config";
 
+const initialState = {
+  initialState: [],
+  pagination: {
+    total: 0,
+    page: 1,
+    pageSize: 5,
+  },
+};
+
 const proveedorDataSlice = createSlice({
   name: "proveedor",
-  initialState: {},
+  initialState,
   reducers: {
     getProveedores: (state, action) => {
-      return {
-        ...state,
-        initialState: action.payload,
-      };
+      const payload = action.payload;
+
+      const proveedores = Array.isArray(payload?.proveedores)
+        ? payload.proveedores
+        : Array.isArray(payload)
+        ? payload
+        : [];
+
+      state.initialState = proveedores;
+
+      if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+        state.pagination = {
+          total: payload.total ?? state.pagination.total,
+          page: payload.page ?? state.pagination.page,
+          pageSize: payload.pageSize ?? state.pagination.pageSize,
+        };
+      }
     },
     addProveedor: (state, action) => {
-      return {
-        ...state,
-        initialState: [action.payload, ...state.initialState],
-      };
+      const currentProveedores = Array.isArray(state.initialState)
+        ? state.initialState
+        : [];
+
+      state.initialState = [action.payload, ...currentProveedores];
     },
     deleteProveedor: (state, action) => {
-      return {
-        ...state,
-        initialState: state.initialState.filter(
-          (proveedor) => proveedor.proveedor_id !== action.payload
-        ),
-      };
+      const currentProveedores = Array.isArray(state.initialState)
+        ? state.initialState
+        : [];
+
+      state.initialState = currentProveedores.filter(
+        (proveedor) => proveedor.proveedor_id !== action.payload
+      );
     },
     editProveedor: (state, action) => {
-      return {
-        ...state,
-        initialState: state.initialState.map((proveedor) =>
-          proveedor.proveedor_id == action.payload.proveedor_id
-            ? action.payload
-            : proveedor
-        ),
-      };
+      const currentProveedores = Array.isArray(state.initialState)
+        ? state.initialState
+        : [];
+
+      state.initialState = currentProveedores.map((proveedor) =>
+        proveedor.proveedor_id === action.payload.proveedor_id
+          ? action.payload
+          : proveedor
+      );
     },
   },
 });

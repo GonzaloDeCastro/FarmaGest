@@ -26,11 +26,20 @@ class SelectAdapter {
    * @returns {Array} Opciones de clientes para react-select
    */
   static clienteToSelectOptions(clientes) {
+    const data = Array.isArray(clientes)
+      ? clientes
+      : clientes?.initialState || [];
+
     return this.toSelectOptions(
-      clientes?.initialState || [],
+      data,
       "cliente_id",
       "DNI",
-      (cliente) => `${cliente.DNI} - ${cliente.Apellido} ${cliente.Nombre}`
+      (cliente) => {
+        const dni = cliente.DNI ?? cliente.dni ?? "";
+        const apellido = cliente.Apellido ?? cliente.apellido ?? "";
+        const nombre = cliente.Nombre ?? cliente.nombre ?? "";
+        return `${dni} - ${apellido} ${nombre}`.trim();
+      }
     );
   }
 
@@ -43,7 +52,12 @@ class SelectAdapter {
     return this.toSelectOptions(
       productos?.initialState || [],
       "producto_id",
-      "Nombre"
+      "Nombre",
+      (producto) => {
+        const codigo = producto.Codigo ?? producto.codigo ?? "";
+        const nombre = producto.Nombre ?? producto.nombre ?? "";
+        return codigo ? `${codigo} - ${nombre}` : nombre;
+      }
     );
   }
 
@@ -124,4 +138,6 @@ class SelectAdapter {
 }
 
 export default SelectAdapter;
+
+
 

@@ -5,13 +5,32 @@ import API from "../config";
 
 const sesionesSlice = createSlice({
   name: "sesiones",
-  initialState: {},
+  initialState: {
+    sesionState: [],
+    pagination: {
+      total: 0,
+      page: 1,
+      pageSize: 10,
+    },
+  },
   reducers: {
     getSesiones: (state, action) => {
-      return {
-        ...state,
-        sesionState: action.payload,
-      };
+      const payload = action.payload;
+      const sesiones = Array.isArray(payload?.sesiones)
+        ? payload.sesiones
+        : Array.isArray(payload)
+        ? payload
+        : [];
+
+      state.sesionState = sesiones;
+
+      if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+        state.pagination = {
+          total: payload.total ?? state.pagination.total,
+          page: payload.page ?? state.pagination.page,
+          pageSize: payload.pageSize ?? state.pagination.pageSize,
+        };
+      }
     },
   },
 });

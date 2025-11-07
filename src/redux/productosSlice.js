@@ -6,40 +6,101 @@ import API from "../config";
 
 const productoDataSlice = createSlice({
   name: "producto",
-  initialState: {},
-  categoriasState: {},
+  initialState: {
+    initialState: [], // Lista de productos
+    categoriasState: [],
+    total: 0,
+    page: 1,
+    pageSize: 10,
+    totalPages: 1,
+  },
   reducers: {
     getProductos: (state, action) => {
+      const data = action.payload;
+      const productosRaw = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.productos)
+        ? data.productos
+        : [];
+
+      const adaptProducto = (producto = {}) => ({
+        producto_id: producto.producto_id ?? producto.Producto_id ?? null,
+        Nombre: producto.Nombre ?? producto.nombre ?? "",
+        Codigo: producto.Codigo ?? producto.codigo ?? "",
+        Marca: producto.Marca ?? producto.marca ?? "",
+        Categoria:
+          producto.Categoria ??
+          producto.categoria ??
+          producto.categoria_nombre ??
+          producto.categoria_descripcion ??
+          "",
+        categoria_id: producto.categoria_id ?? null,
+        Stock: Number(
+          producto.Stock ?? producto.stock ?? producto.cantidad ?? 0
+        ),
+        Precio: Number(producto.Precio ?? producto.precio ?? 0),
+        proveedor_id: producto.proveedor_id ?? null,
+        Proveedor: producto.proveedor ?? producto.Proveedor ?? "",
+      });
+
+      const productos = productosRaw.map(adaptProducto);
+
+      const total = typeof data?.total === "number" ? data.total : productos.length;
+      const page = typeof data?.page === "number" ? data.page : state.page || 1;
+      const pageSize = typeof data?.pageSize === "number" ? data.pageSize : state.pageSize || productos.length || 10;
+      const totalPages = typeof data?.totalPages === "number" ? data.totalPages : state.totalPages || 1;
+
       return {
         ...state,
-        initialState: action.payload,
+        initialState: productos,
+        total,
+        page,
+        pageSize,
+        totalPages,
       };
     },
     getCategorias: (state, action) => {
       return {
         ...state,
-        categoriasState: action.payload,
+        categoriasState: Array.isArray(action.payload) ? action.payload : [],
       };
     },
     addProducto: (state, action) => {
+      // Asegurar que initialState sea un array
+      const currentInitialState = Array.isArray(state.initialState) 
+        ? state.initialState 
+        : [];
+      
       return {
         ...state,
-        initialState: [action.payload, ...state.initialState],
+        initialState: [action.payload, ...currentInitialState],
+        total: (state.total || currentInitialState.length) + 1,
       };
     },
 
     deleteProducto: (state, action) => {
+      // Asegurar que initialState sea un array
+      const currentInitialState = Array.isArray(state.initialState) 
+        ? state.initialState 
+        : [];
+      
       return {
         ...state,
-        initialState: state?.initialState?.filter(
+        initialState: currentInitialState.filter(
           (productoData) => productoData?.producto_id !== action?.payload
         ),
+        total: Math.max((state.total || currentInitialState.length) - 1, 0),
       };
     },
     editProducto: (state, action) => {
+      // Asegurar que initialState sea un array
+      const currentInitialState = Array.isArray(state.initialState) 
+        ? state.initialState 
+        : [];
+      
       return {
         ...state,
-        initialState: state.initialState.map((productoData) =>
+        initialState: currentInitialState.map((productoData) =>
           productoData?.producto_id === action?.payload?.producto_id
             ? action.payload
             : productoData
@@ -120,11 +181,35 @@ export const addProductoAPI = (productoData) => {
       }
     } catch (error) {
       console.error("Error al agregar producto:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Hubo un problema al agregar el producto.",
-      });
+      
+      if (error.response && error.response.status === 409) {
+        // Error 409: Conflicto (probablemente código duplicado)
+        const mensaje = error.response.data?.mensaje || error.response.data?.message || 
+          `El código "${productoData.codigo}" ya existe. Por favor, use un código diferente.`;
+        
+        Swal.fire({
+          icon: "warning",
+          title: "Código duplicado",
+          text: mensaje,
+        });
+      } else if (error.response && error.response.status) {
+        // Otros errores HTTP
+        const mensaje = error.response.data?.mensaje || error.response.data?.message || 
+          `Error ${error.response.status}: No se pudo agregar el producto.`;
+        
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: mensaje,
+        });
+      } else {
+        // Error de conexión
+        Swal.fire({
+          icon: "error",
+          title: "Error de conexión",
+          text: "No se pudo conectar con el servidor. Verifica que el backend esté corriendo.",
+        });
+      }
     }
   };
 };

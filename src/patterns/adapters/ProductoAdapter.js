@@ -15,8 +15,8 @@ class ProductoAdapter {
       codigo: formData.codigo,
       marca: formData.marca,
       categoria_id: formData.categoriaID === 0 || formData.categoriaID === "" ? null : parseInt(formData.categoriaID),
-      precio: parseFloat(formData.precio),
-      stock: parseInt(formData.cantidad),
+      precio: ProductoAdapter.parseDecimal(formData.precio),
+      stock: parseInt(formData.cantidad, 10),
       usuario_id: usuarioId,
     };
   }
@@ -36,7 +36,7 @@ class ProductoAdapter {
       Categoria: formData.categoriaDesc,
       categoria_id: formData.categoriaID === 0 || formData.categoriaID === "" ? null : parseInt(formData.categoriaID),
       Stock: parseInt(formData.cantidad),
-      Precio: parseFloat(formData.precio),
+      Precio: ProductoAdapter.parseDecimal(formData.precio),
     };
   }
 
@@ -71,8 +71,8 @@ class ProductoAdapter {
       codigo: formData.codigo,
       marca: formData.marca,
       categoria_id: formData.categoriaID === 0 || formData.categoriaID === "" ? null : parseInt(formData.categoriaID),
-      precio: parseFloat(formData.precio),
-      stock: parseInt(formData.cantidad),
+      precio: ProductoAdapter.parseDecimal(formData.precio),
+      stock: parseInt(formData.cantidad, 10),
       usuario_id: usuarioId,
     };
   }
@@ -92,10 +92,19 @@ class ProductoAdapter {
       Categoria: formData.categoriaDesc,
       categoria_id: formData.categoriaID === 0 || formData.categoriaID === "" ? null : parseInt(formData.categoriaID),
       Stock: parseInt(formData.cantidad),
-      Precio: parseFloat(formData.precio),
+      Precio: ProductoAdapter.parseDecimal(formData.precio),
     };
+  }
+
+  static parseDecimal(value) {
+    if (value === null || value === undefined) return 0;
+    const normalized = String(value).replace(",", ".");
+    const result = parseFloat(normalized);
+    return isNaN(result) ? 0 : result;
   }
 }
 
 export default ProductoAdapter;
+
+
 

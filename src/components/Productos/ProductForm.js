@@ -16,7 +16,12 @@ const ProductFormModal = ({ Categorias, usuarioId }) => {
     setValue,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      categoriaID: "", // Valor por defecto vacío
+      categoriaDesc: "", // Valor por defecto vacío
+    },
+  });
 
   const [show, setShow] = useState(false);
 
@@ -130,12 +135,20 @@ const ProductFormModal = ({ Categorias, usuarioId }) => {
               <div className="form-group col-md-12">
                 <label htmlFor="precio">Precio:</label>
                 <input
-                  type="number"
+                  type="text"
                   id="precio"
                   className="form-control"
                   {...register("precio", {
                     required: "Este campo es requerido",
+                    pattern: {
+                      value: /^\d+(?:[\.,]\d{0,2})?$/,
+                      message: "Ingrese un número válido (ej: 1234.56)",
+                    },
                   })}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/,/g, ".");
+                    setValue("precio", value);
+                  }}
                 />
                 {errors.precio && (
                   <p style={{ color: "red" }}>{errors.precio.message}</p>
@@ -156,29 +169,32 @@ const ProductFormModal = ({ Categorias, usuarioId }) => {
                 )}
               </div>
               <div className="form-group col-md-12">
-                <label htmlFor="categoriaID">Categoria:</label>
+                <label htmlFor="categoriaID">Categoria (Opcional):</label>
                 <select
                   id="categoriaID"
                   className="form-select"
-                  {...register("categoriaID", {
-                    required: "Este campo es requerido",
-                  })}
+                  {...register("categoriaID")}
                   onChange={handleChange}
+                  defaultValue=""
                 >
                   <option value="" className="default-option">
-                    Seleccionar Categoria
+                    {Categorias && Array.isArray(Categorias) && Categorias.length > 0 
+                      ? "Seleccionar Categoria (Opcional)" 
+                      : "Sin categorías disponibles (Opcional)"}
                   </option>
-                  {Categorias?.map((categoria) => (
-                    <option
-                      key={categoria.categoria_id}
-                      value={categoria.categoria_id}
-                      data-user-categoria={categoria.nombre}
-                    >
-                      {categoria.nombre}
-                    </option>
-                  ))}
+                  {Categorias && Array.isArray(Categorias) && Categorias.length > 0 && (
+                    Categorias.map((categoria) => (
+                      <option
+                        key={categoria.categoria_id || categoria.id}
+                        value={categoria.categoria_id || categoria.id}
+                        data-user-categoria={categoria.nombre || categoria.Nombre || categoria.name}
+                      >
+                        {categoria.nombre || categoria.Nombre || categoria.name}
+                      </option>
+                    ))
+                  )}
                 </select>
-                {errors.categoriaID && (
+                {errors.categoriaID && errors.categoriaID.message && (
                   <p style={{ color: "red" }}>{errors.categoriaID.message}</p>
                 )}
               </div>

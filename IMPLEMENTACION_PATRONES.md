@@ -234,3 +234,5 @@ const options = SelectAdapter.clienteToSelectOptions(clientes);
 **Fecha de implementación**: 2024
 **Estado**: ✅ Completado y funcional
 
+
+

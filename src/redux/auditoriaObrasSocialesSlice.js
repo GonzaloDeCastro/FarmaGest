@@ -5,13 +5,19 @@ import API from "../config";
 
 const auditoriaObrasSocialesSlice = createSlice({
   name: "auditoria obras sociales",
-  initialState: {},
+  initialState: {
+    initialState: [],
+  },
   reducers: {
     getAuditoriaObrasSociales: (state, action) => {
-      return {
-        ...state,
-        initialState: action.payload,
-      };
+      const payload = action.payload;
+      const auditoria = Array.isArray(payload)
+        ? payload
+        : Array.isArray(payload?.auditoria)
+        ? payload.auditoria
+        : [];
+
+      state.initialState = auditoria;
     },
   },
 });

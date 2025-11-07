@@ -4,60 +4,78 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import API from "../config";
 
+const initialState = {
+  initialState: [],
+  rolesState: [],
+  loginState: {},
+  pagination: {
+    total: 0,
+    page: 1,
+    pageSize: 10,
+    totalPages: 1,
+  },
+};
+
 const usuarioDataSlice = createSlice({
   name: "usuario",
-  initialState: {},
-  rolesState: {},
-  loginState: {},
+  initialState,
   reducers: {
     getUsuarioLogin: (state, action) => {
-      return {
-        ...state,
-        loginState: action.payload,
-      };
+      state.loginState = action.payload || {};
     },
     logoutUsuario: (state) => {
-      return {
-        ...state,
-        loginState: {},
-      };
+      state.loginState = {};
     },
     getUsuarios: (state, action) => {
-      return {
-        ...state,
-        initialState: action.payload,
-      };
+      const payload = action.payload;
+
+      const usuarios = Array.isArray(payload?.usuarios)
+        ? payload.usuarios
+        : Array.isArray(payload)
+        ? payload
+        : [];
+
+      state.initialState = usuarios;
+
+      if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+        state.pagination = {
+          total: payload.total ?? state.pagination.total,
+          page: payload.page ?? state.pagination.page,
+          pageSize: payload.pageSize ?? state.pagination.pageSize,
+          totalPages: payload.totalPages ?? state.pagination.totalPages,
+        };
+      }
     },
     getRoles: (state, action) => {
-      return {
-        ...state,
-        rolesState: action.payload,
-      };
+      const roles = Array.isArray(action.payload) ? action.payload : [];
+      state.rolesState = roles;
     },
     addUsuario: (state, action) => {
-      return {
-        ...state,
-        initialState: [action.payload, ...state.initialState],
-      };
-    },
+      const currentUsuarios = Array.isArray(state.initialState)
+        ? state.initialState
+        : [];
 
+      state.initialState = [action.payload, ...currentUsuarios];
+    },
     deleteUsuario: (state, action) => {
-      return {
-        ...state,
-        initialState: state?.initialState?.filter(
-          (usuarioData) => usuarioData?.usuario_id !== action?.payload
-        ),
-      };
+      const currentUsuarios = Array.isArray(state.initialState)
+        ? state.initialState
+        : [];
+
+      state.initialState = currentUsuarios.filter(
+        (usuarioData) => usuarioData?.usuario_id !== action?.payload
+      );
     },
     editUsuario: (state, action) => {
-      return {
-        ...state,
-        initialState: state.initialState.map((usuarioData) =>
-          usuarioData?.usuario_id === action?.payload?.usuario_id
-            ? action.payload
-            : usuarioData
-        ),
-      };
+      const currentUsuarios = Array.isArray(state.initialState)
+        ? state.initialState
+        : [];
+
+      state.initialState = currentUsuarios.map((usuarioData) =>
+        usuarioData?.usuario_id === action?.payload?.usuario_id
+          ? action.payload
+          : usuarioData
+      );
     },
   },
 });
@@ -132,17 +150,23 @@ export const addUsuarioAPI = (usuarioData) => {
         });
       }
     } catch (error) {
-      if (error.response.status === 409) {
+      if (error.response && error.response.status === 409) {
         Swal.fire({
           icon: "warning",
           title: "Advertencia!",
-          text: error.response.data.mensaje,
+          text: error.response.data?.mensaje || "Error de validación",
+        });
+      } else if (error.response && error.response.status) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.response.data?.mensaje || `Error ${error.response.status}`,
         });
       } else {
         Swal.fire({
           icon: "error",
-          title: "Error",
-          text: error.response.data.mensaje,
+          title: "Error de conexión",
+          text: "No se pudo conectar con el servidor.",
         });
       }
     }
@@ -235,17 +259,31 @@ export const getUsuarioLoginAPI = (
         dispatch(getUsuarioLogin(response.data));
       }
     } catch (error) {
-      if (error.response.status === 401) {
+      if (error.response && error.response.status === 401) {
+        const mensaje =
+          error.response.data?.mensaje ||
+          error.response.data ||
+          "Usuario o contraseña incorrectos";
         Swal.fire({
           icon: "warning",
           title: "Advertencia!",
-          text: error.response.data,
+          text: mensaje,
         });
-      } else {
+      } else if (error.response && error.response.status) {
         Swal.fire({
           icon: "error",
-          title: "Advertencia!",
-          text: "Error 500",
+          title: "Error",
+          text:
+            error.response.data?.mensaje ||
+            error.response.data ||
+            `Error ${error.response.status}`,
+        });
+      } else {
+        // Error de conexión o backend no disponible
+        Swal.fire({
+          icon: "error",
+          title: "Error de conexión",
+          text: "No se pudo conectar con el servidor. Verifica que el backend esté corriendo.",
         });
       }
     }
@@ -291,17 +329,23 @@ export const updatePasswordDataAPI = (dataUser) => {
         });
       }
     } catch (error) {
-      if (error.response.status === 401) {
+      if (error.response && error.response.status === 401) {
         Swal.fire({
           icon: "warning",
           title: "Advertencia!",
-          text: error.response.data,
+          text: error.response.data || "Credenciales inválidas",
+        });
+      } else if (error.response && error.response.status) {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: error.response.data?.mensaje || error.response.data || `Error ${error.response.status}`,
         });
       } else {
         Swal.fire({
           icon: "error",
-          title: "Error!",
-          text: error.response.data,
+          title: "Error de conexión",
+          text: "No se pudo conectar con el servidor.",
         });
       }
     }

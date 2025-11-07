@@ -1176,3 +1176,5 @@ const ProductFormModal = ({ Categorias, usuarioId }) => {
 - Se recomienda implementar gradualmente y medir impacto
 - Los patrones actuales (Observer, Singleton, Facade, Proxy) ya están bien implementados
 
+
+

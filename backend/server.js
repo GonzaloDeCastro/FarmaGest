@@ -21,6 +21,14 @@ const ventasRoutes = require('./routes/ventas');
 const sesionesRoutes = require('./routes/sesiones');
 const reportesRoutes = require('./routes/reportes');
 const auditoriaRoutes = require('./routes/auditoria');
+const {
+  getUltimaVenta,
+  getVentasByCliente,
+  getVentaDetalle,
+  getAuditoriaProductosList,
+  getAuditoriaClientesList,
+  getAuditoriaObrasSocialesList,
+} = require('./controllers/otrosController');
 
 console.log('✅ Todos los módulos cargados correctamente');
 
@@ -81,12 +89,18 @@ app.get('/health', async (req, res) => {
 });
 
 // Rutas API
+app.get('/api/ventas/ultima-venta', getUltimaVenta);
+app.get('/api/ventas/cliente/:clienteId', getVentasByCliente);
+app.get('/api/ventas/venta-id/:ventaId', getVentaDetalle);
+app.get('/api/auditoria-productos', getAuditoriaProductosList);
+app.get('/api/auditoria-clientes', getAuditoriaClientesList);
+app.get('/api/auditoria-obras-sociales', getAuditoriaObrasSocialesList);
+app.use('/api/ventas', ventasRoutes);
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/productos', productosRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/obras-sociales', obrasSocialesRoutes);
 app.use('/api/proveedores', proveedoresRoutes);
-app.use('/api/ventas', ventasRoutes);
 app.use('/api/sesiones', sesionesRoutes);
 app.use('/api/reportes', reportesRoutes);
 app.use('/api/auditoria', auditoriaRoutes);

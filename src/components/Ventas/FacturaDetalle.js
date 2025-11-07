@@ -13,6 +13,16 @@ const FacturaDetalle = ({ ventaId }) => {
 
   const facturaDetalle = useSelector((state) => state.venta.facturaState || {});
 
+  const formatearMoneda = (valor) =>
+    Number(valor || 0).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+  const fechaFormateada = facturaDetalle?.fecha_hora
+    ? new Date(facturaDetalle.fecha_hora).toLocaleString()
+    : "-";
+
   useEffect(() => {
     if (show) {
       dispatch(verFacturaVentaAPI(ventaId));
@@ -74,59 +84,81 @@ const FacturaDetalle = ({ ventaId }) => {
         <Modal.Body className={styles.modalBody}>
           <div ref={facturaRef}>
             <p className={styles.encabezadoFactura}>
-              <strong>Factura N°:</strong> {facturaDetalle.venta_id}
+              <strong>Factura N°:</strong> {facturaDetalle.numero_factura || facturaDetalle.venta_id}
             </p>
             <p className={styles.encabezadoFactura}>
-              <strong>Fecha y hora:</strong>{" "}
-              {new Date(facturaDetalle.fecha_hora).toLocaleString()}
+              <strong>Fecha y hora:</strong> {fechaFormateada}
             </p>
             <p className={styles.encabezadoFactura}>
-              <strong>Cliente:</strong> {facturaDetalle.cliente_nombre}{" "}
-              {facturaDetalle.cliente_apellido}
+              <strong>Cliente:</strong> {facturaDetalle.cliente_nombre} {facturaDetalle.cliente_apellido}
             </p>
             <p className={styles.encabezadoFactura}>
-              <strong>Vendedor:</strong> {facturaDetalle.usuario_nombre}{" "}
-              {facturaDetalle.usuario_apellido}
+              <strong>Vendedor:</strong> {facturaDetalle.usuario_nombre} {facturaDetalle.usuario_apellido}
             </p>
+            {facturaDetalle.obra_social && (
+              <p className={styles.encabezadoFactura}>
+                <strong>Obra Social:</strong> {facturaDetalle.obra_social}
+              </p>
+            )}
             <table className={styles.table}>
               <thead>
                 <tr>
                   <th>Producto</th>
                   <th>Cantidad</th>
                   <th>Precio</th>
-                  <th>Sub Total</th>
+                  <th>Subtotal</th>
                 </tr>
               </thead>
               <tbody>
-                {facturaDetalle.items?.map((item) => (
-                  <tr key={item.item_id}>
-                    <td>{item.producto_nombre}</td>
-                    <td>{item.cantidad}</td>
-                    <td>${item.precio_unitario}</td>
-                    <td>${item.total_item}</td>
+                {facturaDetalle.items?.length ? (
+                  facturaDetalle.items.map((item) => (
+                    <tr key={item.item_id}>
+                      <td>{item.producto_nombre}</td>
+                      <td>{item.cantidad}</td>
+                      <td>${formatearMoneda(item.precio_unitario)}</td>
+                      <td>${formatearMoneda(item.subtotal)}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} style={{ textAlign: 'center' }}>
+                      Sin items cargados
+                    </td>
                   </tr>
-                ))}
+                )}
               </tbody>
-            </table>{" "}
-            <>
-              <div className={styles.contenedorTotal}>
-                Total sin descuento:
-                <span className={styles.valorSubTotal}>
-                  ${facturaDetalle?.total_sin_descuento}
-                </span>
-              </div>
-
-              <div className={styles.contenedorTotal}>
-                Descuento aplicado:
-                <span className={styles.valorDescuento}>
-                  {facturaDetalle?.descuento}%
-                </span>
-                Total:
-                <span className={styles.valorTotal}>
-                  ${facturaDetalle?.total}
-                </span>
-              </div>
-            </>
+            </table>
+            <div className={styles.contenedorTotal}>
+              Total sin descuento:
+              <span className={styles.valorSubTotal}>
+                ${formatearMoneda(facturaDetalle.total_sin_descuento)}
+              </span>
+            </div>
+            <div className={styles.contenedorTotal}>
+              Descuento aplicado:
+              <span className={styles.valorDescuento}>
+                {facturaDetalle.descuento_porcentaje}% (
+                ${formatearMoneda(facturaDetalle.descuento_monto)})
+              </span>
+            </div>
+            <div className={styles.contenedorTotal}>
+              Subtotal con descuento:
+              <span className={styles.valorSubTotal}>
+                ${formatearMoneda(facturaDetalle.subtotal_con_descuento)}
+              </span>
+            </div>
+            <div className={styles.contenedorTotal}>
+              IVA {facturaDetalle.iva_porcentaje}%:
+              <span className={styles.valorSubTotal}>
+                ${formatearMoneda(facturaDetalle.iva_monto)}
+              </span>
+            </div>
+            <div className={styles.contenedorTotal}>
+              Total:
+              <span className={styles.valorTotal}>
+                ${formatearMoneda(facturaDetalle.total)}
+              </span>
+            </div>
           </div>
         </Modal.Body>
         <Modal.Footer>

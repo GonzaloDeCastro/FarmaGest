@@ -134,11 +134,15 @@ const Usuarios = () => {
           </thead>
           <tbody>
             {Object?.keys(Usuarios)?.length == 0 ? (
-              <div
-                className="spinner-border"
-                style={{ marginTop: "10%", width: "100px", height: "100px" }}
-                role="status"
-              />
+              <tr>
+                <td colSpan={keys.length + 1}>
+                  <div
+                    className="spinner-border"
+                    style={{ marginTop: "10%", width: "100px", height: "100px" }}
+                    role="status"
+                  />
+                </td>
+              </tr>
             ) : Usuarios.initialState && Usuarios?.initialState?.length > 0 ? (
               Usuarios?.initialState?.map((dato) => (
                 <tr key={dato.usuario_id}>
@@ -179,7 +183,11 @@ const Usuarios = () => {
                 </tr>
               ))
             ) : (
-              <div className="NoData">sin datos </div>
+              <tr>
+                <td colSpan={keys.length + 1} className="NoData">
+                  sin datos
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

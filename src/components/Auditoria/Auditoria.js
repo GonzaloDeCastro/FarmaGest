@@ -134,9 +134,20 @@ const Auditoria = () => {
                       }}
                       key={`${auditoria.id}-${column}`}
                     >
-                      {column == "Fecha"
-                        ? auditoria[column].slice(0, 16).replace("T", " ")
-                        : auditoria[column]}
+                      {(() => {
+                        const value = auditoria[column];
+                        if (column === "Fecha") {
+                          if (!value) return "-";
+                          return value.toString().slice(0, 16).replace("T", " ");
+                        }
+                        if (
+                          value !== null &&
+                          typeof value === "object"
+                        ) {
+                          return JSON.stringify(value, null, 2);
+                        }
+                        return value ?? "-";
+                      })()}
                     </td>
                   ))}
                 </tr>

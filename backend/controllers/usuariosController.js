@@ -119,6 +119,52 @@ const loginUsuario = async (req, res) => {
     );
     
     // Retornar datos del usuario (sin contraseña)
+    // Permisos por rol (map estático hasta implementar tabla de permisos)
+    const permisosPorRol = {
+      administrador: [
+        'gestion_productos',
+        'gestion_ventas',
+        'gestion_clientes',
+        'gestion_proveedores',
+        'gestion_obras_sociales',
+        'gestion_usuarios',
+        'gestion_pedidos'
+      ],
+      admin: [
+        'gestion_productos',
+        'gestion_ventas',
+        'gestion_clientes',
+        'gestion_proveedores',
+        'gestion_obras_sociales',
+        'gestion_usuarios',
+        'gestion_pedidos'
+      ],
+      vendedor: [
+        'gestion_productos',
+        'gestion_ventas',
+        'gestion_clientes'
+      ],
+      cajero: [
+        'gestion_ventas'
+      ],
+      farmaceutico: [
+        'gestion_productos',
+        'gestion_ventas',
+        'gestion_clientes',
+        'gestion_proveedores',
+        'gestion_obras_sociales'
+      ],
+    };
+
+    const normalizeRolKey = (rol = '') =>
+      rol
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '');
+
+    const rolKey = usuario.rol ? normalizeRolKey(usuario.rol) : '';
+    const permisos = permisosPorRol[rolKey] || [];
+
     const usuarioResponse = {
       usuario_id: usuario.usuario_id,
       nombre: usuario.nombre,
@@ -126,7 +172,8 @@ const loginUsuario = async (req, res) => {
       correo: usuario.correo,
       rol: usuario.rol,
       rol_id: usuario.rol_id,
-      sesion_id: sesionResult.rows[0].sesion_id
+      sesion_id: sesionResult.rows[0].sesion_id,
+      permisos,
     };
     
     res.json(usuarioResponse);
@@ -295,6 +342,30 @@ const updatePassword = async (req, res) => {
   }
 };
 
+// Logout de usuario
+const logoutUsuario = async (req, res) => {
+  try {
+    const { sesion_id } = req.params;
+
+    if (!sesion_id) {
+      return res.status(400).json({ mensaje: 'Sesión inválida' });
+    }
+
+    await query(
+      `UPDATE sesiones
+       SET activo = false,
+           fecha_fin = CURRENT_TIMESTAMP
+       WHERE sesion_id = $1`,
+      [sesion_id]
+    );
+
+    res.json({ mensaje: 'Sesión cerrada correctamente' });
+  } catch (error) {
+    console.error('Error al cerrar sesión:', error);
+    res.status(500).json({ mensaje: 'Error al cerrar sesión', error: error.message });
+  }
+};
+ 
 module.exports = {
   getUsuarios,
   getRoles,
@@ -302,6 +373,7 @@ module.exports = {
   createUsuario,
   updateUsuario,
   deleteUsuario,
-  updatePassword
+  updatePassword,
+  logoutUsuario
 };
 

@@ -5,35 +5,52 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import API from "../config";
 
-const ventasSlice = createSlice({
-  name: "ventas",
-  initialState: {},
+const initialState = {
+  initialState: [],
   ultimaVentaState: {},
   facturaState: {},
+  pagination: {
+    total: 0,
+    page: 1,
+    pageSize: 10,
+  },
+};
+
+const ventasSlice = createSlice({
+  name: "ventas",
+  initialState,
   reducers: {
     getVentas: (state, action) => {
-      return {
-        ...state,
-        initialState: action.payload,
-      };
+      const payload = action.payload;
+
+      const ventas = Array.isArray(payload?.ventas)
+        ? payload.ventas
+        : Array.isArray(payload)
+        ? payload
+        : [];
+
+      state.initialState = ventas;
+
+      if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+        state.pagination = {
+          total: payload.total ?? state.pagination.total,
+          page: payload.page ?? state.pagination.page,
+          pageSize: payload.pageSize ?? state.pagination.pageSize,
+        };
+      }
     },
     getUltimaVenta: (state, action) => {
-      return {
-        ...state,
-        ultimaVentaState: action.payload,
-      };
+      state.ultimaVentaState = action.payload || {};
     },
     addVenta: (state, action) => {
-      return {
-        ...state,
-        initialState: [action.payload, ...state.initialState],
-      };
+      const currentVentas = Array.isArray(state.initialState)
+        ? state.initialState
+        : [];
+
+      state.initialState = [action.payload, ...currentVentas];
     },
     verFacturaVenta: (state, action) => {
-      return {
-        ...state,
-        facturaState: action.payload,
-      };
+      state.facturaState = action.payload || {};
     },
   },
 });
@@ -65,6 +82,20 @@ export const getUltimaVentaAPI = () => async (dispatch) => {
     console.error("Error al obtener ventas:", error);
   }
 };
+
+// Obtener historial de ventas de un cliente para recomendaciones IA
+export const getVentasByClienteAPI = (clienteId) => async (dispatch) => {
+  try {
+    const response = await axios.get(`${API}/ventas/cliente/${clienteId}`);
+    if (response.status === 200) {
+      return response.data;
+    }
+    return [];
+  } catch (error) {
+    console.error("Error al obtener ventas del cliente:", error);
+    return [];
+  }
+};
 export const verFacturaVentaAPI = (ventaId) => async (dispatch) => {
   try {
     const response = await axios.get(`${API}/ventas/venta-id/${ventaId}`);
@@ -79,14 +110,30 @@ export const verFacturaVentaAPI = (ventaId) => async (dispatch) => {
 export const addVentaAPI = (ventaData) => {
   return async (dispatch) => {
     try {
-      const response = await axios.post(`${API}/ventas`, ventaData);
+      const payload = {
+        cliente_id: ventaData.cliente_id,
+        usuario_id: ventaData.usuario_id,
+        items: (ventaData.itemsAgregados || []).map((item) => ({
+          producto_id: item.productoId || item.producto_id,
+          cantidad: item.cantidad,
+          precio_unitario: item.precio,
+          subtotal: item.total,
+        })),
+        subtotal: parseFloat(ventaData.totalSinDescuento) || 0,
+        descuento: ventaData.descuento || 0,
+        total: parseFloat(ventaData.totalConDescuento) || 0,
+        forma_pago: ventaData.forma_pago || null,
+        fecha_hora: ventaData.fecha_hora,
+        numero_factura: ventaData.numero_factura,
+      };
+
+      const response = await axios.post(`${API}/ventas`, payload);
       if (response.status === 201) {
-        //dispatch(addVenta(ventaData));
-        const response = await axios.get(`${API}/ventas`, {
+        const responseVentas = await axios.get(`${API}/ventas`, {
           params: { page: 1, pageSize: 8, search: "" },
         });
-        if (response.status === 200) {
-          dispatch(getVentas(response.data));
+        if (responseVentas.status === 200) {
+          dispatch(getVentas(responseVentas.data));
         }
         Swal.fire({
           icon: "success",
@@ -95,17 +142,23 @@ export const addVentaAPI = (ventaData) => {
         });
       }
     } catch (error) {
-      if (error.response.status === 409) {
+      if (error.response && error.response.status === 409) {
         Swal.fire({
           icon: "warning",
           title: "Advertencia!",
-          text: error.response.data.mensaje,
+          text: error.response.data?.mensaje || "Conflicto en la operación",
+        });
+      } else if (error.response && error.response.status) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.response.data?.mensaje || `Error ${error.response.status}`,
         });
       } else {
         Swal.fire({
           icon: "error",
-          title: "Error",
-          text: error.response.data.mensaje,
+          title: "Error de conexión",
+          text: "No se pudo conectar con el servidor.",
         });
       }
     }
