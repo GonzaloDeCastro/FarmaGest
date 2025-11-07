@@ -19,8 +19,9 @@ const FacturaDetalle = ({ ventaId }) => {
       maximumFractionDigits: 2,
     });
 
-  const fechaFormateada = facturaDetalle?.fecha_hora
-    ? new Date(facturaDetalle.fecha_hora).toLocaleString()
+  const fechaReferencia = facturaDetalle?.fecha_hora || facturaDetalle?.fecha;
+  const fechaFormateada = fechaReferencia
+    ? new Date(fechaReferencia).toLocaleString()
     : "-";
 
   useEffect(() => {

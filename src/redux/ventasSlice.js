@@ -23,11 +23,41 @@ const ventasSlice = createSlice({
     getVentas: (state, action) => {
       const payload = action.payload;
 
-      const ventas = Array.isArray(payload?.ventas)
+      const ventasRaw = Array.isArray(payload?.ventas)
         ? payload.ventas
         : Array.isArray(payload)
         ? payload
         : [];
+
+      const normalizeVenta = (venta = {}) => {
+        const fechaReferencia = venta.fecha_hora || venta.fecha || null;
+        const fechaIso = fechaReferencia
+          ? new Date(fechaReferencia).toISOString()
+          : null;
+
+        const subtotal = Number(
+          venta.total_sin_descuento ?? venta.subtotal ?? 0
+        );
+
+        const descuentoValor = Number(venta.descuento ?? 0);
+        const descuentoPorcentaje =
+          descuentoValor <= 1 ? descuentoValor * 100 : descuentoValor;
+
+        return {
+          ...venta,
+          fecha: fechaIso,
+          fecha_hora: fechaIso,
+          numero_factura:
+            venta.numero_factura ||
+            (venta.venta_id ? String(venta.venta_id).padStart(8, "0") : null),
+          total_sin_descuento: subtotal,
+          subtotal,
+          descuento: descuentoPorcentaje,
+          total: Number(venta.total ?? 0),
+        };
+      };
+
+      const ventas = ventasRaw.map(normalizeVenta);
 
       state.initialState = ventas;
 

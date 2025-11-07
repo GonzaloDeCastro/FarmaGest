@@ -363,12 +363,11 @@ const getVentaDetalle = async (req, res) => {
 
     const ventaResult = await query(
       `SELECT v.venta_id,
+              v.numero_factura,
               v.fecha,
-              v.fecha_hora,
               v.subtotal,
               v.descuento,
               v.total,
-              LPAD(v.venta_id::text, 8, '0') AS numero_formateado,
               c.nombre AS cliente_nombre,
               c.apellido AS cliente_apellido,
               u.nombre AS usuario_nombre,
@@ -390,7 +389,7 @@ const getVentaDetalle = async (req, res) => {
     const venta = ventaResult.rows[0];
 
     const itemsResult = await query(
-      `SELECT vi.venta_item_id,
+      `SELECT vi.item_id AS venta_item_id,
               vi.producto_id,
               p.nombre AS producto_nombre,
               vi.cantidad,
@@ -399,7 +398,7 @@ const getVentaDetalle = async (req, res) => {
        FROM ventas_items vi
        LEFT JOIN productos p ON vi.producto_id = p.producto_id
        WHERE vi.venta_id = $1
-       ORDER BY vi.venta_item_id`,
+       ORDER BY vi.item_id`,
       [ventaId]
     );
 
@@ -424,11 +423,19 @@ const getVentaDetalle = async (req, res) => {
     const ivaMonto = subtotalConDescuento * ivaPorcentaje;
     const totalConIva = subtotalConDescuento + ivaMonto;
 
+    const fechaIso = venta.fecha
+      ? new Date(venta.fecha).toISOString()
+      : null;
+
+    const numeroFactura = venta.numero_factura
+      ? venta.numero_factura
+      : String(venta.venta_id).padStart(8, '0');
+
     res.json({
       venta_id: venta.venta_id,
-      numero_factura: venta.numero_formateado,
-      fecha: venta.fecha,
-      fecha_hora: venta.fecha_hora,
+      numero_factura: numeroFactura,
+      fecha: fechaIso,
+      fecha_hora: fechaIso,
       cliente_nombre: venta.cliente_nombre,
       cliente_apellido: venta.cliente_apellido,
       usuario_nombre: venta.usuario_nombre,
@@ -455,7 +462,17 @@ const getVentaDetalle = async (req, res) => {
 
 const createVenta = async (req, res) => {
   try {
-    const { cliente_id, usuario_id, items, subtotal, descuento, total, forma_pago } = req.body;
+    const {
+      cliente_id,
+      usuario_id,
+      items,
+      subtotal,
+      descuento,
+      total,
+      forma_pago,
+      numero_factura,
+      fecha_hora,
+    } = req.body;
 
     const client = await require('../config/database').getClient();
     try {
@@ -480,13 +497,45 @@ const createVenta = async (req, res) => {
         }
       }
 
+      const numeroFacturaNormalizado = numero_factura
+        ? String(numero_factura).padStart(8, '0')
+        : null;
+
+      let fechaVenta = null;
+      if (fecha_hora) {
+        const fechaParseada = new Date(fecha_hora);
+        if (!isNaN(fechaParseada.getTime())) {
+          fechaVenta = fechaParseada.toISOString();
+        }
+      }
+
       const ventaResult = await client.query(
-        `INSERT INTO ventas (cliente_id, usuario_id, subtotal, descuento, total, forma_pago)
-         VALUES ($1, $2, $3, $4, $5, $6) RETURNING venta_id`,
-        [cliente_id || null, usuario_id, subtotal, descuento || 0, total, forma_pago || null]
+        `INSERT INTO ventas (cliente_id, usuario_id, numero_factura, fecha, subtotal, descuento, total, forma_pago)
+         VALUES ($1, $2, $3, COALESCE($4::timestamp, CURRENT_TIMESTAMP), $5, $6, $7, $8)
+         RETURNING venta_id, numero_factura, fecha`,
+        [
+          cliente_id || null,
+          usuario_id,
+          numeroFacturaNormalizado,
+          fechaVenta,
+          subtotal,
+          descuento || 0,
+          total,
+          forma_pago || null,
+        ]
       );
 
-      const venta_id = ventaResult.rows[0].venta_id;
+      const ventaRow = ventaResult.rows[0];
+      const venta_id = ventaRow.venta_id;
+      let numeroFacturaAsignado = ventaRow.numero_factura;
+
+      if (!numeroFacturaAsignado) {
+        numeroFacturaAsignado = String(venta_id).padStart(8, '0');
+        await client.query(
+          `UPDATE ventas SET numero_factura = $1 WHERE venta_id = $2`,
+          [numeroFacturaAsignado, venta_id]
+        );
+      }
 
       for (const item of items) {
         await client.query(
@@ -502,7 +551,11 @@ const createVenta = async (req, res) => {
       }
 
       await client.query('COMMIT');
-      res.status(201).json({ venta_id, mensaje: 'Venta creada correctamente' });
+      res.status(201).json({
+        venta_id,
+        numero_factura: numeroFacturaAsignado,
+        mensaje: 'Venta creada correctamente',
+      });
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;

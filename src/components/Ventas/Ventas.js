@@ -70,7 +70,7 @@ const Ventas = () => {
                 <td>{`${venta.cliente_nombre || ""} ${venta.cliente_apellido || ""}`.trim() || "-"}</td>
                 <td>{`${venta.usuario_nombre || ""} ${venta.usuario_apellido || ""}`.trim() || "-"}</td>
                 <td>${Number(venta.total_sin_descuento || 0).toFixed(2)}</td>
-                <td>{Number(venta.descuento || 0)}%</td>
+                <td>{Number(venta.descuento || 0).toFixed(2)}%</td>
                 <td>${Number(venta.total || 0).toFixed(2)}</td>
                 <td>
                   {/* <EditVentaForm venta={venta} /> */}
