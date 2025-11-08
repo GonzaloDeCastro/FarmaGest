@@ -77,7 +77,14 @@ const VentaFormModal = ({ usuarioId }) => {
     dispatch(getClientesAPI(1, pageSizeFull, "", null, null, sesion));
     dispatch(getUltimaVentaAPI());
     dispatch(getObrasSocialesAPI(1, pageSizeFull));
-    dispatch(getProductosAPI(1, pageSizeFull, "", sesion));
+    dispatch(
+      getProductosAPI({
+        page: 1,
+        pageSize: pageSizeFull,
+        search: "",
+        sesion,
+      })
+    );
     dispatch(getCategoriasAPI());
   }, [dispatch, sesion, show]);
 

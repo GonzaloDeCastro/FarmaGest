@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const {
   getProductos,
+  getProductosFiltros,
   getCategorias,
   createProducto,
   updateProducto,
@@ -10,6 +11,7 @@ const {
 } = require('../controllers/productosController');
 
 router.get('/categorias', getCategorias);
+router.get('/filtros', getProductosFiltros);
 router.get('/', getProductos);
 router.post('/', createProducto);
 router.put('/:producto_id', updateProducto);

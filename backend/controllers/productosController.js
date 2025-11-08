@@ -4,26 +4,80 @@ const { query } = require('../config/database');
 // Obtener productos con paginación
 const getProductos = async (req, res) => {
   try {
-    const { page = 1, pageSize = 10, search = '', sesion = '' } = req.query;
+    const {
+      page = 1,
+      pageSize = 10,
+      search = '',
+      marca = '',
+      proveedorId = '',
+      stockMin,
+      stockMax,
+      fechaDesde,
+      fechaHasta,
+    } = req.query;
     const offset = (page - 1) * pageSize;
-    
+
     let whereClause = 'WHERE p.activo = true';
     const params = [];
     let paramCount = 0;
-    
+
     if (search) {
       paramCount++;
       whereClause += ` AND (p.nombre ILIKE $${paramCount} OR p.codigo ILIKE $${paramCount} OR p.marca ILIKE $${paramCount})`;
       params.push(`%${search}%`);
     }
-    
+
+    if (marca) {
+      paramCount++;
+      whereClause += ` AND p.marca ILIKE $${paramCount}`;
+      params.push(`%${marca}%`);
+    }
+
+    if (proveedorId) {
+      paramCount++;
+      whereClause += ` AND p.proveedor_id = $${paramCount}`;
+      params.push(proveedorId);
+    }
+
+    if (stockMin !== undefined && stockMin !== '') {
+      paramCount++;
+      whereClause += ` AND p.stock >= $${paramCount}`;
+      params.push(Number(stockMin));
+    }
+
+    if (stockMax !== undefined && stockMax !== '') {
+      paramCount++;
+      whereClause += ` AND p.stock <= $${paramCount}`;
+      params.push(Number(stockMax));
+    }
+
+    if (fechaDesde) {
+      paramCount++;
+      whereClause += ` AND p.created_at >= $${paramCount}`;
+      params.push(new Date(fechaDesde));
+    }
+
+    if (fechaHasta) {
+      const fechaFin = new Date(fechaHasta);
+      fechaFin.setHours(23, 59, 59, 999);
+      paramCount++;
+      whereClause += ` AND p.created_at <= $${paramCount}`;
+      params.push(fechaFin);
+    }
+
     // Contar total
-    const countResult = await query(`SELECT COUNT(*) as total FROM productos p ${whereClause}`, params);
-    const total = parseInt(countResult.rows[0].total);
-    
+    const countResult = await query(
+      `SELECT COUNT(*) as total FROM productos p ${whereClause}`,
+      params
+    );
+    const total = parseInt(countResult.rows[0].total, 10);
+
     // Obtener productos
     params.push(pageSize, offset);
-    
+
+    const limitParam = params.length - 1;
+    const offsetParam = params.length;
+
     const productosQuery = `
       SELECT 
         p.producto_id,
@@ -35,27 +89,59 @@ const getProductos = async (req, res) => {
         p.categoria_id,
         c.categoria,
         p.proveedor_id,
-        pr.razon_social as proveedor
+        pr.razon_social as proveedor,
+        p.created_at
       FROM productos p
       LEFT JOIN categorias c ON p.categoria_id = c.categoria_id
       LEFT JOIN proveedores pr ON p.proveedor_id = pr.proveedor_id
       ${whereClause}
       ORDER BY p.producto_id DESC
-      LIMIT $${params.length - 1} OFFSET $${params.length}
+      LIMIT $${limitParam} OFFSET $${offsetParam}
     `;
-    
+
     const result = await query(productosQuery, params);
-    
+
     res.json({
       productos: result.rows,
       total,
-      page: parseInt(page),
-      pageSize: parseInt(pageSize),
-      totalPages: Math.ceil(total / pageSize)
+      page: parseInt(page, 10),
+      pageSize: parseInt(pageSize, 10),
+      totalPages: Math.ceil(total / pageSize),
     });
   } catch (error) {
     console.error('Error al obtener productos:', error);
-    res.status(500).json({ mensaje: 'Error al obtener productos', error: error.message });
+    res
+      .status(500)
+      .json({ mensaje: 'Error al obtener productos', error: error.message });
+  }
+};
+
+const getProductosFiltros = async (_req, res) => {
+  try {
+    const marcasResult = await query(
+      `SELECT DISTINCT marca
+       FROM productos
+       WHERE activo = true AND marca IS NOT NULL AND marca <> ''
+       ORDER BY marca`
+    );
+
+    const proveedoresResult = await query(
+      `SELECT proveedor_id, razon_social
+       FROM proveedores
+       WHERE activo = true
+       ORDER BY razon_social`
+    );
+
+    res.json({
+      marcas: marcasResult.rows.map((row) => row.marca),
+      proveedores: proveedoresResult.rows,
+    });
+  } catch (error) {
+    console.error('Error al obtener filtros de productos:', error);
+    res.status(500).json({
+      mensaje: 'Error al obtener filtros de productos',
+      error: error.message,
+    });
   }
 };
 
@@ -161,6 +247,7 @@ const deleteProducto = async (req, res) => {
 
 module.exports = {
   getProductos,
+  getProductosFiltros,
   getCategorias,
   createProducto,
   updateProducto,

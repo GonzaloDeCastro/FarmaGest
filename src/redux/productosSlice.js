@@ -9,6 +9,10 @@ const productoDataSlice = createSlice({
   initialState: {
     initialState: [], // Lista de productos
     categoriasState: [],
+    filtrosState: {
+      marcas: [],
+      proveedores: [],
+    },
     total: 0,
     page: 1,
     pageSize: 10,
@@ -41,6 +45,11 @@ const productoDataSlice = createSlice({
         Precio: Number(producto.Precio ?? producto.precio ?? 0),
         proveedor_id: producto.proveedor_id ?? null,
         Proveedor: producto.proveedor ?? producto.Proveedor ?? "",
+        FechaCreacion:
+          producto.FechaCreacion ??
+          producto.fechaCreacion ??
+          producto.created_at ??
+          "",
       });
 
       const productos = productosRaw.map(adaptProducto);
@@ -63,6 +72,15 @@ const productoDataSlice = createSlice({
       return {
         ...state,
         categoriasState: Array.isArray(action.payload) ? action.payload : [],
+      };
+    },
+    setFiltros: (state, action) => {
+      const filtros = action.payload || {};
+      state.filtrosState = {
+        marcas: Array.isArray(filtros.marcas) ? filtros.marcas : [],
+        proveedores: Array.isArray(filtros.proveedores)
+          ? filtros.proveedores
+          : [],
       };
     },
     addProducto: (state, action) => {
@@ -113,6 +131,7 @@ const productoDataSlice = createSlice({
 export const {
   getProductos,
   getCategorias,
+  setFiltros,
   addProducto,
   deleteProducto,
   editProducto,
@@ -120,7 +139,20 @@ export const {
 
 // Funciones API para interactuar con el backend
 
-export const getProductosAPI = (page, pageSize, search, sesion) => {
+export const getProductosAPI = (options = {}) => {
+  const {
+    page = 1,
+    pageSize = 10,
+    search = "",
+    sesion,
+    marca,
+    proveedorId,
+    stockMin,
+    stockMax,
+    fechaDesde,
+    fechaHasta,
+  } = options;
+
   return async (dispatch) => {
     try {
       const response = await axios.get(`${API}/productos`, {
@@ -129,6 +161,12 @@ export const getProductosAPI = (page, pageSize, search, sesion) => {
           pageSize,
           search,
           sesion,
+          marca,
+          proveedorId,
+          stockMin,
+          stockMax,
+          fechaDesde,
+          fechaHasta,
         },
       });
 
@@ -155,6 +193,19 @@ export const getCategoriasAPI = () => {
   };
 };
 
+export const getProductosFiltrosAPI = () => {
+  return async (dispatch) => {
+    try {
+      const response = await axios.get(`${API}/productos/filtros`);
+      if (response.status === 200) {
+        dispatch(setFiltros(response.data));
+      }
+    } catch (error) {
+      console.error("Error al obtener filtros de productos:", error);
+    }
+  };
+};
+
 export const addProductoAPI = (productoData) => {
   return async (dispatch) => {
     try {
@@ -170,6 +221,9 @@ export const addProductoAPI = (productoData) => {
           categoria_id: productoData.categoria_id,
           Stock: productoData.stock,
           Precio: productoData.precio,
+          Proveedor: "",
+          proveedor_id: productoData.proveedor_id || null,
+          FechaCreacion: new Date().toISOString(),
         };
 
         dispatch(addProducto(newProducto));
@@ -242,7 +296,7 @@ export const deleteProductoAPI = (productoData) => {
 };
 
 export const editProductoAPI = (productoData) => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     try {
       const response = await axios.put(
         `${API}/productos/${productoData.producto_id}`,
@@ -250,6 +304,12 @@ export const editProductoAPI = (productoData) => {
       );
 
       if (response.status === 200) {
+        const state = getState();
+        const current =
+          state?.producto?.initialState?.find(
+            (item) => item.producto_id === productoData.producto_id
+          ) || {};
+
         const editarProducto = {
           producto_id: productoData.producto_id,
           Nombre: productoData.nombre,
@@ -259,6 +319,10 @@ export const editProductoAPI = (productoData) => {
           categoria_id: productoData.categoria_id,
           Stock: productoData.stock,
           Precio: productoData.precio,
+          Proveedor: productoData.Proveedor ?? current.Proveedor ?? "",
+          proveedor_id: productoData.proveedor_id ?? current.proveedor_id ?? null,
+          FechaCreacion:
+            current.FechaCreacion ?? new Date().toISOString(),
         };
         dispatch(editProducto(editarProducto));
         Swal.fire({

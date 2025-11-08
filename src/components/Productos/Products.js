@@ -4,6 +4,7 @@ import {
   getProductosAPI,
   deleteProductoAPI,
   getCategoriasAPI,
+  getProductosFiltrosAPI,
 } from "../../redux/productosSlice";
 import { FaRegTrashCan } from "react-icons/fa6";
 import Swal from "sweetalert2";
@@ -14,6 +15,8 @@ const Products = () => {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [marcaFilter, setMarcaFilter] = useState("");
+  const [proveedorFilter, setProveedorFilter] = useState("");
 
   const pageSize = 8;
   const logged = JSON.parse(sessionStorage.getItem("logged"));
@@ -21,24 +24,56 @@ const Products = () => {
   const sesion = logged?.sesion?.sesion_id;
 
   useEffect(() => {
-    dispatch(getProductosAPI(page, pageSize, search, sesion));
+    dispatch(
+      getProductosAPI({
+        page,
+        pageSize,
+        search,
+        sesion,
+        marca: marcaFilter.trim() || undefined,
+        proveedorId:
+          proveedorFilter !== "" ? Number(proveedorFilter) : undefined,
+      })
+    );
+  }, [dispatch, page, pageSize, search, sesion, marcaFilter, proveedorFilter]);
+
+  useEffect(() => {
     dispatch(getCategoriasAPI());
-  }, [page, pageSize, search, dispatch]);
+    dispatch(getProductosFiltrosAPI());
+  }, [dispatch]);
 
-  const Products = useSelector((state) => state && state?.producto);
-  const Categorias = useSelector(
-    (state) => state && state?.producto && state?.producto?.categoriasState
-  ) || [];
+  const productosState = useSelector((state) => state?.producto);
+  const Categorias =
+    useSelector((state) => state?.producto?.categoriasState) || [];
+  const filtrosState =
+    useSelector((state) => state?.producto?.filtrosState) || {};
 
-  // Debug: verificar categorías (solo en desarrollo)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🔍 Categorías en Redux:', Categorias);
-    console.log('🔍 Tipo:', typeof Categorias, 'Es array?', Array.isArray(Categorias));
-  }
+  const productos = productosState?.initialState || [];
+  const marcasDisponibles = filtrosState.marcas || [];
+  const proveedoresDisponibles = filtrosState.proveedores || [];
 
-  const keys = Object?.keys(
-    (Products && Products.initialState && Products.initialState[0]) || {}
-  );
+  const columns = [
+    { key: "Nombre", label: "Nombre" },
+    { key: "Codigo", label: "Código" },
+    { key: "Marca", label: "Marca" },
+    { key: "Proveedor", label: "Proveedor" },
+    { key: "Stock", label: "Stock" },
+    { key: "Precio", label: "Precio" },
+    { key: "FechaCreacion", label: "Creado" },
+  ];
+
+  const formatPrice = (value) =>
+    `$${Number(value || 0).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+
+  const formatDate = (value) => {
+    if (!value) return "-";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? "-" : date.toLocaleDateString();
+  };
+
   const handleDelete = (dato) => {
     const datoWithUserId = { ...dato, usuario_id: usuarioId };
     Swal.fire({
@@ -46,22 +81,28 @@ const Products = () => {
       html: `¿Esta seguro que desea eliminar el producto <b>${dato.Nombre}</b> ? `,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes",
+      confirmButtonText: "Si",
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        const action = deleteProductoAPI(datoWithUserId);
-        dispatch(action);
+        dispatch(deleteProductoAPI(datoWithUserId));
       }
     });
   };
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
+    setPage(1);
   };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
+  };
+
+  const handleClearFilters = () => {
+    setMarcaFilter("");
+    setProveedorFilter("");
+    setPage(1);
   };
 
   return (
@@ -82,62 +123,95 @@ const Products = () => {
           <ProductForm Categorias={Categorias} usuarioId={usuarioId} />
         </div>
       </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "12px",
+          marginBottom: "16px",
+          alignItems: "center",
+        }}
+      >
+        <select
+          className="form-select"
+          style={{ width: "220px" }}
+          value={marcaFilter}
+          onChange={(e) => {
+            setMarcaFilter(e.target.value);
+            setPage(1);
+          }}
+        >
+          <option value="">Todas las marcas</option>
+          {marcasDisponibles.map((marca) => (
+            <option key={marca} value={marca}>
+              {marca}
+            </option>
+          ))}
+        </select>
+        <select
+          className="form-select"
+          style={{ width: "220px" }}
+          value={proveedorFilter}
+          onChange={(e) => {
+            setProveedorFilter(e.target.value);
+            setPage(1);
+          }}
+        >
+          <option value="">Todos los proveedores</option>
+          {proveedoresDisponibles.map((prov) => (
+            <option key={prov.proveedor_id} value={prov.proveedor_id}>
+              {prov.razon_social || "-"}
+            </option>
+          ))}
+        </select>
+        <button className="buttonPage" onClick={handleClearFilters}>
+          Limpiar filtros
+        </button>
+      </div>
+
       <div className="containerTableAndPagesSelected">
         <table className="headerTable">
           <thead>
             <tr>
-              {keys.map(
-                (column) =>
-                  //quito columna producto_id
-                  column !== "producto_id" &&
-                  column !== "categoria_id" && <th key={column}>{column}</th>
-              )}
-
+              {columns.map((column) => (
+                <th key={column.key}>{column.label}</th>
+              ))}
               <th style={{ width: "70px" }}>Opciones</th>
             </tr>
           </thead>
           <tbody>
-            {Object?.keys(Products)?.length === 0 ? (
-              <tr>
-                <td colSpan={keys?.length || 1} style={{ textAlign: "center", padding: "40px" }}>
-                  <div
-                    className="spinner-border"
-                    style={{ marginTop: "10%", width: "100px", height: "100px" }}
-                    role="status"
-                  />
-                </td>
-              </tr>
-            ) : Products?.initialState?.length > 0 ? (
-              Products?.initialState?.map((dato) => (
+            {productos.length > 0 ? (
+              productos.map((dato) => (
                 <tr
                   key={dato.producto_id}
                   style={{
-                    backgroundColor: dato.Stock <= 0 && "#f8d7da",
+                    backgroundColor: dato.Stock <= 0 ? "#f8d7da" : undefined,
                   }}
                 >
-                  {keys
-                    ?.filter(
-                      (column) =>
-                        column !== "producto_id" && column !== "categoria_id"
-                    ) //filtro para que no aparezca la columna producto_id
-                    .map((column) => (
-                      <td
-                        style={{
-                          color:
-                            column === "Stock" && dato[column] <= 0 && "red",
-                          fontWeight: column === "Stock" && "bold",
-                        }}
-                        key={`${dato.producto_id}-${column}`}
-                      >
-                        {dato[column]}
-                      </td>
-                    ))}
+                  {columns.map((column) => {
+                    const isStock = column.key === "Stock";
+                    let value = dato[column.key];
 
-                  <td
-                    style={{
-                      flexWrap: "nowrap",
-                    }}
-                  >
+                    if (column.key === "Precio") {
+                      value = formatPrice(value);
+                    } else if (column.key === "FechaCreacion") {
+                      value = formatDate(value);
+                    }
+
+                    return (
+                      <td
+                        key={`${dato.producto_id}-${column.key}`}
+                        style={{
+                          color: isStock && dato.Stock <= 0 ? "red" : undefined,
+                          fontWeight: isStock ? "bold" : undefined,
+                        }}
+                      >
+                        {value ?? "-"}
+                      </td>
+                    );
+                  })}
+                  <td style={{ flexWrap: "nowrap" }}>
                     <EditProductFormModal
                       productSelected={dato}
                       Categorias={Categorias}
@@ -152,7 +226,11 @@ const Products = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={keys?.length || 1} className="NoData" style={{ textAlign: "center", padding: "20px" }}>
+                <td
+                  colSpan={columns.length + 1}
+                  className="NoData"
+                  style={{ textAlign: "center", padding: "20px" }}
+                >
                   sin datos
                 </td>
               </tr>
@@ -171,7 +249,7 @@ const Products = () => {
         <button
           onClick={() => handlePageChange(page + 1)}
           style={{ marginLeft: "10px" }}
-          disabled={Products?.initialState?.length < 6}
+          disabled={productos.length < pageSize}
           className="buttonPage"
         >
           Siguiente
@@ -181,3 +259,4 @@ const Products = () => {
   );
 };
 export default Products;
+
