@@ -45,12 +45,16 @@ class SelectAdapter {
 
   /**
    * Adapta productos para select
-   * @param {Object} productos - Objeto con initialState de productos
+   * @param {Object|Array} productos - Objeto o array con productos
    * @returns {Array} Opciones de productos para react-select
    */
   static productoToSelectOptions(productos) {
+    const data = Array.isArray(productos)
+      ? productos
+      : productos?.productos || productos?.initialState || [];
+
     return this.toSelectOptions(
-      productos?.initialState || [],
+      data,
       "producto_id",
       "Nombre",
       (producto) => {

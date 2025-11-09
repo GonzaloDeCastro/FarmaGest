@@ -6,7 +6,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { addVentaAPI, getUltimaVentaAPI, getVentasByClienteAPI } from "../../redux/ventasSlice";
 import { getClientesAPI } from "../../redux/clientesSlice";
 import { getObrasSocialesAPI } from "../../redux/obrasSocialesSlice";
-import { getProductosAPI, getCategoriasAPI } from "../../redux/productosSlice";
+import {
+  getProductosAPI,
+  getCategoriasAPI,
+  selectProductos,
+} from "../../redux/productosSlice";
 import Select from "react-select";
 import AgregarItems from "./AgregarItems";
 import { FaRegTrashAlt } from "react-icons/fa";
@@ -68,7 +72,7 @@ const VentaFormModal = ({ usuarioId }) => {
   );
   const ultimaVenta = useSelector((state) => state?.venta?.ultimaVentaState);
 
-  const productos = useSelector((state) => state.producto?.initialState || []);
+  const productos = useSelector(selectProductos);
   const ventasHistoricas = useSelector((state) => state.venta?.initialState || []);
   const [ventasCliente, setVentasCliente] = useState([]);
 

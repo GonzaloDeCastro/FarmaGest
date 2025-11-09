@@ -5,6 +5,7 @@ import {
   deleteProductoAPI,
   getCategoriasAPI,
   getProductosFiltrosAPI,
+  selectProductos,
 } from "../../redux/productosSlice";
 import { FaRegTrashCan } from "react-icons/fa6";
 import Swal from "sweetalert2";
@@ -42,13 +43,12 @@ const Products = () => {
     dispatch(getProductosFiltrosAPI());
   }, [dispatch]);
 
-  const productosState = useSelector((state) => state?.producto);
   const Categorias =
     useSelector((state) => state?.producto?.categoriasState) || [];
   const filtrosState =
     useSelector((state) => state?.producto?.filtrosState) || {};
 
-  const productos = productosState?.initialState || [];
+  const productos = useSelector(selectProductos);
   const marcasDisponibles = filtrosState.marcas || [];
   const proveedoresDisponibles = filtrosState.proveedores || [];
 

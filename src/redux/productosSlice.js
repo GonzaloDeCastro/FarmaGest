@@ -4,20 +4,22 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import API from "../config";
 
+const initialState = {
+  productos: [], // Lista de productos en memoria
+  categoriasState: [],
+  filtrosState: {
+    marcas: [],
+    proveedores: [],
+  },
+  total: 0,
+  page: 1,
+  pageSize: 10,
+  totalPages: 1,
+};
+
 const productoDataSlice = createSlice({
   name: "producto",
-  initialState: {
-    initialState: [], // Lista de productos
-    categoriasState: [],
-    filtrosState: {
-      marcas: [],
-      proveedores: [],
-    },
-    total: 0,
-    page: 1,
-    pageSize: 10,
-    totalPages: 1,
-  },
+  initialState,
   reducers: {
     getProductos: (state, action) => {
       const data = action.payload;
@@ -27,41 +29,53 @@ const productoDataSlice = createSlice({
         ? data.productos
         : [];
 
-      const adaptProducto = (producto = {}) => ({
-        producto_id: producto.producto_id ?? producto.Producto_id ?? null,
-        Nombre: producto.Nombre ?? producto.nombre ?? "",
-        Codigo: producto.Codigo ?? producto.codigo ?? "",
-        Marca: producto.Marca ?? producto.marca ?? "",
-        Categoria:
+      const adaptProducto = (producto = {}) => {
+        const categoriaNormalizada =
           producto.Categoria ??
           producto.categoria ??
           producto.categoria_nombre ??
           producto.categoria_descripcion ??
-          "",
-        categoria_id: producto.categoria_id ?? null,
-        Stock: Number(
-          producto.Stock ?? producto.stock ?? producto.cantidad ?? 0
-        ),
-        Precio: Number(producto.Precio ?? producto.precio ?? 0),
-        proveedor_id: producto.proveedor_id ?? null,
-        Proveedor: producto.proveedor ?? producto.Proveedor ?? "",
-        FechaCreacion:
-          producto.FechaCreacion ??
-          producto.fechaCreacion ??
-          producto.created_at ??
-          "",
-      });
+          "";
+
+        return {
+          producto_id: producto.producto_id ?? producto.Producto_id ?? null,
+          Nombre: producto.Nombre ?? producto.nombre ?? "",
+          Codigo: producto.Codigo ?? producto.codigo ?? "",
+          Marca: producto.Marca ?? producto.marca ?? "",
+          Categoria: categoriaNormalizada,
+          categoria: categoriaNormalizada,
+          categoria_id: producto.categoria_id ?? null,
+          Stock: Number(
+            producto.Stock ?? producto.stock ?? producto.cantidad ?? 0
+          ),
+          Precio: Number(producto.Precio ?? producto.precio ?? 0),
+          proveedor_id: producto.proveedor_id ?? null,
+          Proveedor: producto.proveedor ?? producto.Proveedor ?? "",
+          FechaCreacion:
+            producto.FechaCreacion ??
+            producto.fechaCreacion ??
+            producto.created_at ??
+            "",
+        };
+      };
 
       const productos = productosRaw.map(adaptProducto);
 
-      const total = typeof data?.total === "number" ? data.total : productos.length;
+      const total =
+        typeof data?.total === "number" ? data.total : productos.length;
       const page = typeof data?.page === "number" ? data.page : state.page || 1;
-      const pageSize = typeof data?.pageSize === "number" ? data.pageSize : state.pageSize || productos.length || 10;
-      const totalPages = typeof data?.totalPages === "number" ? data.totalPages : state.totalPages || 1;
+      const pageSize =
+        typeof data?.pageSize === "number"
+          ? data.pageSize
+          : state.pageSize || productos.length || 10;
+      const totalPages =
+        typeof data?.totalPages === "number"
+          ? data.totalPages
+          : state.totalPages || 1;
 
       return {
         ...state,
-        initialState: productos,
+        productos,
         total,
         page,
         pageSize,
@@ -84,44 +98,79 @@ const productoDataSlice = createSlice({
       };
     },
     addProducto: (state, action) => {
-      // Asegurar que initialState sea un array
-      const currentInitialState = Array.isArray(state.initialState) 
-        ? state.initialState 
+      // Asegurar que productos sea un array
+      const currentProductos = Array.isArray(state.productos)
+        ? state.productos
         : [];
-      
+
       return {
         ...state,
-        initialState: [action.payload, ...currentInitialState],
-        total: (state.total || currentInitialState.length) + 1,
+        productos: [action.payload, ...currentProductos],
+        total: (state.total || currentProductos.length) + 1,
       };
     },
 
     deleteProducto: (state, action) => {
-      // Asegurar que initialState sea un array
-      const currentInitialState = Array.isArray(state.initialState) 
-        ? state.initialState 
+      // Asegurar que productos sea un array
+      const currentProductos = Array.isArray(state.productos)
+        ? state.productos
         : [];
-      
+
       return {
         ...state,
-        initialState: currentInitialState.filter(
+        productos: currentProductos.filter(
           (productoData) => productoData?.producto_id !== action?.payload
         ),
-        total: Math.max((state.total || currentInitialState.length) - 1, 0),
+        total: Math.max((state.total || currentProductos.length) - 1, 0),
       };
     },
     editProducto: (state, action) => {
-      // Asegurar que initialState sea un array
-      const currentInitialState = Array.isArray(state.initialState) 
-        ? state.initialState 
+      // Asegurar que productos sea un array
+      const currentProductos = Array.isArray(state.productos)
+        ? state.productos
         : [];
-      
+
       return {
         ...state,
-        initialState: currentInitialState.map((productoData) =>
+        productos: currentProductos.map((productoData) =>
           productoData?.producto_id === action?.payload?.producto_id
             ? action.payload
             : productoData
+        ),
+      };
+    },
+    ajustarStock: (state, action) => {
+      const { productoId, delta } = action.payload || {};
+      if (!productoId || typeof delta !== "number") return state;
+
+      return {
+        ...state,
+        productos: state.productos.map((producto) =>
+          producto.producto_id === productoId
+            ? {
+                ...producto,
+                Stock: Math.max(
+                  Number.isFinite(producto.Stock) ? producto.Stock + delta : delta,
+                  0
+                ),
+              }
+            : producto
+        ),
+      };
+    },
+    establecerStock: (state, action) => {
+      const { productoId, stock } = action.payload || {};
+      if (!productoId || typeof stock !== "number") return state;
+
+      return {
+        ...state,
+        productos: state.productos.map((producto) =>
+          producto.producto_id === productoId
+            ? {
+                ...producto,
+                Stock: Math.max(stock, 0),
+              }
+            : producto
         ),
       };
     },
@@ -135,7 +184,18 @@ export const {
   addProducto,
   deleteProducto,
   editProducto,
+  ajustarStock,
+  establecerStock,
 } = productoDataSlice.actions;
+
+export const selectProductos = (state) =>
+  state?.producto?.productos ?? initialState.productos;
+
+export const selectProductosBajoStock = (minimo = 0) => (state) =>
+  selectProductos(state).filter(
+    (producto) =>
+      typeof producto?.Stock === "number" && producto.Stock <= minimo
+  );
 
 // Funciones API para interactuar con el backend
 
@@ -212,12 +272,15 @@ export const addProductoAPI = (productoData) => {
       const response = await axios.post(`${API}/productos`, productoData);
 
       if (response.status === 201) {
+        const categoriaNormalizada =
+          productoData.Categoria ?? productoData.categoria ?? "";
         const newProducto = {
           producto_id: response.data.producto_id,
           Nombre: productoData.nombre,
           Codigo: productoData.codigo,
           Marca: productoData.marca,
-          Categoria: productoData.Categoria,
+          Categoria: categoriaNormalizada,
+          categoria: categoriaNormalizada,
           categoria_id: productoData.categoria_id,
           Stock: productoData.stock,
           Precio: productoData.precio,
@@ -306,16 +369,23 @@ export const editProductoAPI = (productoData) => {
       if (response.status === 200) {
         const state = getState();
         const current =
-          state?.producto?.initialState?.find(
+          state?.producto?.productos?.find(
             (item) => item.producto_id === productoData.producto_id
           ) || {};
+        const categoriaNormalizada =
+          productoData.Categoria ??
+          productoData.categoria ??
+          current.Categoria ??
+          current.categoria ??
+          "";
 
         const editarProducto = {
           producto_id: productoData.producto_id,
           Nombre: productoData.nombre,
           Codigo: productoData.codigo,
           Marca: productoData.marca,
-          Categoria: productoData.Categoria,
+          Categoria: categoriaNormalizada,
+          categoria: categoriaNormalizada,
           categoria_id: productoData.categoria_id,
           Stock: productoData.stock,
           Precio: productoData.precio,

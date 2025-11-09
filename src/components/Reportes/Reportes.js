@@ -5,7 +5,7 @@ import * as XLSX from "xlsx";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "./Reportes.module.css";
 import { getClientesAPI } from "../../redux/clientesSlice";
-import { getProductosAPI } from "../../redux/productosSlice";
+import { getProductosAPI, selectProductos } from "../../redux/productosSlice";
 import { getUsuariosAPI } from "../../redux/usuariosSlice";
 import { getReportesAPI } from "../../redux/reportesSlice";
 import { FaTableList } from "react-icons/fa6";
@@ -49,9 +49,7 @@ const Reportes = () => {
   const clientes = useSelector(
     (state) => (state && state.cliente && state.cliente) || []
   );
-  const productos = useSelector(
-    (state) => (state && state.producto && state.producto) || []
-  );
+  const productos = useSelector(selectProductos);
 
   const usuarios = useSelector(
     (state) => (state && state?.usuario && state?.usuario) || []
@@ -96,12 +94,12 @@ const Reportes = () => {
       setSelectOptionEntities(optionsClientes);
     }
     if (entitySelected === "Producto") {
-      let optionsProductos =
-        productos &&
-        productos?.initialState?.map((producto) => ({
-          value: producto.producto_id,
-          label: `${producto.Nombre}`,
-        }));
+      const optionsProductos = Array.isArray(productos)
+        ? productos.map((producto) => ({
+            value: producto.producto_id,
+            label: `${producto.Nombre ?? producto.nombre ?? ""}`,
+          }))
+        : [];
       setSelectOptionEntities(optionsProductos);
     }
 

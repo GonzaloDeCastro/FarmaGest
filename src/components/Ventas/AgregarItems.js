@@ -4,7 +4,7 @@ import { FaPlusCircle, FaSave } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm, Controller } from "react-hook-form";
 
-import { getProductosAPI } from "../../redux/productosSlice";
+import { getProductosAPI, selectProductos } from "../../redux/productosSlice";
 import Select from "react-select";
 
 const AgregarItems = ({ onAgregarItem }) => {
@@ -27,7 +27,7 @@ const AgregarItems = ({ onAgregarItem }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
   const [outOfStock, setOutOfStock] = useState(false);
-  const productos = useSelector((state) => state.producto?.initialState || []);
+  const productos = useSelector(selectProductos);
 
   useEffect(() => {
     dispatch(getProductosAPI());
