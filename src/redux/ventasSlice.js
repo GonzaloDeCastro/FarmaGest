@@ -13,6 +13,7 @@ const initialState = {
     total: 0,
     page: 1,
     pageSize: 10,
+    totalPages: 1,
   },
 };
 
@@ -61,11 +62,22 @@ const ventasSlice = createSlice({
 
       state.initialState = ventas;
 
-      if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+      if (
+        payload &&
+        typeof payload === "object" &&
+        !Array.isArray(payload)
+      ) {
+        const total = payload.total ?? state.pagination.total;
+        const page = payload.page ?? state.pagination.page;
+        const pageSize = payload.pageSize ?? state.pagination.pageSize;
+        const totalPages =
+          pageSize > 0 ? Math.max(Math.ceil(total / pageSize), 1) : 1;
+
         state.pagination = {
-          total: payload.total ?? state.pagination.total,
-          page: payload.page ?? state.pagination.page,
-          pageSize: payload.pageSize ?? state.pagination.pageSize,
+          total,
+          page,
+          pageSize,
+          totalPages,
         };
       }
     },
@@ -89,10 +101,31 @@ export const { getVentas, getUltimaVenta, addVenta, verFacturaVenta } =
   ventasSlice.actions;
 
 export const getVentasAPI =
-  (page, pageSize, search, sesion) => async (dispatch) => {
+  (options = {}) =>
+  async (dispatch) => {
+    const {
+      page = 1,
+      pageSize = 10,
+      search = "",
+      sesion,
+      fechaDesde,
+      fechaHasta,
+      numeroFactura,
+      clienteId,
+    } = options;
+
     try {
       const response = await axios.get(`${API}/ventas`, {
-        params: { page, pageSize, search, sesion },
+        params: {
+          page,
+          pageSize,
+          search,
+          sesion,
+          fechaDesde,
+          fechaHasta,
+          numeroFactura,
+          clienteId,
+        },
       });
       if (response.status === 200) {
         dispatch(getVentas(response.data));
@@ -196,3 +229,9 @@ export const addVentaAPI = (ventaData) => {
 };
 
 export default ventasSlice.reducer;
+
+export const selectVentas = (state) =>
+  state?.venta?.initialState ?? initialState.initialState;
+
+export const selectVentasPagination = (state) =>
+  state?.venta?.pagination ?? initialState.pagination;

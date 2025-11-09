@@ -261,23 +261,116 @@ const getSesiones = async (req, res) => {
 // === VENTAS ===
 const getVentas = async (req, res) => {
   try {
-    const { page = 1, pageSize = 10 } = req.query;
-    const offset = (page - 1) * pageSize;
-    
-    const result = await query(
-      `SELECT v.*, c.nombre as cliente_nombre, c.apellido as cliente_apellido, u.nombre as usuario_nombre
-       FROM ventas v
-       LEFT JOIN clientes c ON v.cliente_id = c.cliente_id
-       LEFT JOIN usuarios u ON v.usuario_id = u.usuario_id
-       ORDER BY v.fecha DESC
-       LIMIT $1 OFFSET $2`,
-      [pageSize, offset]
-    );
-    
-    res.json({ ventas: result.rows });
+    const {
+      page = 1,
+      pageSize = 10,
+      search = '',
+      fechaDesde,
+      fechaHasta,
+      numeroFactura,
+      clienteId,
+    } = req.query;
+
+    const pageNumber = Number(page) || 1;
+    const pageSizeNumber = Number(pageSize) || 10;
+    const offset = (pageNumber - 1) * pageSizeNumber;
+
+    const filters = [];
+    const params = [];
+
+    const addCondition = (builder, value) => {
+      params.push(value);
+      const placeholder = `$${params.length}`;
+      filters.push(builder(placeholder));
+    };
+
+    if (search) {
+      addCondition(
+        (placeholder) =>
+          `(CAST(v.numero_factura AS TEXT) ILIKE ${placeholder} OR c.nombre ILIKE ${placeholder} OR c.apellido ILIKE ${placeholder} OR u.nombre ILIKE ${placeholder} OR u.apellido ILIKE ${placeholder})`,
+        `%${search}%`
+      );
+    }
+
+    if (numeroFactura) {
+      addCondition(
+        (placeholder) => `CAST(v.numero_factura AS TEXT) ILIKE ${placeholder}`,
+        `%${numeroFactura}%`
+      );
+    }
+
+    if (clienteId) {
+      const clienteIdNumber = Number(clienteId);
+      if (!Number.isNaN(clienteIdNumber)) {
+        addCondition(
+          (placeholder) => `v.cliente_id = ${placeholder}`,
+          clienteIdNumber
+        );
+      }
+    }
+
+    const fechaReferenciaCampo = 'v.fecha';
+
+    if (fechaDesde) {
+      const fechaInicio = new Date(fechaDesde);
+      if (!Number.isNaN(fechaInicio.getTime())) {
+        addCondition(
+          (placeholder) => `${fechaReferenciaCampo} >= ${placeholder}`,
+          fechaInicio
+        );
+      }
+    }
+
+    if (fechaHasta) {
+      const fechaFin = new Date(fechaHasta);
+      if (!Number.isNaN(fechaFin.getTime())) {
+        fechaFin.setDate(fechaFin.getDate() + 1);
+        addCondition(
+          (placeholder) => `${fechaReferenciaCampo} < ${placeholder}`,
+          fechaFin
+        );
+      }
+    }
+
+    const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
+
+    const countQuery = `
+      SELECT COUNT(*) AS total
+      FROM ventas v
+      LEFT JOIN clientes c ON v.cliente_id = c.cliente_id
+      LEFT JOIN usuarios u ON v.usuario_id = u.usuario_id
+      ${whereClause}
+    `;
+    const countResult = await query(countQuery, params);
+    const total = parseInt(countResult.rows?.[0]?.total ?? '0', 10);
+
+    const dataQuery = `
+      SELECT v.*,
+             c.nombre AS cliente_nombre,
+             c.apellido AS cliente_apellido,
+             u.nombre AS usuario_nombre,
+             u.apellido AS usuario_apellido
+      FROM ventas v
+      LEFT JOIN clientes c ON v.cliente_id = c.cliente_id
+      LEFT JOIN usuarios u ON v.usuario_id = u.usuario_id
+      ${whereClause}
+      ORDER BY ${fechaReferenciaCampo} DESC, v.venta_id DESC
+      LIMIT $${params.length + 1} OFFSET $${params.length + 2}
+    `;
+    const dataParams = [...params, pageSizeNumber, offset];
+    const result = await query(dataQuery, dataParams);
+
+    res.json({
+      ventas: result.rows,
+      total,
+      page: pageNumber,
+      pageSize: pageSizeNumber,
+    });
   } catch (error) {
     console.error('Error al obtener ventas:', error);
-    res.status(500).json({ mensaje: 'Error al obtener ventas', error: error.message });
+    res
+      .status(500)
+      .json({ mensaje: 'Error al obtener ventas', error: error.message });
   }
 };
 
