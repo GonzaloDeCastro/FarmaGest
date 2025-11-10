@@ -7,6 +7,50 @@ import { getAuditoriaObrasSocialesAPI } from "../../redux/auditoriaObrasSociales
 import { useNavigate } from "react-router-dom";
 import styles from "./Auditoria.module.css";
 
+const formatDisplayValue = (value) => {
+  if (value === null || value === undefined || value === "") {
+    return "—";
+  }
+
+  if (typeof value === "boolean") {
+    return value ? "Sí" : "No";
+  }
+
+  return value;
+};
+
+const renderChangeList = (value) => {
+  if (!Array.isArray(value)) {
+    return null;
+  }
+
+  if (value.length === 0) {
+    return <span>Sin cambios</span>;
+  }
+
+  return (
+    <div className={styles.changeListWrapper}>
+      <dl className={styles.changeList}>
+        {value.map(({ campo, anterior, nuevo }, idx) => (
+          <React.Fragment key={`${campo}-${idx}`}>
+            <dt>{campo}</dt>
+            <dd>
+              <span className={styles.oldValue}>
+                {formatDisplayValue(anterior)}
+              </span>
+              <span className={styles.changeArrow}>→</span>
+              <span className={styles.newValue}>
+                {formatDisplayValue(nuevo)}
+              </span>
+            </dd>
+          </React.Fragment>
+        ))}
+      </dl>
+    </div>
+  );
+};
+
+
 const Auditoria = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -66,8 +110,8 @@ const Auditoria = () => {
   const handlePageChange = (newPage) => setPage(newPage);
 
   useEffect(() => {
-    if (showBy == 1) navigate(`/sesiones`);
-  }, [showBy]);
+    if (showBy === 1) navigate(`/sesiones`);
+  }, [navigate, showBy]);
 
   return (
     <div className="containerSelected">
@@ -79,6 +123,7 @@ const Auditoria = () => {
             value={search}
             onChange={handleSearchChange}
             placeholder=" &#xF002; Buscar..."
+            aria-label="Buscar en auditoría"
           />
         </div>
         <div style={{ display: "flex" }}>
@@ -87,6 +132,7 @@ const Auditoria = () => {
             className="buttonSelect"
             value={auditoria}
             style={{ marginRight: "10px" }}
+            aria-label="Seleccionar tabla de auditoría"
           >
             <option value={0}>Tabla Productos</option>
             <option value={1}>Tabla Clientes</option>
@@ -96,6 +142,7 @@ const Auditoria = () => {
             onChange={(e) => setShowBy(Number(e.target.value))}
             className="buttonSelect"
             value={showBy}
+            aria-label="Seleccionar vista de auditoría"
           >
             <option value={0}>Auditoría</option>
             <option value={1}>Sesiones</option>
@@ -127,10 +174,13 @@ const Auditoria = () => {
                     <td
                       style={{
                         width:
-                          column == "Fecha" || column == "Accion"
+                          column === "Fecha" || column === "Accion"
                             ? "10%"
-                            : (column == "Producto" || column == "Nombre") &&
-                              "15%",
+                            : column === "Producto" || column === "Nombre"
+                            ? "15%"
+                            : column === "cambios" || column === "resumen"
+                            ? "30%"
+                            : undefined,
                       }}
                       key={`${auditoria.id}-${column}`}
                     >
@@ -139,6 +189,16 @@ const Auditoria = () => {
                         if (column === "Fecha") {
                           if (!value) return "-";
                           return value.toString().slice(0, 16).replace("T", " ");
+                        }
+                        if (column === "resumen" && typeof value === "string") {
+                          return (
+                            <span className={styles.summaryText}>
+                              {value}
+                            </span>
+                          );
+                        }
+                        if (Array.isArray(value)) {
+                          return renderChangeList(value);
                         }
                         if (
                           value !== null &&

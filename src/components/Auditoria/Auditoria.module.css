@@ -55,6 +55,53 @@
   color: #333;
 }
 
+.changeListWrapper {
+  white-space: normal;
+}
+
+.changeList {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(160px, 2fr);
+  gap: 4px 12px;
+  margin: 0;
+  padding: 0;
+}
+
+.changeList dt {
+  font-weight: 600;
+  color: #2d2d2d;
+  text-transform: capitalize;
+}
+
+.changeList dd {
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.changeArrow {
+  font-weight: 600;
+  margin: 0 4px;
+}
+
+.oldValue {
+  color: #6b6b6b;
+}
+
+.newValue {
+  color: #1f5f2f;
+  font-weight: 600;
+}
+
+.summaryText {
+  display: block;
+  white-space: normal;
+  line-height: 1.4;
+  color: #2d2d2d;
+}
+
 @media screen and (min-width: 1080px) and (min-height: 650px) {
   .headerTable {
     max-width: 100%;

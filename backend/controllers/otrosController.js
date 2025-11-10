@@ -674,6 +674,110 @@ const getReportes = async (req, res) => {
   }
 };
 
+// === Utilidades Auditoría ===
+const parseJsonField = (value) => {
+  if (!value) {
+    return {};
+  }
+
+  if (typeof value === 'object' && !Buffer.isBuffer(value)) {
+    return value;
+  }
+
+  try {
+    const parsed =
+      Buffer.isBuffer(value) ? JSON.parse(value.toString()) : JSON.parse(value);
+    return typeof parsed === 'object' && parsed !== null ? parsed : {};
+  } catch (_error) {
+    return {};
+  }
+};
+
+const buildChanges = (before, after) => {
+  const keys = new Set([
+    ...Object.keys(before || {}),
+    ...Object.keys(after || {}),
+  ]);
+
+  return Array.from(keys)
+    .map((field) => ({
+      campo: field,
+      anterior:
+        before && Object.prototype.hasOwnProperty.call(before, field)
+          ? before[field]
+          : null,
+      nuevo:
+        after && Object.prototype.hasOwnProperty.call(after, field)
+          ? after[field]
+          : null,
+    }))
+    .filter(
+      ({ anterior, nuevo }) =>
+        anterior !== nuevo &&
+        !(anterior === null && (nuevo === null || nuevo === undefined)) &&
+        !(nuevo === null && (anterior === null || anterior === undefined))
+    );
+};
+
+const formatValue = (value) => {
+  if (value === null || value === undefined || value === '') {
+    return '—';
+  }
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  return value;
+};
+
+const buildSummaryText = (accion, cambios, label) => {
+  const nombreEntidad = label || 'el registro';
+
+  if (accion === 'CREAR') {
+    return `Se creó ${nombreEntidad}`;
+  }
+
+  if (accion === 'ELIMINAR') {
+    return `Se eliminó ${nombreEntidad}`;
+  }
+
+  if (cambios.length === 0) {
+    return `Se modificó ${nombreEntidad} sin cambios visibles`;
+  }
+
+  const detalles = cambios.map(
+    ({ campo, anterior, nuevo }) =>
+      `${campo}: ${formatValue(anterior)} → ${formatValue(nuevo)}`
+  );
+
+  const prefijo = `Se actualizaron ${detalles.length} campo${
+    detalles.length > 1 ? 's' : ''
+  } en ${nombreEntidad}`;
+
+  return `${prefijo}: ${detalles.join('; ')}`;
+};
+
+const formatAuditRow = (row, options) => {
+  const { entityKey, getLabel } =
+    typeof options === 'string' ? { entityKey: options } : options;
+  const before = parseJsonField(row.datos_anteriores);
+  const after = parseJsonField(row.datos_nuevos);
+  const cambios = buildChanges(before, after);
+  const displayLabel = getLabel
+    ? getLabel(before, after, row)
+    : after?.[entityKey] || before?.[entityKey] || row[entityKey] || null;
+  const resumen = buildSummaryText(row.accion, cambios, displayLabel);
+
+  return {
+    auditoria_id: row.auditoria_id,
+    fecha: row.fecha,
+    accion: row.accion,
+    [entityKey]: displayLabel,
+    usuario: row.usuario || 'Sistema',
+    cambios,
+    resumen,
+  };
+};
+
 // === AUDITORIA ===
 const getAuditoria = async (req, res) => {
   try {
@@ -734,7 +838,17 @@ const getAuditoriaProductosList = async (req, res) => {
                        LIMIT $${limitParam} OFFSET $${offsetParam}`;
 
     const result = await query(queryText, params);
-    res.json(result.rows);
+    const formatted = result.rows.map((row) =>
+      formatAuditRow(row, {
+        entityKey: 'producto',
+        getLabel: (before, after, current) =>
+          after?.nombre ||
+          before?.nombre ||
+          current.producto ||
+          null,
+      })
+    );
+    res.json(formatted);
   } catch (error) {
     console.error('Error al obtener auditoría de productos:', error);
     res.status(500).json({ mensaje: 'Error al obtener auditoría de productos', error: error.message });
@@ -775,7 +889,29 @@ const getAuditoriaClientesList = async (req, res) => {
                        LIMIT $${limitParam} OFFSET $${offsetParam}`;
 
     const result = await query(queryText, params);
-    res.json(result.rows);
+    const formatted = result.rows.map((row) =>
+      formatAuditRow(row, {
+        entityKey: 'cliente',
+        getLabel: (before, after, current) => {
+          const fallbackAfter = [after?.nombre, after?.apellido]
+            .filter(Boolean)
+            .join(' ')
+            .trim();
+          const fallbackBefore = [before?.nombre, before?.apellido]
+            .filter(Boolean)
+            .join(' ')
+            .trim();
+
+          return (
+            (fallbackAfter.length > 0 ? fallbackAfter : null) ||
+            (fallbackBefore.length > 0 ? fallbackBefore : null) ||
+            current.cliente ||
+            null
+          );
+        },
+      })
+    );
+    res.json(formatted);
   } catch (error) {
     console.error('Error al obtener auditoría de clientes:', error);
     res.status(500).json({ mensaje: 'Error al obtener auditoría de clientes', error: error.message });
@@ -816,7 +952,17 @@ const getAuditoriaObrasSocialesList = async (req, res) => {
                        LIMIT $${limitParam} OFFSET $${offsetParam}`;
 
     const result = await query(queryText, params);
-    res.json(result.rows);
+    const formatted = result.rows.map((row) =>
+      formatAuditRow(row, {
+        entityKey: 'obra_social',
+        getLabel: (before, after, current) =>
+          after?.obra_social ||
+          before?.obra_social ||
+          current.obra_social ||
+          null,
+      })
+    );
+    res.json(formatted);
   } catch (error) {
     console.error('Error al obtener auditoría de obras sociales:', error);
     res.status(500).json({ mensaje: 'Error al obtener auditoría de obras sociales', error: error.message });
