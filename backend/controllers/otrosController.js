@@ -664,13 +664,77 @@ const createVenta = async (req, res) => {
 // === REPORTES ===
 const getReportes = async (req, res) => {
   try {
-    const { tipo, fecha_inicio, fecha_fin } = req.query;
-    
-    // Implementar reportes básicos
-    res.json({ mensaje: 'Reportes - Implementar según necesidades' });
+    const {
+      dateSelectedFrom,
+      dateSelectedTo,
+      entitySelected,
+      clienteProductoVendedor,
+    } = req.query;
+
+    const filters = [];
+    const params = [];
+
+    if (dateSelectedFrom) {
+      params.push(dateSelectedFrom);
+      filters.push(`v.fecha >= $${params.length}::date`);
+    }
+
+    if (dateSelectedTo) {
+      params.push(dateSelectedTo);
+      filters.push(`v.fecha < ($${params.length}::date + INTERVAL '1 day')`);
+    }
+
+    if (
+      entitySelected === 'Cliente' &&
+      clienteProductoVendedor &&
+      !Number.isNaN(Number(clienteProductoVendedor))
+    ) {
+      params.push(Number(clienteProductoVendedor));
+      filters.push(`v.cliente_id = $${params.length}`);
+    }
+
+    if (
+      entitySelected === 'Vendedor' &&
+      clienteProductoVendedor &&
+      !Number.isNaN(Number(clienteProductoVendedor))
+    ) {
+      params.push(Number(clienteProductoVendedor));
+      filters.push(`v.usuario_id = $${params.length}`);
+    }
+
+    if (
+      entitySelected === 'Producto' &&
+      clienteProductoVendedor &&
+      !Number.isNaN(Number(clienteProductoVendedor))
+    ) {
+      params.push(Number(clienteProductoVendedor));
+      const placeholder = `$${params.length}`;
+      filters.push(
+        `EXISTS (SELECT 1 FROM ventas_items vi WHERE vi.venta_id = v.venta_id AND vi.producto_id = ${placeholder})`
+      );
+    }
+
+    const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
+
+    const queryText = `
+      SELECT
+        DATE(v.fecha) AS fecha,
+        COUNT(*) AS cantidad_ventas,
+        COALESCE(SUM(v.total), 0) AS monto_total
+      FROM ventas v
+      ${whereClause}
+      GROUP BY DATE(v.fecha)
+      ORDER BY DATE(v.fecha)
+    `;
+
+    const result = await query(queryText, params);
+
+    res.json(result.rows ?? []);
   } catch (error) {
     console.error('Error al obtener reportes:', error);
-    res.status(500).json({ mensaje: 'Error al obtener reportes', error: error.message });
+    res
+      .status(500)
+      .json({ mensaje: 'Error al obtener reportes', error: error.message });
   }
 };
 
