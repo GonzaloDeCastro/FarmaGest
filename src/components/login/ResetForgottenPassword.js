@@ -11,15 +11,19 @@ const ResetForgottenPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
     try {
-      await axios.post(`${API}/auth/reset-password`, {
+      const response = await axios.post(`${API}/usuarios/reset-password`, {
         token,
         newPassword,
       });
-      setMessage("Contraseña actualizada con éxito.");
+      setMessage(response?.data?.mensaje || "Contraseña actualizada con éxito.");
       setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
-      setMessage("Error al actualizar la contraseña.");
+      setMessage(
+        error?.response?.data?.mensaje ||
+          "No fue posible actualizar la contraseña. Revisa el enlace o solicita uno nuevo."
+      );
     }
   };
 

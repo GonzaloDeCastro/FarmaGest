@@ -8,13 +8,20 @@ const ForgotPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
     try {
-      const res = await axios.post(`${API}/auth/forgot-password`, {
+      const res = await axios.post(`${API}/usuarios/forgot-password`, {
         email,
       });
-      setMessage(res.data.message);
+      setMessage(
+        res?.data?.mensaje ||
+          "Si el correo corresponde a un usuario registrado, enviaremos instrucciones en breve."
+      );
     } catch (error) {
-      setMessage("Error al enviar el correo.");
+      setMessage(
+        error?.response?.data?.mensaje ||
+          "No pudimos enviar el correo de recuperación. Intenta nuevamente."
+      );
     }
   };
 

@@ -9,7 +9,9 @@ const {
   updateUsuario,
   deleteUsuario,
   updatePassword,
-  logoutUsuario
+  logoutUsuario,
+  requestPasswordReset,
+  resetPasswordWithToken,
 } = require('../controllers/usuariosController');
 
 // Rutas
@@ -21,6 +23,8 @@ router.put('/logout/:sesion_id', logoutUsuario);
 router.put('/:usuario_id', updateUsuario);
 router.delete('/:usuario_id', deleteUsuario);
 router.put('/pwd/:correo', updatePassword);
+router.post('/forgot-password', requestPasswordReset);
+router.post('/reset-password', resetPasswordWithToken);
 
 module.exports = router;
 
