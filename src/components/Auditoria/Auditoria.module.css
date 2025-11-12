@@ -102,6 +102,169 @@
   color: #2d2d2d;
 }
 
+.liquidacionWrapper {
+  width: 100%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.liquidacionFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  background-color: #f2f2f2;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.liquidacionFilterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 180px;
+}
+
+.liquidacionDateInput {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #cccccc;
+  min-width: 160px;
+}
+
+.liquidacionDateInput:focus {
+  outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15);
+}
+
+.liquidacionCheckboxWrapper {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #333333;
+}
+
+.liquidacionActions {
+  display: flex;
+  gap: 10px;
+}
+
+.liquidacionActionsBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.liquidacionEmailForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.liquidacionEmailInput {
+  flex: 1;
+  min-width: 220px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #cccccc;
+}
+
+.liquidacionEmailInput:focus {
+  outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15);
+}
+
+.liquidacionSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.liquidacionSummaryCard {
+  background: #ffffff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.liquidacionSummaryLabel {
+  font-size: 0.85rem;
+  color: #555555;
+}
+
+.liquidacionMessage {
+  background: #ffffff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: #444444;
+}
+
+.liquidacionError {
+  background: #ffe7e7;
+  border: 1px solid #ffc9c9;
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: #8a1f1f;
+}
+
+.liquidacionGroup {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.liquidacionGroup + .liquidacionGroup {
+  margin-top: 16px;
+}
+
+.liquidacionGroupHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.liquidacionGroupHeader h3 {
+  margin: 0;
+}
+
+.liquidacionGroupMetrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.liquidacionPlan {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #555555;
+}
+
+.liquidacionTableWrapper {
+  overflow-x: auto;
+}
+
 @media screen and (min-width: 1080px) and (min-height: 650px) {
   .headerTable {
     max-width: 100%;

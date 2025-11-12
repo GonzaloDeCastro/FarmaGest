@@ -6,6 +6,7 @@ import { getAuditoriaClientesAPI } from "../../redux/auditoriaClientesSlice";
 import { getAuditoriaObrasSocialesAPI } from "../../redux/auditoriaObrasSocialesSlice";
 import { useNavigate } from "react-router-dom";
 import styles from "./Auditoria.module.css";
+import LiquidacionObrasSociales from "./LiquidacionObrasSociales";
 
 const formatDisplayValue = (value) => {
   if (value === null || value === undefined || value === "") {
@@ -80,6 +81,8 @@ const Auditoria = () => {
         await dispatch(getAuditoriaClientesAPI(page, pageSize, search));
       } else if (auditoria == 2) {
         await dispatch(getAuditoriaObrasSocialesAPI(page, pageSize, search));
+      } else if (auditoria == 3) {
+        setEntidad([]);
       }
     };
 
@@ -94,6 +97,8 @@ const Auditoria = () => {
       setEntidad(auditoriaClientes.initialState || []);
     } else if (auditoria == 2) {
       setEntidad(auditoriaObrasSociales.initialState || []);
+    } else if (auditoria == 3) {
+      setEntidad([]);
     }
   }, [
     auditoria,
@@ -137,6 +142,7 @@ const Auditoria = () => {
             <option value={0}>Tabla Productos</option>
             <option value={1}>Tabla Clientes</option>
             <option value={2}>Tabla Obras Sociales</option>
+            <option value={3}>Liquidación Obras Sociales</option>
           </select>
           <select
             onChange={(e) => setShowBy(Number(e.target.value))}
@@ -151,90 +157,101 @@ const Auditoria = () => {
       </div>
 
       {/* 📌 Tabla de auditoría */}
-      <div className={styles.containerTableAndPagesSelected}>
-        <table className={styles.headerTable}>
-          <thead>
-            <tr>
-              {keys.map((column) => (
-                <th key={column}>{column}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {entidad.length === 0 ? (
-              <tr>
-                <td colSpan={keys.length + 1} className="NoData">
-                  Sin datos
-                </td>
-              </tr>
-            ) : (
-              entidad.map((auditoria, index) => (
-                <tr key={index}>
+      {auditoria === 3 ? (
+        <div className={styles.containerTableAndPagesSelected}>
+          <LiquidacionObrasSociales />
+        </div>
+      ) : (
+        <>
+          <div className={styles.containerTableAndPagesSelected}>
+            <table className={styles.headerTable}>
+              <thead>
+                <tr>
                   {keys.map((column) => (
-                    <td
-                      style={{
-                        width:
-                          column === "Fecha" || column === "Accion"
-                            ? "10%"
-                            : column === "Producto" || column === "Nombre"
-                            ? "15%"
-                            : column === "cambios" || column === "resumen"
-                            ? "30%"
-                            : undefined,
-                      }}
-                      key={`${auditoria.id}-${column}`}
-                    >
-                      {(() => {
-                        const value = auditoria[column];
-                        if (column === "Fecha") {
-                          if (!value) return "-";
-                          return value.toString().slice(0, 16).replace("T", " ");
-                        }
-                        if (column === "resumen" && typeof value === "string") {
-                          return (
-                            <span className={styles.summaryText}>
-                              {value}
-                            </span>
-                          );
-                        }
-                        if (Array.isArray(value)) {
-                          return renderChangeList(value);
-                        }
-                        if (
-                          value !== null &&
-                          typeof value === "object"
-                        ) {
-                          return JSON.stringify(value, null, 2);
-                        }
-                        return value ?? "-";
-                      })()}
-                    </td>
+                    <th key={column}>{column}</th>
                   ))}
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              </thead>
+              <tbody>
+                {entidad.length === 0 ? (
+                  <tr>
+                    <td colSpan={keys.length + 1} className="NoData">
+                      Sin datos
+                    </td>
+                  </tr>
+                ) : (
+                  entidad.map((auditoria, index) => (
+                    <tr key={index}>
+                      {keys.map((column) => (
+                        <td
+                          style={{
+                            width:
+                              column === "Fecha" || column === "Accion"
+                                ? "10%"
+                                : column === "Producto" || column === "Nombre"
+                                ? "15%"
+                                : column === "cambios" || column === "resumen"
+                                ? "30%"
+                                : undefined,
+                          }}
+                          key={`${auditoria.id}-${column}`}
+                        >
+                          {(() => {
+                            const value = auditoria[column];
+                            if (column === "Fecha") {
+                              if (!value) return "-";
+                              return value
+                                .toString()
+                                .slice(0, 16)
+                                .replace("T", " ");
+                            }
+                            if (column === "resumen" && typeof value === "string") {
+                              return (
+                                <span className={styles.summaryText}>
+                                  {value}
+                                </span>
+                              );
+                            }
+                            if (Array.isArray(value)) {
+                              return renderChangeList(value);
+                            }
+                            if (
+                              value !== null &&
+                              typeof value === "object"
+                            ) {
+                              return JSON.stringify(value, null, 2);
+                            }
+                            return value ?? "-";
+                          })()}
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
 
-      {/* 📌 Paginación */}
-      <div>
-        <button
-          onClick={() => handlePageChange(page - 1)}
-          disabled={page === 1}
-          className="buttonPage"
-        >
-          Anterior
-        </button>
-        <button
-          onClick={() => handlePageChange(page + 1)}
-          style={{ marginLeft: "10px" }}
-          disabled={entidad.length < pageSize}
-          className="buttonPage"
-        >
-          Siguiente
-        </button>
-      </div>
+          {/* 📌 Paginación */}
+          <div>
+            <button
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 1}
+              className="buttonPage"
+            >
+              Anterior
+            </button>
+            <button
+              onClick={() => handlePageChange(page + 1)}
+              style={{ marginLeft: "10px" }}
+              disabled={entidad.length < pageSize}
+              className="buttonPage"
+            >
+              Siguiente
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

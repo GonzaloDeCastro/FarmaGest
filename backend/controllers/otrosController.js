@@ -1,5 +1,6 @@
 // Controladores básicos para otros módulos (estructura inicial)
 const { query } = require('../config/database');
+const { sendLiquidacionObrasSocialesEmail } = require('../services/emailService');
 
 // === CLIENTES ===
 const getClientes = async (req, res) => {
@@ -982,6 +983,184 @@ const getAuditoriaClientesList = async (req, res) => {
   }
 };
 
+const parseBoolean = (value) => {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    return normalized === 'true' || normalized === '1' || normalized === 'sí';
+  }
+  return false;
+};
+
+const createBadRequestError = (message) => {
+  const error = new Error(message);
+  error.isBadRequest = true;
+  return error;
+};
+
+const buildLiquidacionObrasSocialesData = async (rawFilters = {}) => {
+  const {
+    obraSocialId,
+    fechaDesde,
+    fechaHasta,
+    incluirSinObraSocial,
+  } = rawFilters;
+
+  const includeWithoutObraSocial = parseBoolean(incluirSinObraSocial);
+
+  const params = [];
+  const conditions = [];
+
+  let obraSocialIdNumber = null;
+  if (obraSocialId !== undefined && obraSocialId !== null && `${obraSocialId}`.trim() !== '') {
+    obraSocialIdNumber = Number(obraSocialId);
+    if (Number.isNaN(obraSocialIdNumber)) {
+      throw createBadRequestError('obraSocialId debe ser numérico');
+    }
+    params.push(obraSocialIdNumber);
+    conditions.push(`os.obra_social_id = $${params.length}`);
+  } else if (!includeWithoutObraSocial) {
+    conditions.push('os.obra_social_id IS NOT NULL');
+  }
+
+  let parsedFechaDesde = null;
+  if (fechaDesde) {
+    parsedFechaDesde = new Date(fechaDesde);
+    if (Number.isNaN(parsedFechaDesde.getTime())) {
+      throw createBadRequestError('fechaDesde inválida');
+    }
+    params.push(parsedFechaDesde);
+    conditions.push(`v.fecha >= $${params.length}`);
+  }
+
+  let parsedFechaHasta = null;
+  if (fechaHasta) {
+    parsedFechaHasta = new Date(fechaHasta);
+    if (Number.isNaN(parsedFechaHasta.getTime())) {
+      throw createBadRequestError('fechaHasta inválida');
+    }
+    parsedFechaHasta.setHours(23, 59, 59, 999);
+    params.push(parsedFechaHasta);
+    conditions.push(`v.fecha <= $${params.length}`);
+  }
+
+  const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+
+  const queryText = `
+      SELECT
+        v.venta_id,
+        v.numero_factura,
+        v.fecha,
+        v.subtotal,
+        v.descuento,
+        v.total,
+        v.forma_pago,
+        c.cliente_id,
+        c.nombre AS cliente_nombre,
+        c.apellido AS cliente_apellido,
+        c.dni AS cliente_dni,
+        os.obra_social_id,
+        os.obra_social,
+        os.plan
+      FROM ventas v
+      LEFT JOIN clientes c ON v.cliente_id = c.cliente_id
+      LEFT JOIN obras_sociales os ON c.obra_social_id = os.obra_social_id
+      ${whereClause}
+      ORDER BY v.fecha DESC, v.venta_id DESC
+    `;
+
+  const result = await query(queryText, params);
+  const rows = result.rows || [];
+
+  const agrupadas = rows.reduce((acc, row) => {
+    const obraSocialKey = row.obra_social_id || 'sin-obra';
+    if (!acc[obraSocialKey]) {
+      acc[obraSocialKey] = {
+        obra_social_id: row.obra_social_id,
+        obra_social: row.obra_social || 'Sin obra social',
+        plan: row.plan || null,
+        cantidad_ventas: 0,
+        subtotal_total: 0,
+        descuento_total: 0,
+        total_paciente: 0,
+        aporte_obra_social: 0,
+        detalle: [],
+      };
+    }
+
+    const subtotal = Number(row.subtotal ?? 0);
+    const descuentoValor = Number(row.descuento ?? 0);
+    const descuentoFraccion = descuentoValor > 1 ? descuentoValor / 100 : descuentoValor;
+    const descuentoMonto = subtotal * descuentoFraccion;
+    const totalPaciente = Number(row.total ?? (subtotal - descuentoMonto));
+    const aporteObraSocial = descuentoMonto;
+
+    acc[obraSocialKey].cantidad_ventas += 1;
+    acc[obraSocialKey].subtotal_total += subtotal;
+    acc[obraSocialKey].descuento_total += descuentoMonto;
+    acc[obraSocialKey].total_paciente += totalPaciente;
+    acc[obraSocialKey].aporte_obra_social += aporteObraSocial;
+    acc[obraSocialKey].detalle.push({
+      venta_id: row.venta_id,
+      numero_factura: row.numero_factura || String(row.venta_id).padStart(8, '0'),
+      fecha: row.fecha,
+      cliente: {
+        cliente_id: row.cliente_id,
+        nombre: row.cliente_nombre,
+        apellido: row.cliente_apellido,
+        dni: row.cliente_dni,
+      },
+      subtotal,
+      descuento_porcentaje: descuentoValor > 1 ? descuentoValor : descuentoValor * 100,
+      descuento_monto: descuentoMonto,
+      total_paciente: totalPaciente,
+      aporte_obra_social: aporteObraSocial,
+      forma_pago: row.forma_pago,
+    });
+
+    return acc;
+  }, {});
+
+  const resumen = Object.values(agrupadas).map((item) => ({
+    ...item,
+    subtotal_total: Number(item.subtotal_total.toFixed(2)),
+    descuento_total: Number(item.descuento_total.toFixed(2)),
+    total_paciente: Number(item.total_paciente.toFixed(2)),
+    aporte_obra_social: Number(item.aporte_obra_social.toFixed(2)),
+  }));
+
+  const totales = resumen.reduce(
+    (acc, item) => ({
+      cantidad_ventas: acc.cantidad_ventas + item.cantidad_ventas,
+      subtotal_total: Number((acc.subtotal_total + item.subtotal_total).toFixed(2)),
+      descuento_total: Number((acc.descuento_total + item.descuento_total).toFixed(2)),
+      total_paciente: Number((acc.total_paciente + item.total_paciente).toFixed(2)),
+      aporte_obra_social: Number((acc.aporte_obra_social + item.aporte_obra_social).toFixed(2)),
+    }),
+    {
+      cantidad_ventas: 0,
+      subtotal_total: 0,
+      descuento_total: 0,
+      total_paciente: 0,
+      aporte_obra_social: 0,
+    }
+  );
+
+  return {
+    filtros: {
+      obraSocialId: obraSocialIdNumber,
+      fechaDesde: fechaDesde || null,
+      fechaHasta: fechaHasta || null,
+      incluirSinObraSocial: includeWithoutObraSocial,
+    },
+    resumen,
+    totales,
+    totalRegistros: rows.length,
+  };
+};
+
 const getAuditoriaObrasSocialesList = async (req, res) => {
   try {
     const { page = 1, pageSize = 10, search = "" } = req.query;
@@ -1033,6 +1212,74 @@ const getAuditoriaObrasSocialesList = async (req, res) => {
   }
 };
 
+const getAuditoriaObrasSocialesLiquidacion = async (req, res) => {
+  try {
+    const data = await buildLiquidacionObrasSocialesData(req.query);
+    res.json(data);
+  } catch (error) {
+    if (error.isBadRequest) {
+      return res.status(400).json({ mensaje: error.message });
+    }
+    console.error('Error al obtener liquidación de obras sociales:', error);
+    res.status(500).json({
+      mensaje: 'Error al obtener liquidación de obras sociales',
+      error: error.message,
+    });
+  }
+};
+
+const sendAuditoriaObrasSocialesLiquidacionEmail = async (req, res) => {
+  try {
+    const { to, subject } = req.body || {};
+
+    if (!to || (typeof to === 'string' && to.trim() === '')) {
+      return res.status(400).json({ mensaje: 'El correo destino es requerido' });
+    }
+
+    const data = await buildLiquidacionObrasSocialesData(req.body);
+
+    await sendLiquidacionObrasSocialesEmail({
+      to: Array.isArray(to) ? to : `${to}`.split(',').map((email) => email.trim()).filter(Boolean),
+      subject,
+      resumen: data.resumen,
+      totales: data.totales,
+      filtros: data.filtros,
+      totalRegistros: data.totalRegistros,
+    });
+
+    res.json({
+      mensaje: 'Liquidación enviada correctamente',
+      enviados: Array.isArray(to) ? to.length : `${to}`.split(',').filter((email) => email.trim()).length,
+    });
+  } catch (error) {
+    if (error.isBadRequest) {
+      return res.status(400).json({ mensaje: error.message });
+    }
+    if (error.code === 'SMTP_NOT_CONFIGURED') {
+      return res.status(503).json({ mensaje: 'No hay configuración SMTP para enviar correos' });
+    }
+    const smtpConnectionErrors = new Set([
+      'ENOTFOUND',
+      'ECONNREFUSED',
+      'ETIMEDOUT',
+      'ECONNECTION',
+      'ESOCKET',
+      'EAUTH',
+      'EENVELOPE',
+    ]);
+    if (smtpConnectionErrors.has(error.code)) {
+      return res.status(502).json({
+        mensaje: 'No fue posible conectarse al servidor SMTP. Verifica host, puerto y credenciales.',
+      });
+    }
+    console.error('Error al enviar liquidación por correo:', error);
+    res.status(500).json({
+      mensaje: 'Error al enviar liquidación por correo',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   // Clientes
   getClientes,
@@ -1061,6 +1308,8 @@ module.exports = {
   getAuditoriaProductosList,
   getAuditoriaClientesList,
   getAuditoriaObrasSocialesList,
+  getAuditoriaObrasSocialesLiquidacion,
+  sendAuditoriaObrasSocialesLiquidacionEmail,
   // Reportes
   getReportes,
   // Auditoría

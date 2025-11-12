@@ -13,6 +13,7 @@ console.log('📦 Cargando rutas...');
 
 // Importar rutas
 const usuariosRoutes = require('./routes/usuarios');
+const authRoutes = require('./routes/auth');
 const productosRoutes = require('./routes/productos');
 const clientesRoutes = require('./routes/clientes');
 const obrasSocialesRoutes = require('./routes/obrasSociales');
@@ -28,6 +29,8 @@ const {
   getAuditoriaProductosList,
   getAuditoriaClientesList,
   getAuditoriaObrasSocialesList,
+  getAuditoriaObrasSocialesLiquidacion,
+  sendAuditoriaObrasSocialesLiquidacionEmail,
 } = require('./controllers/otrosController');
 
 console.log('✅ Todos los módulos cargados correctamente');
@@ -95,8 +98,11 @@ app.get('/api/ventas/venta-id/:ventaId', getVentaDetalle);
 app.get('/api/auditoria-productos', getAuditoriaProductosList);
 app.get('/api/auditoria-clientes', getAuditoriaClientesList);
 app.get('/api/auditoria-obras-sociales', getAuditoriaObrasSocialesList);
+app.get('/api/auditoria-obras-sociales/liquidacion', getAuditoriaObrasSocialesLiquidacion);
+app.post('/api/auditoria-obras-sociales/liquidacion/email', sendAuditoriaObrasSocialesLiquidacionEmail);
 app.use('/api/ventas', ventasRoutes);
 app.use('/api/usuarios', usuariosRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/productos', productosRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/obras-sociales', obrasSocialesRoutes);
