@@ -73,15 +73,13 @@ const Proveedores = () => {
         <table className="headerTable">
           <thead>
             <tr>
-              {keys.map(
-                (column, index) =>
-                  //quito columna id
-                  column !== "proveedor_id" && (
-                    <th key={index}>
-                      {column == "razon_social" ? "Razon Social" : column}
-                    </th>
-                  )
-              )}
+              {keys
+                .filter((column) => column !== "proveedor_id")
+                .map((column) => (
+                  <th key={column}>
+                    {column == "razon_social" ? "Razon Social" : column}
+                  </th>
+                ))}
               <th style={{ width: "70px" }}>Opciones</th>
             </tr>
           </thead>

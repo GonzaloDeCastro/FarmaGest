@@ -47,11 +47,7 @@ const FormLogin = () => {
   }, [UsuarioLogin, navigate]);
 
   const buttonOlvidoPassword = () => {
-    Swal.fire({
-      title: "Recuperación de contraseña",
-      text: `Envie un correo al administrador gonzalo@example.com`,
-      icon: "info",
-    });
+    navigate("/forgot-password");
   };
 
   return (
@@ -112,13 +108,23 @@ const FormLogin = () => {
           <p className="errorsHandler">El campo contraseña es requerido</p>
         )}
 
-        <label
+        <button
+          type="button"
           className="forgetPassword"
-          style={{ fontSize: "13px", marginTop: "-20px" }}
+          style={{
+            fontSize: "13px",
+            marginTop: "-20px",
+            background: "transparent",
+            border: "none",
+            color: "#2e7d32",
+            cursor: "pointer",
+            textDecoration: "underline",
+            alignSelf: "flex-start",
+          }}
           onClick={buttonOlvidoPassword}
         >
-          Olvidó su contraseña?
-        </label>
+          ¿Olvidaste tu contraseña?
+        </button>
         <button type="submit">Iniciar sesión</button>
       </form>
     </div>
