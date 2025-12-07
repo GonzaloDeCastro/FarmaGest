@@ -58,18 +58,32 @@ const Ventas = () => {
   }, [dispatch, sesion]);
 
   useEffect(() => {
-    dispatch(
-      getVentasAPI({
-        page,
-        pageSize,
-        search: search.trim(),
-        sesion,
-        fechaDesde: appliedFechaDesde || undefined,
-        fechaHasta: appliedFechaHasta || undefined,
-        numeroFactura: appliedNumeroFactura || undefined,
-        clienteId: appliedClienteId || undefined,
-      })
-    );
+    // Solo enviar filtros si tienen valor (no vacíos)
+    const filtros = {
+      page,
+      pageSize,
+      search: search.trim() || undefined,
+      sesion: sesion || undefined,
+    };
+
+    // Agregar filtros solo si tienen valor
+    if (appliedFechaDesde && appliedFechaDesde.trim() !== "") {
+      filtros.fechaDesde = appliedFechaDesde;
+    }
+    if (appliedFechaHasta && appliedFechaHasta.trim() !== "") {
+      filtros.fechaHasta = appliedFechaHasta;
+    }
+    if (appliedNumeroFactura && appliedNumeroFactura.trim() !== "") {
+      filtros.numeroFactura = appliedNumeroFactura;
+    }
+    if (appliedClienteId && appliedClienteId.trim() !== "") {
+      filtros.clienteId = appliedClienteId;
+    }
+
+    console.log("🔄 Cargando ventas con filtros:", filtros);
+    dispatch(getVentasAPI(filtros)).catch((error) => {
+      console.error("❌ Error al cargar ventas:", error);
+    });
   }, [
     dispatch,
     page,
@@ -337,7 +351,17 @@ const Ventas = () => {
             ) : (
               <tr>
                 <td colSpan={8} style={{ textAlign: "center", padding: "24px" }}>
-                  No se encontraron ventas con los filtros aplicados.
+                  {ventas === null || ventas === undefined ? (
+                    <span>Cargando ventas...</span>
+                  ) : (
+                    <span>
+                      No se encontraron ventas con los filtros aplicados.
+                      <br />
+                      <small style={{ color: "#666" }}>
+                        Intenta limpiar los filtros o verificar la conexión.
+                      </small>
+                    </span>
+                  )}
                 </td>
               </tr>
             )}

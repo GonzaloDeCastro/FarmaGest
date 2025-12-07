@@ -115,23 +115,37 @@ export const getVentasAPI =
     } = options;
 
     try {
-      const response = await axios.get(`${API}/ventas`, {
-        params: {
-          page,
-          pageSize,
-          search,
-          sesion,
-          fechaDesde,
-          fechaHasta,
-          numeroFactura,
-          clienteId,
-        },
+      // Solo enviar parámetros que no sean undefined o vacíos
+      const params = {
+        page,
+        pageSize,
+        search: search || undefined,
+        sesion: sesion || undefined,
+        fechaDesde: fechaDesde || undefined,
+        fechaHasta: fechaHasta || undefined,
+        numeroFactura: numeroFactura || undefined,
+        clienteId: clienteId || undefined,
+      };
+
+      // Limpiar parámetros undefined
+      Object.keys(params).forEach(key => {
+        if (params[key] === undefined || params[key] === '') {
+          delete params[key];
+        }
       });
+
+      const response = await axios.get(`${API}/ventas`, { params });
+      
       if (response.status === 200) {
-        dispatch(getVentas(response.data));
+        const ventasData = response.data || [];
+        console.log(`✅ Ventas obtenidas: ${Array.isArray(ventasData) ? ventasData.length : 0} ventas`);
+        dispatch(getVentas(ventasData));
       }
     } catch (error) {
-      console.error("Error al obtener ventas:", error);
+      console.error("❌ Error al obtener ventas:", error);
+      console.error("   Detalles:", error.response?.data || error.message);
+      // Asegurar que el estado se limpia si hay error
+      dispatch(getVentas([]));
     }
   };
 

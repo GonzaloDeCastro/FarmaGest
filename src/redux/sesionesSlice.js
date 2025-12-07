@@ -7,6 +7,8 @@ const sesionesSlice = createSlice({
   name: "sesiones",
   initialState: {
     sesionState: [],
+    loading: false,
+    error: null,
     pagination: {
       total: 0,
       page: 1,
@@ -23,6 +25,8 @@ const sesionesSlice = createSlice({
         : [];
 
       state.sesionState = sesiones;
+      state.loading = false;
+      state.error = null;
 
       if (payload && typeof payload === "object" && !Array.isArray(payload)) {
         state.pagination = {
@@ -32,15 +36,24 @@ const sesionesSlice = createSlice({
         };
       }
     },
+    setLoading: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    setError: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
   },
 });
 
-export const { getSesiones } = sesionesSlice.actions;
+export const { getSesiones, setLoading, setError } = sesionesSlice.actions;
 
 // Funciones API para interactuar con el backend
 export const getSesionesAPI = (page, pageSize, search) => {
   return async (dispatch) => {
     try {
+      dispatch(setLoading());
       const response = await axios.get(`${API}/sesiones`, {
         params: {
           page,
@@ -50,10 +63,15 @@ export const getSesionesAPI = (page, pageSize, search) => {
       });
 
       if (response.status === 200) {
-        dispatch(getSesiones(response.data));
+        dispatch(getSesiones(response.data || []));
+      } else {
+        dispatch(setError("Error al obtener las sesiones"));
       }
     } catch (error) {
       console.error("Error al obtener sesiones:", error);
+      dispatch(setError(error.response?.data?.mensaje || error.message || "Error al obtener sesiones"));
+      // Asegurarse de que siempre hay un array vacío en caso de error
+      dispatch(getSesiones([]));
     }
   };
 };

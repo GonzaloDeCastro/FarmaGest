@@ -103,6 +103,46 @@ const LiquidacionObrasSociales = () => {
     [resumen]
   );
 
+  // Obras sociales únicas por nombre para el dropdown
+  const obrasSocialesUnicas = useMemo(() => {
+    if (!Array.isArray(obrasSociales) || obrasSociales.length === 0) {
+      return [];
+    }
+
+    // Función para normalizar nombres (eliminar espacios, convertir a minúsculas, sin caracteres especiales)
+    const normalizarNombre = (nombre) => {
+      return (nombre || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, " ") // Normalizar espacios múltiples
+        .replace(/[^a-z0-9\s]/g, "") // Eliminar caracteres especiales
+        .replace(/\s+/g, ""); // Eliminar todos los espacios
+    };
+
+    // Crear un mapa para eliminar duplicados basándose en el nombre normalizado
+    const obrasUnicasMap = new Map();
+
+    obrasSociales.forEach((obra) => {
+      const nombreNormalizado = normalizarNombre(obra.obra_social);
+      
+      // Si no existe en el mapa, agregarlo
+      if (!obrasUnicasMap.has(nombreNormalizado)) {
+        obrasUnicasMap.set(nombreNormalizado, obra);
+      } else {
+        const existente = obrasUnicasMap.get(nombreNormalizado);
+        // Mantener el que tenga el ID más bajo
+        if (obra.obra_social_id < existente.obra_social_id) {
+          obrasUnicasMap.set(nombreNormalizado, obra);
+        }
+      }
+    });
+
+    // Convertir el mapa a array y ordenar
+    return Array.from(obrasUnicasMap.values()).sort((a, b) =>
+      (a.obra_social || "").localeCompare(b.obra_social || "")
+    );
+  }, [obrasSociales]);
+
   const handlePrint = () => {
     const printNode = printableRef.current;
     if (!printNode) {
@@ -208,15 +248,14 @@ const LiquidacionObrasSociales = () => {
             className="buttonSelect"
           >
             <option value="">Todas</option>
-            {Array.isArray(obrasSociales) &&
-              obrasSociales.map((obra) => (
-                <option
-                  key={obra.obra_social_id}
-                  value={obra.obra_social_id}
-                >
-                  {obra.obra_social}
-                </option>
-              ))}
+            {obrasSocialesUnicas.map((obra) => (
+              <option
+                key={obra.obra_social_id}
+                value={obra.obra_social_id}
+              >
+                {obra.obra_social}
+              </option>
+            ))}
           </select>
         </div>
 

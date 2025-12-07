@@ -17,6 +17,7 @@ class ProductoAdapter {
       categoria_id: formData.categoriaID === 0 || formData.categoriaID === "" ? null : parseInt(formData.categoriaID),
       precio: ProductoAdapter.parseDecimal(formData.precio),
       stock: parseInt(formData.cantidad, 10),
+      proveedor_id: formData.proveedorID === 0 || formData.proveedorID === "" ? null : parseInt(formData.proveedorID),
       usuario_id: usuarioId,
     };
   }

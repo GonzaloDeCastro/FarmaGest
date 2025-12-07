@@ -101,20 +101,18 @@ const Clientes = () => {
         <table className="headerTable">
           <thead>
             <tr>
-              {keys.map((column) => {
-                if (
-                  column === "cliente_id" ||
-                  column === "obra_social_id" ||
-                  column === "ciudad_id"
-                ) {
-                  return null;
-                }
-                return (
+              {keys
+                .filter(
+                  (column) =>
+                    column !== "cliente_id" &&
+                    column !== "obra_social_id" &&
+                    column !== "ciudad_id"
+                )
+                .map((column) => (
                   <th key={column}>
                     {column == "obra_social" ? "Obra Social" : column}
                   </th>
-                );
-              })}
+                ))}
               <th style={{ width: "70px" }}>Opciones</th>
             </tr>
           </thead>
@@ -132,20 +130,18 @@ const Clientes = () => {
               clientes.initialState &&
               clientes.initialState.map((cliente) => (
                 <tr key={cliente.cliente_id}>
-                  {keys.map((column) => {
-                    if (
-                      column === "cliente_id" ||
-                      column === "obra_social_id" ||
-                      column === "ciudad_id"
-                    ) {
-                      return null;
-                    }
-                    return (
+                  {keys
+                    .filter(
+                      (column) =>
+                        column !== "cliente_id" &&
+                        column !== "obra_social_id" &&
+                        column !== "ciudad_id"
+                    )
+                    .map((column) => (
                       <td key={`${cliente.cliente_id}-${column}`}>
                         {cliente[column]}
                       </td>
-                    );
-                  })}
+                    ))}
                   <td style={{ flexWrap: "nowrap" }}>
                     <EditClienteForm
                       clienteSelected={cliente}

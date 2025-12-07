@@ -7,7 +7,7 @@ import styles from "./Reportes.module.css";
 import { getClientesAPI } from "../../redux/clientesSlice";
 import { getProductosAPI, selectProductos } from "../../redux/productosSlice";
 import { getUsuariosAPI } from "../../redux/usuariosSlice";
-import { getReportesAPI } from "../../redux/reportesSlice";
+import { getReportesAPI, selectReportes } from "../../redux/reportesSlice";
 import { FaTableList } from "react-icons/fa6";
 import { BiBarChartAlt2 } from "react-icons/bi";
 import Swal from "sweetalert2";
@@ -17,7 +17,7 @@ import { ExcelExportStrategy } from "../../patterns/strategies/ExportStrategy";
 const Reportes = () => {
   const dispatch = useDispatch();
 
-  const reportes = useSelector((state) => state.reporte.initialState || []);
+  const reportes = useSelector(selectReportes);
   const [clienteProductoVendedor, setClienteProductoVendedor] = useState("");
   const [grafico, setGrafico] = useState(false);
   const [disabled, setDisabled] = useState(false);

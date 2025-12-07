@@ -8,7 +8,7 @@ import ProductoBuilder from "../../patterns/builders/ProductoBuilder";
 import ProductoAdapter from "../../patterns/adapters/ProductoAdapter";
 import Swal from "sweetalert2";
 
-const ProductFormModal = ({ Categorias, usuarioId }) => {
+const ProductFormModal = ({ Categorias, Proveedores = [], usuarioId }) => {
   const dispatch = useDispatch();
   const {
     register,
@@ -196,6 +196,34 @@ const ProductFormModal = ({ Categorias, usuarioId }) => {
                 </select>
                 {errors.categoriaID && errors.categoriaID.message && (
                   <p style={{ color: "red" }}>{errors.categoriaID.message}</p>
+                )}
+              </div>
+              <div className="form-group col-md-12">
+                <label htmlFor="proveedorID">Proveedor (Opcional):</label>
+                <select
+                  id="proveedorID"
+                  className="form-select"
+                  {...register("proveedorID")}
+                  defaultValue=""
+                >
+                  <option value="" className="default-option">
+                    {Proveedores && Array.isArray(Proveedores) && Proveedores.length > 0 
+                      ? "Seleccionar Proveedor (Opcional)" 
+                      : "Sin proveedores disponibles (Opcional)"}
+                  </option>
+                  {Proveedores && Array.isArray(Proveedores) && Proveedores.length > 0 && (
+                    Proveedores.map((proveedor) => (
+                      <option
+                        key={proveedor.proveedor_id || proveedor.id}
+                        value={proveedor.proveedor_id || proveedor.id}
+                      >
+                        {proveedor.razon_social || proveedor.Razon_social || "-"}
+                      </option>
+                    ))
+                  )}
+                </select>
+                {errors.proveedorID && errors.proveedorID.message && (
+                  <p style={{ color: "red" }}>{errors.proveedorID.message}</p>
                 )}
               </div>
             </div>

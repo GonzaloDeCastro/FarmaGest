@@ -120,7 +120,7 @@ const Products = () => {
           />
         </div>
         <div style={{ display: "flex" }}>
-          <ProductForm Categorias={Categorias} usuarioId={usuarioId} />
+          <ProductForm Categorias={Categorias} Proveedores={proveedoresDisponibles} usuarioId={usuarioId} />
         </div>
       </div>
 

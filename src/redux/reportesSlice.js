@@ -1,23 +1,28 @@
 // En redux/reportesSlice.js
 
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createSelector } from "@reduxjs/toolkit";
 import axios from "axios";
 import API from "../config";
 
 const reportesSlice = createSlice({
   name: "reportes",
-  initialState: {},
+  initialState: {
+    initialState: [],
+  },
   reducers: {
     getVentas: (state, action) => {
-      return {
-        ...state,
-        initialState: action.payload,
-      };
+      state.initialState = Array.isArray(action.payload) ? action.payload : [];
     },
   },
 });
 
 export const { getVentas } = reportesSlice.actions;
+
+// Selector memoizado para evitar re-renders innecesarios
+export const selectReportes = createSelector(
+  [(state) => state.reporte?.initialState],
+  (initialState) => Array.isArray(initialState) ? initialState : []
+);
 
 export const getReportesAPI =
   (dateSelectedFrom, dateSelectedTo, entitySelected, clienteProductoVendedor) =>

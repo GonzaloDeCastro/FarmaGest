@@ -5,25 +5,75 @@ import { getSesionesAPI } from "../../redux/sesionesSlice";
 import { formatString } from "../../functions/formatText";
 import { useNavigate } from "react-router-dom";
 import styles from "./Auditoria.module.css";
+
 const Sesiones = () => {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [showBy, setShowBy] = useState(1);
+  const [hasError, setHasError] = useState(false);
   const navigate = useNavigate();
   const pageSize = 8;
 
-  const sesiones = useSelector(
-    (state) => state && state.sesiones && state.sesiones
-  );
+  // Obtener sesiones con manejo seguro - los hooks deben estar fuera del try-catch
+  const sesionesState = useSelector((state) => state?.sesiones);
+  const sesiones = sesionesState || { sesionState: [], loading: false, error: null };
 
   useEffect(() => {
-    dispatch(getSesionesAPI(page, pageSize, search));
+    try {
+      dispatch(getSesionesAPI(page, pageSize, search));
+    } catch (error) {
+      console.error("Error al cargar sesiones:", error);
+      setHasError(true);
+    }
   }, [dispatch, page, pageSize, search]);
 
-  const keys = Object.keys(
-    (sesiones && sesiones.sesionState && sesiones.sesionState[0]) || {}
-  );
+  // Definir columnas por defecto para evitar problemas cuando no hay datos
+  const defaultColumns = [
+    "correo_usuario",
+    "nombre_completo",
+    "navegador",
+    "ip",
+    "hora_logueo",
+    "ultima_actividad",
+    "hora_logout",
+    "estado",
+    "duracion",
+  ];
+
+  // Obtener las claves de los datos o usar las columnas por defecto
+  let sesionesData = [];
+  let keys = defaultColumns;
+  
+  try {
+    sesionesData = Array.isArray(sesiones?.sesionState) ? sesiones.sesionState : [];
+    
+    if (sesionesData.length > 0 && sesionesData[0] && typeof sesionesData[0] === "object") {
+      const keysFromData = Object.keys(sesionesData[0]).filter(
+        (key) => key !== "sesion_id" && key !== "duracion_minutos"
+      );
+      keys = keysFromData.length > 0 ? keysFromData : defaultColumns;
+    }
+  } catch (error) {
+    console.error("Error al procesar datos de sesiones:", error);
+    keys = defaultColumns;
+  }
+  
+  // Función para formatear nombres de columnas
+  const getColumnLabel = (key) => {
+    const labels = {
+      correo_usuario: "Usuario",
+      nombre_completo: "Nombre",
+      navegador: "Navegador",
+      ip: "Dirección IP",
+      hora_logueo: "Hora de inicio",
+      ultima_actividad: "Última actividad",
+      hora_logout: "Hora de cierre",
+      estado: "Estado",
+      duracion: "Duración",
+    };
+    return labels[key] || formatString(key);
+  };
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -38,6 +88,20 @@ const Sesiones = () => {
       navigate(`/auditoria`);
     }
   }, [showBy]);
+
+  // Si hay un error crítico, mostrar mensaje
+  if (hasError) {
+    return (
+      <div className="containerSelected">
+        <div className="headerSelected">
+          <h2>Error al cargar sesiones</h2>
+        </div>
+        <div style={{ padding: "20px", textAlign: "center" }}>
+          <p>Hubo un error al cargar las sesiones. Por favor, recarga la página.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="containerSelected">
@@ -64,50 +128,107 @@ const Sesiones = () => {
         <table className={styles.headerTable}>
           <thead>
             <tr>
-              {keys.map((column) => {
-                return <th key={column}>{formatString(column)}</th>;
-              })}
+              {keys && keys.length > 0 ? (
+                keys.map((column) => {
+                  return <th key={column}>{getColumnLabel(column)}</th>;
+                })
+              ) : (
+                <th>Sin columnas</th>
+              )}
             </tr>
           </thead>
           <tbody>
-            {sesiones &&
-            sesiones.sesionState &&
-            sesiones.sesionState.length === 0 ? (
+            {sesiones?.loading ? (
               <tr>
-                <td colSpan={keys.length + 1} className="NoData">
+                <td colSpan={keys.length || 1} className="NoData">
+                  Cargando...
+                </td>
+              </tr>
+            ) : sesiones?.error ? (
+              <tr>
+                <td colSpan={keys.length || 1} className="NoData" style={{ color: "#ef4444" }}>
+                  Error: {sesiones.error}
+                </td>
+              </tr>
+            ) : sesionesData.length === 0 ? (
+              <tr>
+                <td colSpan={keys.length || 1} className="NoData">
                   Sin datos
                 </td>
               </tr>
             ) : (
-              sesiones &&
-              sesiones.sesionState &&
-              sesiones.sesionState.map((sesion, index) => (
-                <tr key={index}>
-                  {keys.map((column) => {
-                    return (
-                      <td
-                        key={`${sesion.sesion_id}-${column}`}
-                        style={{
-                          textAlign: sesion[column] == null && "center",
-                        }}
-                      >
-                        {column == "hora_logueo" ||
-                        column == "hora_logout" ||
-                        column == "ultima_actividad"
-                          ? sesion[column] == null
-                            ? "-"
-                            : sesion[column].slice(0, 16).replace("T", " ")
-                          : sesion[column]}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))
+              sesionesData.map((sesion, index) => {
+                if (!sesion || typeof sesion !== "object") return null;
+                return (
+                  <tr key={sesion.sesion_id || `sesion-${index}`}>
+                    {keys.map((column) => {
+                      try {
+                        return (
+                          <td
+                            key={`${sesion.sesion_id || index}-${column}`}
+                            style={{
+                              textAlign: sesion[column] == null ? "center" : "left",
+                            }}
+                          >
+                            {column === "hora_logueo" ||
+                            column === "hora_logout" ||
+                            column === "ultima_actividad"
+                              ? sesion[column] == null
+                                ? "-"
+                                : (() => {
+                                    try {
+                                      return new Date(sesion[column])
+                                        .toLocaleString("es-AR", {
+                                          year: "numeric",
+                                          month: "2-digit",
+                                          day: "2-digit",
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                        });
+                                    } catch {
+                                      return sesion[column] || "-";
+                                    }
+                                  })()
+                              : column === "estado"
+                              ? (
+                                  <span
+                                    style={{
+                                      padding: "4px 8px",
+                                      borderRadius: "4px",
+                                      backgroundColor:
+                                        sesion[column] === "Activa"
+                                          ? "#10b981"
+                                          : "#6b7280",
+                                      color: "white",
+                                      fontSize: "12px",
+                                      fontWeight: "500",
+                                    }}
+                                  >
+                                    {sesion[column] || "-"}
+                                  </span>
+                                )
+                              : column === "ip"
+                              ? sesion[column] || "-"
+                              : sesion[column] != null
+                              ? String(sesion[column])
+                              : "-"}
+                          </td>
+                        );
+                      } catch (error) {
+                        console.error(`Error al renderizar columna ${column}:`, error);
+                        return (
+                          <td key={`${sesion.sesion_id || index}-${column}`}>-</td>
+                        );
+                      }
+                    })}
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
       </div>
-      <div /* style={{ border: "solid 1px" }} */>
+      <div>
         <button
           onClick={() => handlePageChange(page - 1)}
           disabled={page === 1}
@@ -119,8 +240,7 @@ const Sesiones = () => {
           onClick={() => handlePageChange(page + 1)}
           style={{ marginLeft: "10px" }}
           disabled={
-            sesiones &&
-            sesiones.sesionState &&
+            !sesiones?.sesionState ||
             sesiones.sesionState.length < pageSize
           }
           className="buttonPage"

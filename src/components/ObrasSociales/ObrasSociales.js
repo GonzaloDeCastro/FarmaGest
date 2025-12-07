@@ -77,15 +77,13 @@ const ObrasSociales = () => {
         <table className="headerTable">
           <thead>
             <tr>
-              {keys.map(
-                (column) =>
-                  //quito columna id
-                  column !== "obra_social_id" && (
-                    <th key={column}>
-                      {column == "obra_social" ? "Obra Social" : column}
-                    </th>
-                  )
-              )}
+              {keys
+                .filter((column) => column !== "obra_social_id")
+                .map((column) => (
+                  <th key={column}>
+                    {column == "obra_social" ? "Obra Social" : column}
+                  </th>
+                ))}
               <th style={{ width: "70px" }}>Opciones</th>
             </tr>
           </thead>
